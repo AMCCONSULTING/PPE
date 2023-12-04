@@ -1,0 +1,91 @@
+@functions {
+    bool IsLinkActive(string controller, string action)
+    {
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+
+        return string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase) &&
+               string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
+    }
+}
+<div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
+    <div class="main-menu-content">
+        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+            <li class="nav-item @(IsLinkActive("Home", "Index") ? "active" : "")"><a asp-action="Index" asp-controller="Home">
+                <i class="la la-dashboard"></i>
+                <span class="menu-title">Dashboard</span>
+            </a>
+            <li class="nav-item">
+                <a href="#"><i class="la la-industry"></i>
+                    <span class="menu-title">PPE</span></a>
+                <ul class="menu-content">
+                    <li class="@(IsLinkActive("Categories", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Categories" asp-action="Index"><i></i>
+                            <span>PPE Categories</span>
+                        </a>
+                    </li>
+                    @*<li class="@(ViewBag.Class==true?"active":"")">
+                        <a class="menu-item" asp-controller="Ppes" asp-action="Index"><i></i>
+                            <span>PPEs</span>
+                        </a>
+                    </li>*@
+                </ul>
+            </li>
+            <li class=" nav-item">
+                <a href="#"><i class="la la-cog"></i>
+                    <span class="menu-title">Administration</span></a>
+                <ul class="menu-content">
+                    <li class="@(IsLinkActive("Functions", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Functions" asp-action="Index"><i></i>
+                            <span>List functions</span>
+                        </a>
+                    </li>
+                    <li class="@(IsLinkActive("Employees", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Employees" asp-action="Index">
+                            <i></i>
+                            <span>List employees</span>
+                        </a>
+                    </li>
+                    <li class="@(IsLinkActive("Managers", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Managers" asp-action="Index">
+                            <i></i>
+                            <span>Mangers</span>
+                        </a>
+                    </li>
+                    <li class="@(IsLinkActive("Employees", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Employees" asp-action="Index">
+                            <i></i>
+                            <span>Coordinateurs</span>
+                        </a>
+                    </li>
+                    <li class="@(IsLinkActive("Employees", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Employees" asp-action="Index">
+                            <i></i>
+                            <span>Transporteurs</span>
+                        </a>
+                    </li>
+                    <li class="@(IsLinkActive("Employees", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Employees" asp-action="Index">
+                            <i></i>
+                            <span>Magaziniers</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="nav-item @(IsLinkActive("Projects", "Index") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Projects">
+                    <i class="la la-list"></i>
+                    <span class="menu-title">Projects</span>
+                </a>
+            </li>
+            <li class="nav-item @(IsLinkActive("Stocks", "Index") ? "active" : "")">
+                <a asp-action="Index" asp-controller="Stocks">
+                    <i class="la la-file-archive-o"></i>
+                    <span class="menu-title">Stocks</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+</div>

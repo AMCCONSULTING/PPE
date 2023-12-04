@@ -1,0 +1,98 @@
+@model PPE.Models.Employee
+
+@{
+    ViewData["Title"] = "Employee: " + Model.FullName;
+}
+
+<div class="bg-white mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Employee details</h3>
+            <div class="d-flex">
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary btn-sm">Edit</a> | 
+                <a asp-action="Index" class="btn btn-dark btn-sm">Back to list</a>
+            </div>
+        </div>
+        <hr/>
+        <div class="row justify-content-between align-items-center">
+            <div class="col-12 col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>@Html.DisplayNameFor(model => model.FirstName)</strong> : <span>@Html.DisplayFor(model => model.FirstName)</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>@Html.DisplayNameFor(model => model.LastName)</strong> : <span>@Html.DisplayFor(model => model.LastName)</span>
+                    </li>
+               
+                    <li class="list-group-item">
+                        <strong>@Html.DisplayNameFor(model => model.NNI)</strong> : <span>@Html.DisplayFor(model => model.NNI)</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>@Html.DisplayNameFor(model => model.Phone)</strong> : <span>@Html.DisplayFor(model => model.Phone)</span>
+                    </li>
+                </ul> 
+            </div>
+            <div class="col-12 col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>@Html.DisplayNameFor(model => model.Tel)</strong> : <span>@Html.DisplayFor(model => model.Tel)</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>@Html.DisplayNameFor(model => Model.Project)</strong> : <span>@Html.DisplayFor(model => Model.Project.Prefix)</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>@Html.DisplayNameFor(model => Model.Function)</strong> : <span>@Html.DisplayFor(model => Model.Function.Title)</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>@Html.DisplayNameFor(model => Model.Gender)</strong> : <span>@Html.DisplayFor(model => Model.Gender)</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="bg-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Current PPEs</h3>
+                    <a asp-action="Create" class="btn btn-primary btn-sm">Add new PPE</a>
+                </div>
+                <table class="table table-primary">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>PPE</th>
+                        <th>Category</th>
+                        <th>Qte</th>
+                    </tr>
+                    </thead>
+                </table>
+                
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="bg-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">History PPEs</h3>
+                    @* <a asp-action="Create" class="btn btn-primary btn-sm">Add PPE</a> *@
+                </div>
+                <table class="table table-dark">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>PPE</th>
+                        <th>Category</th>
+                        <th>Qte</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

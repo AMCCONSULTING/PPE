@@ -1,0 +1,79 @@
+@model IEnumerable<PPE.Models.Stock>
+
+@{
+    ViewData["Title"] = "Stock List";
+}
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<div class="bg-white">
+   <table class="table">
+       <thead>
+           <tr>
+               @*<th>
+                   @Html.DisplayNameFor(model => model.Quantity)
+               </th>*@
+               <th>
+                   @Html.DisplayNameFor(model => model.Date)
+               </th>
+               <th>
+                   @Html.DisplayNameFor(model => model.VariantValue.Variant.Ppe)
+               </th>
+               <th>
+                   @Html.DisplayNameFor(model => model.VariantValue.Variant)
+               </th>
+               <th>
+                   @Html.DisplayNameFor(model => model.Project)
+               </th>
+               <th>
+                   @Html.DisplayNameFor(model => model.StockIn)
+               </th>
+               <th>
+                   @Html.DisplayNameFor(model => model.StockOut)
+               </th>
+               <th>
+                   @Html.DisplayNameFor(model => model.CurrentStock)
+               </th>
+               <th></th>
+           </tr>
+       </thead>
+       <tbody>
+   @foreach (var item in Model) {
+           <tr>
+               @*<td>
+                   @Html.DisplayFor(modelItem => item.Quantity)
+               </td>*@
+               <td>
+                   @* @Html.DisplayFor(modelItem => item.Date) *@
+                   @item.Date.ToString("dd/MM/yyyy")
+               </td>
+               <td>
+                   @Html.DisplayFor(modelItem => item.VariantValue.Variant.Ppe.Title)
+               </td>
+               <td>
+                   @Html.DisplayFor(modelItem => item.VariantValue.Value) 
+               </td>
+               <td>
+                   @Html.DisplayFor(modelItem => item.Project.Prefix)
+               </td>
+               <td>
+                   @Html.DisplayFor(modelItem => item.StockIn)
+               </td>
+               <td>
+                   @Html.DisplayFor(modelItem => item.StockOut)
+               </td>
+               <td>
+                   @Html.DisplayFor(modelItem => item.CurrentStock)
+               </td>
+               <td>
+                   <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                   <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                   <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+               </td>
+           </tr>
+   }
+       </tbody>
+   </table> 
+</div>
+

@@ -1,0 +1,54 @@
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.selectProject').on('change',function () {
+            const id = $(this).val();
+            $.ajax({
+                url: '/Stocks/GetVariantValueNotInProjectStocks',
+                type: 'POST',
+                data: { id: id },
+                success: function (data) {
+                    $('.selectVariantValue').html(data);
+                },
+                error: function (err) {
+                    alert(JSON.stringify(err));
+                }
+            });
+        });
+        let counter = 0;
+        $('.selectVariantValue').on('change',function () {
+            let id = $(this).val();
+            let variantValue = $('.selectVariantValue').find(':selected').text();
+            if ($('.stockTable').find(`input[value="${id}"]`).length > 0) {
+                alert('This PPE already exists');
+                return;
+            }
+            counter++;
+            $("#stockTable").append(
+                `<tr>
+                    <td style="vertical-align: center">
+                        <input type="hidden" name="VariantValue[${counter}]" value="${id}" class="form-control" />
+                        ${variantValue} - ${counter}
+                    </td>
+                    <td>
+                        <input type="text" name="StockIn[${counter}]" value="0" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" name="StockOut[${counter}]" value="0" class="form-control" />  
+                    </td>
+                    <td>
+                        <input type="hidden" name="Date" value="12/12/2022" />
+                        <input type="hidden" name="ProjectId" value="1" />
+                        <a href="#" class="btn btn-danger btn-sm remove">Remove</a>
+                    </td>   
+                </tr>`
+            );
+        });
+        
+        $(".stockTable").on('click', '.remove', function () {
+            $(this).closest('tr').remove();
+        });
+    });
+</script>
