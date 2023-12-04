@@ -7,5 +7,5 @@ public class Variant
     public int PpeId { get; set; }
     public virtual Ppe Ppe { get; set; }
     public virtual ICollection<VariantValue> VariantValues { get; set; }   
-    public virtual ICollection<Stock> Stocks { get; set; }
+    //public virtual ICollection<Stock> Stocks { get; set; }
 }

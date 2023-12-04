@@ -51,7 +51,7 @@ public static class DataSeeder
         }
         
         // Seed VariantValues
-        if (!dbContext.VariantValues.Any())
+        /*if (!dbContext.VariantValues.Any())
         {
             var helmet = new List<VariantValue>
             {
@@ -76,7 +76,7 @@ public static class DataSeeder
                 new VariantValue { Value = "Medium", VariantId = 3 },
                 new VariantValue { Value = "Large", VariantId = 3 },
                 new VariantValue { Value = "Extra Large", VariantId = 3 },
-            };*/
+            };#1#
             
             var vest = new List<VariantValue>
             {
@@ -104,7 +104,7 @@ public static class DataSeeder
             dbContext.VariantValues.AddRange(shoes);
             dbContext.VariantValues.AddRange(vest);
             dbContext.SaveChanges();
-        }
+        }*/
         
         // Seed Projects
         if (!dbContext.Projects.Any())
