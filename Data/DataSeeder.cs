@@ -55,19 +55,19 @@ public static class DataSeeder
         {
             var helmet = new List<VariantValue>
             {
-                new VariantValue { ValueId = 1, VariantId = 1 },
-                new VariantValue { ValueId = 2, VariantId = 1 },
-                new VariantValue { ValueId = 3, VariantId = 1 },
-                new VariantValue { ValueId = 4, VariantId = 1 },
-                new VariantValue { ValueId = 5, VariantId = 1 },
-                new VariantValue { ValueId = 6, VariantId = 1 },
-                new VariantValue { ValueId = 7, VariantId = 1 },
+                new VariantValue { Value = "Red", VariantId = 1 },
+                new VariantValue { Value = "Blue", VariantId = 1 },
+                new VariantValue { Value = "Green", VariantId = 1 },
+                new VariantValue { Value = "Yellow", VariantId = 1 },
+                new VariantValue { Value = "Black", VariantId = 1 },
+                new VariantValue { Value = "White", VariantId = 1 },
+                new VariantValue { Value = "Orange", VariantId = 1 },
             };
             
             var glasses = new List<VariantValue>
             {
-                new VariantValue { ValueId = 8, VariantId = 4 },
-                new VariantValue { ValueId = 9, VariantId = 4 },
+                new VariantValue { Value = "Black", VariantId = 4 },
+                new VariantValue { Value = "Transparent", VariantId = 4 },
             };
             
             /*var glove = new List<VariantValue>
@@ -80,22 +80,22 @@ public static class DataSeeder
             
             var vest = new List<VariantValue>
             {
-                new VariantValue { ValueId = 10, VariantId = 2 },
-                new VariantValue { ValueId = 11, VariantId = 2 },
-                new VariantValue { ValueId = 12, VariantId = 2 },
-                new VariantValue { ValueId = 13, VariantId = 2 },
-                new VariantValue { ValueId = 14, VariantId = 2 },
-                new VariantValue { ValueId = 15, VariantId = 2 },
+                new VariantValue { Value = "M", VariantId = 2 },
+                new VariantValue { Value = "L", VariantId = 2 },
+                new VariantValue { Value = "XL", VariantId = 2 },
+                new VariantValue { Value = "2XL", VariantId = 2 },
+                new VariantValue { Value = "3XL", VariantId = 2 },
+                new VariantValue { Value = "4XL", VariantId = 2 },
             };
             
             var shoes = new List<VariantValue>
             {
-                new VariantValue { ValueId = 16, VariantId = 3 },
-                new VariantValue { ValueId = 17, VariantId = 3 },
-                new VariantValue { ValueId = 18, VariantId = 3 },
-                new VariantValue { ValueId = 19, VariantId = 3 },
-                new VariantValue { ValueId = 20, VariantId = 3 },
-                new VariantValue { ValueId = 21, VariantId = 3 },
+                new VariantValue { Value = "41", VariantId = 3 },
+                new VariantValue { Value = "42", VariantId = 3 },
+                new VariantValue { Value = "43", VariantId = 3 },
+                new VariantValue { Value = "44", VariantId = 3 },
+                new VariantValue { Value = "45", VariantId = 3 },
+                new VariantValue { Value = "46", VariantId = 3 },
             };
             
             dbContext.VariantValues.AddRange(helmet);

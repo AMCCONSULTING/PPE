@@ -33,15 +33,7 @@ public class AppDbContext : DbContext
             .WithMany(v => v.Stocks)
             .HasForeignKey(s => s.VariantValueId);
         
-        modelBuilder.Entity<Function>()
-            .HasMany(f => f.Employees)
-            .WithOne(e => e.Function)
-            .HasForeignKey(e => e.FunctionId);
         
-        modelBuilder.Entity<Project>()
-            .HasMany(p => p.Stocks)
-            .WithOne(s => s.Project)
-            .HasForeignKey(s => s.ProjectId);
         
     }
     
@@ -55,7 +47,6 @@ public class AppDbContext : DbContext
     public DbSet<Function> Functions { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Manager> Managers { get; set; }
-    public DbSet<Value> Values { get; set; }
     
     
 }

@@ -45,7 +45,7 @@ namespace PPE.Controllers
         // GET: Managers/Create
         public IActionResult Create()
         {
-            ViewBag.Fonction = new SelectList(Enum.GetValues(typeof(Fonction)));
+            ViewBag.Fonction = new SelectList(Enum.GetValues(typeof(Fonction)));          
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix");
             return View();
         }
@@ -63,8 +63,8 @@ namespace PPE.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Fonction = new SelectList(Enum.GetValues(typeof(Fonction)));
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", manager.ProjectId);
+            ViewBag.Fonction = new SelectList(Enum.GetValues(typeof(Fonction)));
             return View(manager);
         }
 
@@ -81,8 +81,8 @@ namespace PPE.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Fonction = new SelectList(Enum.GetValues(typeof(Fonction)));
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", manager.ProjectId);
+            ViewBag.Fonction = new SelectList(Enum.GetValues(typeof(Fonction)));
             return View(manager);
         }
 
@@ -119,7 +119,7 @@ namespace PPE.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Fonction = new SelectList(Enum.GetValues(typeof(Fonction)));
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", manager.ProjectId);
+            ViewData["ProjectId"] = new SelectList(Enum.GetValues(typeof(Fonction)));
             return View(manager);
         }
 
