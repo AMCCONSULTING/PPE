@@ -2,7 +2,62 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<canvas id="ppeChart" width="400" height="100"></canvas>
+
+@*<section class="out-of-stock">
+    <div class="container">
+        <canvas id="ppeChart" width="400" height="200"></canvas>
+        <div class="row">
+            <div class="col-md-6">
+                @foreach (var item in ViewBag.Ppe)
+                {
+                    <div class="alert alert-danger">
+                        <span> @item.Project.Title </span> |
+                        $1$ <span> @item.VariantValue.Ppe </span> |  #1#
+                        <span> @item.VariantValue.Variant.Ppe.Title </span> |
+                        <span> @item.VariantValue.Value </span> |
+                        <span> @item.CurrentStock </span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>*@
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let labels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Labels));
+            let data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Data));
+            
+            console.log('Labels type:', typeof labels);
+            console.log('Data type:', typeof data);
+            
+            console.log('Labels:', labels);
+            console.log('Data:', data);
+                    
+            let ctx = document.getElementById('ppeChart').getContext('2d');
+            let myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Levels',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

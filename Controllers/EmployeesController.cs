@@ -43,6 +43,33 @@ namespace PPE.Controllers
                 .Include(e => e.Function)
                 .Include(e => e.Project)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            
+            var employeeStocks = await _context.EmployeeStocks
+                .Include(e => e.Employee)
+                .Include(e => e.Function)
+                .Include(e => e.Project)
+                .Include(e => e.VariantValue)
+                .ThenInclude(e => e.Variant)
+                .ThenInclude(e => e.Ppe)
+                .Where(e => e.EmployeeId == id && e.Status == StockEmployeeStatus.Current)
+                .ToListAsync();
+            
+            var employeeStocksHistory = await _context.EmployeeStocks
+                .Include(e => e.Employee)
+                .Include(e => e.Function)
+                .Include(e => e.Project)
+                .Include(e => e.VariantValue)
+                .ThenInclude(e => e.Variant)
+                .ThenInclude(e => e.Ppe)
+                .Where(e => e.EmployeeId == id && e.Status == StockEmployeeStatus.Returned
+                            || e.EmployeeId == id && e.Status == StockEmployeeStatus.Lost 
+                            || e.EmployeeId == id && e.Status == StockEmployeeStatus.Damaged)
+                .ToListAsync();
+            
+            ViewData["EmployeeStocksHistory"] = employeeStocksHistory;
+            
+            ViewData["EmployeeStocks"] = employeeStocks;
+            
             if (employee == null)
             {
                 return NotFound();

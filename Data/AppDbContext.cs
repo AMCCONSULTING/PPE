@@ -13,6 +13,10 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         
+        /*modelBuilder.Entity<Stock>()
+            .Property(s => s.CurrentStock)
+            .HasColumnName("CurrentStock");*/
+        
         modelBuilder.Entity<Variant>()
             .HasMany(v => v.VariantValues)
             .WithOne(vv => vv.Variant)
@@ -43,6 +47,22 @@ public class AppDbContext : DbContext
             .WithOne(s => s.Project)
             .HasForeignKey(s => s.ProjectId);
         
+        modelBuilder.Entity<Employee>()
+            .HasMany(e => e.EmployeeStocks)
+            .WithOne(es => es.Employee)
+            .HasForeignKey(es => es.EmployeeId);
+        
+        modelBuilder.Entity<Stock>()
+            .HasOne(s => s.VariantValue)
+            .WithMany(v => v.Stocks)
+            .HasForeignKey(s => s.VariantValueId);
+        
+        modelBuilder.Entity<Stock>()
+            .HasOne(s => s.Project)
+            .WithMany(p => p.Stocks)
+            .HasForeignKey(s => s.ProjectId);
+        
+        
     }
     
     public DbSet<Category> Categories { get; set; }
@@ -56,6 +76,7 @@ public class AppDbContext : DbContext
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Value> Values { get; set; }
+    public DbSet<EmployeeStock> EmployeeStocks { get; set; }
     
     
 }

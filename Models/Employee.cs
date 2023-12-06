@@ -16,13 +16,12 @@ public class Employee
     public string LastName { get; set; }
     [DisplayName("Full name")]
     public string FullName => $"{FirstName} {LastName}";
-    [Required]
-    public string NNI { get; set; }
-    [Required]
-    public string Phone { get; set; }
+    public string Size { get; set; }
+    public string ShoeSize { get; set; }
+    public string? NNI { get; set; }
+    public string? Phone { get; set; }
     public string? Tel { get; set; }
-    [Required]
-    public Gender Gender { get; set; }
+    public Gender? Gender { get; set; }
     
     // Relationship with Project
     [Required] [DisplayName("Project")]
@@ -33,5 +32,9 @@ public class Employee
     [Required] [DisplayName("Function")]
     public int FunctionId { get; set; }
     public Function? Function { get; set; } = null!;
+    
+    // Relationship with EmployeeStock
+    public ICollection<EmployeeStock>? EmployeeStocks { get; set; }
+    
     
 }

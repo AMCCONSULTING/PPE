@@ -22,11 +22,26 @@ namespace PPE.Controllers
         // GET: Stocks
         public async Task<IActionResult> Index()
         {
+            // Define your filter values
+            var projectId = 1/* your project id */;
+            var ppeId = 1/* your ppe id */;
+            var variantValueId = 1/* your variant value id */;
+
+            /*var appDbContext = _context.Stocks
+                .Where(s =>
+                    (projectId == 0 || s.Project.Id == projectId) &&
+                    //(ppeId == 0 || s.VariantValue.Variant.Ppe.Id == ppeId) &&
+                    (variantValueId == 0 || s.VariantValue.Id == variantValueId))
+                .Include(s => s.Project)
+                .Include(s => s.VariantValue)
+                .ThenInclude(s => s.Variant)
+                .ThenInclude(s => s.Ppe);*/
             var appDbContext = _context.Stocks
                 .Include(s => s.Project)
                 .Include(s => s.VariantValue)
                 .ThenInclude(s => s.Variant)
                 .ThenInclude(s => s.Ppe);
+            
             return View(await appDbContext.ToListAsync());
         }
 
@@ -71,6 +86,7 @@ namespace PPE.Controllers
         [HttpPost]
         public IActionResult SaveStocks(List<Stock> stocks)
         {
+            Console.WriteLine($"Stocks: {stocks}");
             return Json(stocks);
             try
             {
@@ -294,6 +310,11 @@ namespace PPE.Controllers
         private bool StockExists(int id)
         {
           return (_context.Stocks?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        public IActionResult FilterStock()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -176,37 +176,7 @@ namespace PPE.Migrations
                         principalTable: "Variants",
                         principalColumn: "Id");
                 });
-
-            migrationBuilder.CreateTable(
-                name: "StockDetails",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StockId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<int>(type: "int", nullable: false),
-                    Total = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PpeAttributeId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StockDetails", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StockDetails_PpeAttributes_PpeAttributeId",
-                        column: x => x.PpeAttributeId,
-                        principalTable: "PpeAttributes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_StockDetails_Stocks_StockId",
-                        column: x => x.StockId,
-                        principalTable: "Stocks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
+            
             migrationBuilder.CreateIndex(
                 name: "IX_PpeAttributes_CustomAttributeId",
                 table: "PpeAttributes",
