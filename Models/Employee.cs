@@ -16,8 +16,8 @@ public class Employee
     public string LastName { get; set; }
     [DisplayName("Full name")]
     public string FullName => $"{FirstName} {LastName}";
-    public string Size { get; set; }
-    public string ShoeSize { get; set; }
+    public Size Size { get; set; }
+    public ShoeSize ShoeSize { get; set; }
     public string? NNI { get; set; }
     public string? Phone { get; set; }
     public string? Tel { get; set; }

@@ -2,11 +2,15 @@
 
 @{
     ViewData["Title"] = "Employees List";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Create employee",
+            Action = "Create",
+            Controller = "Employees",
+            ButtonType = "primary"
+        }
+    };
 }
-<div class="d-flex justify-content-between align-items-center">
-    <h3 class="card-title">Employees</h3>
-    <a asp-action="Create" class="btn btn-primary btn-sm">Create employee</a>
-</div>
 
 <div class="table-responsive mt-1">
         <table class="table bg-white">

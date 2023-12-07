@@ -12,8 +12,8 @@ using PPE.Data;
 namespace PPE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231204114721_functionEmployeeTable2")]
-    partial class functionEmployeeTable2
+    [Migration("20231206100534_initialMigrations")]
+    partial class initialMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,56 @@ namespace PPE.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("PPE.Models.Attribute", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Attribute");
+                });
+
+            modelBuilder.Entity("PPE.Models.AttributeValue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PpeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ValueId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttributeId");
+
+                    b.HasIndex("PpeId");
+
+                    b.HasIndex("ValueId");
+
+                    b.ToTable("AttributeValue");
+                });
 
             modelBuilder.Entity("PPE.Models.Category", b =>
                 {
@@ -45,27 +95,6 @@ namespace PPE.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("PPE.Models.CustomAttribute", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CustomAttributes");
-                });
-
             modelBuilder.Entity("PPE.Models.Employee", b =>
                 {
                     b.Property<int>("Id")
@@ -81,7 +110,7 @@ namespace PPE.Migrations
                     b.Property<int>("FunctionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Gender")
+                    b.Property<int?>("Gender")
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
@@ -89,15 +118,21 @@ namespace PPE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NNI")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ShoeSize")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tel")
                         .HasColumnType("nvarchar(max)");
@@ -109,6 +144,54 @@ namespace PPE.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("PPE.Models.EmployeeStock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FunctionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockIn")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockOut")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VariantValueId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("FunctionId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("VariantValueId");
+
+                    b.ToTable("EmployeeStocks");
                 });
 
             modelBuilder.Entity("PPE.Models.Function", b =>
@@ -129,6 +212,38 @@ namespace PPE.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Functions");
+                });
+
+            modelBuilder.Entity("PPE.Models.Manager", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Fonction")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Managers");
                 });
 
             modelBuilder.Entity("PPE.Models.Ppe", b =>
@@ -157,29 +272,6 @@ namespace PPE.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Ppes");
-                });
-
-            modelBuilder.Entity("PPE.Models.PpeAttribute", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CustomAttributeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PpeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomAttributeId");
-
-                    b.HasIndex("PpeId");
-
-                    b.ToTable("PpeAttributes");
                 });
 
             modelBuilder.Entity("PPE.Models.Project", b =>
@@ -226,17 +318,12 @@ namespace PPE.Migrations
                     b.Property<int>("StockOut")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VariantId")
-                        .HasColumnType("int");
-
                     b.Property<int>("VariantValueId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
-
-                    b.HasIndex("VariantId");
 
                     b.HasIndex("VariantValueId");
 
@@ -254,9 +341,6 @@ namespace PPE.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PpeAttributeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
@@ -271,11 +355,26 @@ namespace PPE.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PpeAttributeId");
-
                     b.HasIndex("StockId");
 
                     b.ToTable("StockDetails");
+                });
+
+            modelBuilder.Entity("PPE.Models.Value", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Values");
                 });
 
             modelBuilder.Entity("PPE.Models.Variant", b =>
@@ -286,6 +385,9 @@ namespace PPE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PpeId")
                         .HasColumnType("int");
 
@@ -294,6 +396,8 @@ namespace PPE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("PpeId");
 
@@ -308,18 +412,57 @@ namespace PPE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ValueId")
+                        .HasColumnType("int");
 
                     b.Property<int>("VariantId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ValueId");
+
                     b.HasIndex("VariantId");
 
                     b.ToTable("VariantValues");
+                });
+
+            modelBuilder.Entity("PPE.Models.Attribute", b =>
+                {
+                    b.HasOne("PPE.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("PPE.Models.AttributeValue", b =>
+                {
+                    b.HasOne("PPE.Models.Attribute", "Attribute")
+                        .WithMany("AttributeValues")
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PPE.Models.Ppe", "Ppe")
+                        .WithMany()
+                        .HasForeignKey("PpeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PPE.Models.Value", "Value")
+                        .WithMany("AttributeValues")
+                        .HasForeignKey("ValueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attribute");
+
+                    b.Navigation("Ppe");
+
+                    b.Navigation("Value");
                 });
 
             modelBuilder.Entity("PPE.Models.Employee", b =>
@@ -331,12 +474,58 @@ namespace PPE.Migrations
                         .IsRequired();
 
                     b.HasOne("PPE.Models.Project", "Project")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Function");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("PPE.Models.EmployeeStock", b =>
+                {
+                    b.HasOne("PPE.Models.Employee", "Employee")
+                        .WithMany("EmployeeStocks")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PPE.Models.Function", "Function")
+                        .WithMany()
+                        .HasForeignKey("FunctionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PPE.Models.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PPE.Models.VariantValue", "VariantValue")
+                        .WithMany()
+                        .HasForeignKey("VariantValueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Function");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("VariantValue");
+                });
+
+            modelBuilder.Entity("PPE.Models.Manager", b =>
+                {
+                    b.HasOne("PPE.Models.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Project");
                 });
@@ -352,25 +541,6 @@ namespace PPE.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("PPE.Models.PpeAttribute", b =>
-                {
-                    b.HasOne("PPE.Models.CustomAttribute", "CustomAttribute")
-                        .WithMany("Attributes")
-                        .HasForeignKey("CustomAttributeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PPE.Models.Ppe", "Ppe")
-                        .WithMany()
-                        .HasForeignKey("PpeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CustomAttribute");
-
-                    b.Navigation("Ppe");
-                });
-
             modelBuilder.Entity("PPE.Models.Stock", b =>
                 {
                     b.HasOne("PPE.Models.Project", "Project")
@@ -378,10 +548,6 @@ namespace PPE.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("PPE.Models.Variant", null)
-                        .WithMany("Stocks")
-                        .HasForeignKey("VariantId");
 
                     b.HasOne("PPE.Models.VariantValue", "VariantValue")
                         .WithMany("Stocks")
@@ -396,53 +562,68 @@ namespace PPE.Migrations
 
             modelBuilder.Entity("PPE.Models.StockDetail", b =>
                 {
-                    b.HasOne("PPE.Models.PpeAttribute", "PpeAttribute")
-                        .WithMany("StockDetails")
-                        .HasForeignKey("PpeAttributeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PPE.Models.Stock", "Stock")
                         .WithMany()
                         .HasForeignKey("StockId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PpeAttribute");
-
                     b.Navigation("Stock");
                 });
 
             modelBuilder.Entity("PPE.Models.Variant", b =>
                 {
+                    b.HasOne("PPE.Models.Category", "Category")
+                        .WithMany("Variants")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PPE.Models.Ppe", "Ppe")
                         .WithMany("Variants")
                         .HasForeignKey("PpeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Category");
+
                     b.Navigation("Ppe");
                 });
 
             modelBuilder.Entity("PPE.Models.VariantValue", b =>
                 {
+                    b.HasOne("PPE.Models.Value", "Value")
+                        .WithMany()
+                        .HasForeignKey("ValueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PPE.Models.Variant", "Variant")
                         .WithMany("VariantValues")
                         .HasForeignKey("VariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Value");
+
                     b.Navigation("Variant");
+                });
+
+            modelBuilder.Entity("PPE.Models.Attribute", b =>
+                {
+                    b.Navigation("AttributeValues");
                 });
 
             modelBuilder.Entity("PPE.Models.Category", b =>
                 {
                     b.Navigation("Ppes");
+
+                    b.Navigation("Variants");
                 });
 
-            modelBuilder.Entity("PPE.Models.CustomAttribute", b =>
+            modelBuilder.Entity("PPE.Models.Employee", b =>
                 {
-                    b.Navigation("Attributes");
+                    b.Navigation("EmployeeStocks");
                 });
 
             modelBuilder.Entity("PPE.Models.Function", b =>
@@ -455,20 +636,20 @@ namespace PPE.Migrations
                     b.Navigation("Variants");
                 });
 
-            modelBuilder.Entity("PPE.Models.PpeAttribute", b =>
-                {
-                    b.Navigation("StockDetails");
-                });
-
             modelBuilder.Entity("PPE.Models.Project", b =>
                 {
+                    b.Navigation("Employees");
+
                     b.Navigation("Stocks");
+                });
+
+            modelBuilder.Entity("PPE.Models.Value", b =>
+                {
+                    b.Navigation("AttributeValues");
                 });
 
             modelBuilder.Entity("PPE.Models.Variant", b =>
                 {
-                    b.Navigation("Stocks");
-
                     b.Navigation("VariantValues");
                 });
 

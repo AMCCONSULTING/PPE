@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +24,64 @@ namespace PPE.Controllers
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix");
             return View(await applicationDbContext.ToListAsync());
         }
+        
+        // GET: Employees/AddToEmployeeStock/5
+        public IActionResult AddToEmployeeStock(int? id)
+        {
+            if (id == null || _context.Employees == null)
+            {
+                return NotFound();
+            }
+
+            var employee = _context.Employees
+                .Include(e => e.Function)
+                .Include(e => e.Project)
+                .FirstOrDefault(m => m.Id == id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            ViewBag.VariantValues = _context.VariantValues
+                .Include(v => v.Variant)
+                .ThenInclude(v => v.Ppe)
+                .Include(v => v.Value)
+                .Select(v => new SelectListItem
+                {
+                    Text = $"{v.Variant.Ppe.Title} - {v.Value.Text}",
+                    Value = v.Id.ToString(),
+                });
+            ViewBag.EmployeeId = employee.Id;
+            ViewBag.ProjectId = employee.ProjectId;
+            ViewBag.FunctionId = employee.FunctionId;
+            return View(employee);
+        }
+        
+        // POST: Employees/AddToEmployeeStock
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToEmployeeStock([Bind("Id,Date,StockIn,StockOut,Status,Remarks,VariantValueId,EmployeeId,ProjectId,FunctionId")] EmployeeStock employeeStock)
+        {
+            employeeStock.Status = StockEmployeeStatus.Current;
+            employeeStock.Id = 5;
+            //return Json(employeeStock);
+            if (ModelState.IsValid)
+            {
+                _context.Add(employeeStock);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Details", new {id = employeeStock.EmployeeId});
+            }
+            ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeStock.EmployeeId);
+            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", employeeStock.ProjectId);
+            ViewData["FunctionId"] = new SelectList(_context.Functions, "Id", "Title", employeeStock.FunctionId);
+
+            var errorList = (from item in ModelState.Values
+                from error in item.Errors
+                select error.ErrorMessage).ToList();
+            return Json(errorList);
+            
+            return View();
+        }
 
         // GET: Employees/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -51,6 +103,8 @@ namespace PPE.Controllers
                 .Include(e => e.VariantValue)
                 .ThenInclude(e => e.Variant)
                 .ThenInclude(e => e.Ppe)
+                .Include(e => e.VariantValue)
+                .ThenInclude(e => e.Value)
                 .Where(e => e.EmployeeId == id && e.Status == StockEmployeeStatus.Current)
                 .ToListAsync();
             
@@ -61,6 +115,8 @@ namespace PPE.Controllers
                 .Include(e => e.VariantValue)
                 .ThenInclude(e => e.Variant)
                 .ThenInclude(e => e.Ppe)
+                .Include(e => e.VariantValue)
+                .ThenInclude(e => e.Value)
                 .Where(e => e.EmployeeId == id && e.Status == StockEmployeeStatus.Returned
                             || e.EmployeeId == id && e.Status == StockEmployeeStatus.Lost 
                             || e.EmployeeId == id && e.Status == StockEmployeeStatus.Damaged)
@@ -81,8 +137,10 @@ namespace PPE.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
+            ViewData["Size"] = new SelectList(Enum.GetValues(typeof(Size)));
+            ViewData["ShoeSize"] = new SelectList(Enum.GetValues(typeof(ShoeSize)));
             ViewData["FunctionId"] = new SelectList(_context.Functions, "Id", "Title");
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix");
+            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Title");
             ViewData["Gender"] = new SelectList(Enum.GetValues(typeof(Gender)));
 
             return View();
@@ -93,7 +151,7 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,NNI,Phone,Tel,Gender,ProjectId,FunctionId")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -101,6 +159,8 @@ namespace PPE.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["Size"] = new SelectList(Enum.GetValues(typeof(Size)));
+            ViewData["ShoeSize"] = new SelectList(Enum.GetValues(typeof(ShoeSize)));
             ViewData["FunctionId"] = new SelectList(_context.Functions, "Id", "Title", employee.FunctionId);
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", employee.ProjectId);
             ViewData["Gender"] = new SelectList(Enum.GetValues(typeof(Gender)));
@@ -120,6 +180,8 @@ namespace PPE.Controllers
             {
                 return NotFound();
             }
+            ViewData["Size"] = new SelectList(Enum.GetValues(typeof(Size)));
+            ViewData["ShoeSize"] = new SelectList(Enum.GetValues(typeof(ShoeSize)));
             ViewData["FunctionId"] = new SelectList(_context.Functions, "Id", "Title", employee.FunctionId);
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", employee.ProjectId);
             ViewData["Gender"] = new SelectList(Enum.GetValues(typeof(Gender)));
@@ -131,7 +193,7 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,NNI,Phone,Tel,Gender,ProjectId,FunctionId")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
         {
             if (id != employee.Id)
             {
@@ -158,6 +220,8 @@ namespace PPE.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["Size"] = new SelectList(Enum.GetValues(typeof(Size)));
+            ViewData["ShoeSize"] = new SelectList(Enum.GetValues(typeof(ShoeSize)));
             ViewData["FunctionId"] = new SelectList(_context.Functions, "Id", "Title", employee.FunctionId);
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", employee.ProjectId);
             ViewData["Gender"] = new SelectList(Enum.GetValues(typeof(Gender)));

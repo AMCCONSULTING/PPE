@@ -22,6 +22,11 @@ public class AppDbContext : DbContext
             .WithOne(vv => vv.Variant)
             .HasForeignKey(vv => vv.VariantId);
         
+        modelBuilder.Entity<Value>()
+            .HasMany(v => v.VariantValues)
+            .WithOne(vv => vv.Value)
+            .HasForeignKey(vv => vv.ValueId);
+        
         modelBuilder.Entity<Ppe>()
             .HasMany(p => p.Variants)
             .WithOne(v => v.Ppe)
@@ -53,14 +58,10 @@ public class AppDbContext : DbContext
             .HasForeignKey(es => es.EmployeeId);
         
         modelBuilder.Entity<Stock>()
-            .HasOne(s => s.VariantValue)
-            .WithMany(v => v.Stocks)
-            .HasForeignKey(s => s.VariantValueId);
-        
-        modelBuilder.Entity<Stock>()
             .HasOne(s => s.Project)
             .WithMany(p => p.Stocks)
             .HasForeignKey(s => s.ProjectId);
+        
         
         
     }

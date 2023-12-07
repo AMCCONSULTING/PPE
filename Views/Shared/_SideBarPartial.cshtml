@@ -15,8 +15,8 @@
             routeValues.Remove("action");
             routeValues.Remove("controller");
 
-    // If there are no remaining route values, or if the remaining values match the given parameters
-            return !routeValues.Any() || routeValues.All(rv => string.Equals(rv.Value?.ToString(), "", StringComparison.OrdinalIgnoreCase));
+    // If there are no remaining route values, the link is active
+            return !routeValues.Any();
         }
         return false;
     }
@@ -36,6 +36,11 @@
                     <li class="@(IsLinkActive("Categories", "Index") ? "active" : "")">
                         <a class="menu-item" asp-controller="Categories" asp-action="Index"><i></i>
                             <span>PPE Categories</span>
+                        </a>
+                    </li>
+                    <li class="@(IsLinkActive("Ppes", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Ppes" asp-action="Index"><i></i>
+                            <span>PPEs</span>
                         </a>
                     </li>
                 </ul>

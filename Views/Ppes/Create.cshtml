@@ -1,0 +1,48 @@
+@model PPE.Models.Ppe
+
+@{
+    ViewData["Title"] = "Create PPE";
+}
+<div class="d-flex justify-content-end mb-2">
+    <a asp-action="Index" class="btn btn-dark btn-sm">Back to List</a>
+</div>
+<section class="p-2 bg-white">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="form-group col-md-4 col-12">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group col-md-4 col-12">
+                    <label asp-for="CategoryId" class="control-label"></label>
+                    <select asp-for="CategoryId" class ="form-control select2" asp-items="ViewBag.CategoryId"></select>
+                </div>
+                
+                <div class="form-group col-md-4 col-12">
+                    <label asp-for="Threshold" class="control-label"></label>
+                    <input asp-for="Threshold" class="form-control" />
+                    <span asp-validation-for="Threshold" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" class="form-control" ></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+   
+</section>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

@@ -11,13 +11,13 @@ public class EmployeeStock
     public StockEmployeeStatus Status { get; set; } = StockEmployeeStatus.Current;
     public string? Remarks { get; set; }
     public int VariantValueId { get; set; }
-    public VariantValue VariantValue { get; set; } = null!;
+    public VariantValue? VariantValue { get; set; } = null!;
     public int EmployeeId { get; set; }
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
     public int ProjectId { get; set; }
-    public Project Project { get; set; } = null!;
+    public Project? Project { get; set; } = null!;
     public int FunctionId { get; set; }
-    public Function Function { get; set; } = null!;
+    public Function? Function { get; set; } = null!;
     public int Total => StockIn - StockOut;
 
     /*public EmployeeStock()

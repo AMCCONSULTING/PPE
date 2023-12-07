@@ -28,7 +28,9 @@
         <link rel="stylesheet" type="text/css" href="~/app-assets/css/core/colors/palette-gradient.css">
         <!-- END: Page CSS-->
     
-        <!-- BEGIN: Custom CSS-->
+    <link rel="stylesheet" href="cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    
+    <!-- BEGIN: Custom CSS-->
         <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
         <!-- END: Custom CSS-->
     
@@ -49,8 +51,19 @@
 <div class="app-content content">
     <div class="content-overlay"></div>
     <div class="content-wrapper">
-        <div class="content-header row">
-            <div class="content-header-left col-md-6 col-12 mb-2">
+        @{
+            if (ViewBag.Buttons == null)
+            {
+                ViewBag.Buttons = new List<ButtonModel>();
+            }
+        }
+        @Html.Partial("_ContentHeader", new ContentHeaderModel
+        {
+            Title = ViewData["Title"].ToString(),
+            Buttons = ViewBag.Buttons
+        })
+        @*<div class="content-header row">
+            $1$<div class="content-header-left col-md-6 col-12 mb-2">
                 <h3 class="content-header-title">
                     @ViewData["Title"]
                 </h3>
@@ -66,14 +79,15 @@
                         </ol>
                     </div>
                 </div>
-            </div>
-            @*<div class="content-header-right col-md-6 col-12">
+            </div>#1#
+            
+            $1$<div class="content-header-right col-md-6 col-12">
                 <div class="btn-group float-md-right" role="group" aria-label="Button group with nested dropdown">
                     <button class="btn btn-info round dropdown-toggle dropdown-menu-right box-shadow-2 px-2 mb-1" id="btnGroupDrop1" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="ft-settings icon-left"></i> Settings</button>
                     <div class="dropdown-menu" aria-labelledby="btnGroupDrop1"><a class="dropdown-item" href="card-bootstrap.html">Cards</a><a class="dropdown-item" href="component-buttons-extended.html">Buttons</a></div>
                 </div>
-            </div>*@
-        </div>
+            </div>#1#
+        </div>*@
         <div class="content-body">
             @RenderBody()
         </div>
@@ -86,12 +100,13 @@
     <div class="drag-target"></div>
 
     <!-- BEGIN: Footer-->
-    <footer class="footer footer-static footer-light navbar-border navbar-shadow">
-        <p class="clearfix blue-grey lighten-2 text-sm-center mb-0 px-2">
-            <span class="float-md-left d-block d-md-inline-block">Copyright &copy; 2023 <a class="text-bold-800 grey darken-2" href="https://1.envato.market/modern_admin" target="_blank">AMC CONSULTING</a></span><span class="float-md-right d-none d-lg-block">Hand-crafted & Made with<i class="ft-heart pink"></i><span id="scroll-top"></span></span>
-        </p>
-    </footer>
-    <!-- END: Footer-->
+<footer class="footer footer-static footer-light navbar-border navbar-shadow mt-2">
+    <p class="clearfix blue-grey lighten-2 text-sm-center mb-0 px-2">
+        <span class="float-md-left d-block d-md-inline-block">Copyright &copy; 2023 <a class="text-bold-800 grey darken-2" href="https://1.envato.market/modern_admin" target="_blank">AMC CONSULTING</a></span><span class="float-md-right d-none d-lg-block">Hand-crafted & Made with<i class="ft-heart pink"></i><span id="scroll-top"></span></span>
+    </p>
+</footer>
+<!-- END: Footer-->
+
 
 <!-- BEGIN: Vendor JS-->
     <script src="~/app-assets/vendors/js/vendors.min.js"></script>
@@ -103,7 +118,9 @@
 
     <!-- Begin: Select2 JS-->
 <script src="~/app-assets/vendors/js/forms/select/select2.full.min.js"></script>
-    <!-- Begin: Select2 JS-->
+<!-- Begin: Select2 JS-->
+
+<script src="cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
 <!-- BEGIN: Theme JS-->
 <script src="~/app-assets/js/core/app-menu.js"></script>

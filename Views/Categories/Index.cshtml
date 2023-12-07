@@ -1,41 +1,69 @@
 @model IEnumerable<PPE.Models.Category>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "List Categories";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Create New",
+            Action = "Create",
+            Controller = "Categories",
+            ButtonType = "primary"
+        }
+    };
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
+<div class="table-responsive bg-white">
+    <table class="table data-table" id="data-table">
+        <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PpeCount)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <th></th>
         </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.PpeCount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">
+                            <i class="la la-edit"></i>
+                        </a> 
+                        <a class="btn btn-sm btn-dark" asp-action="Details" asp-route-id="@item.Id">
+                            <i class="la la-eye"></i>
+                        </a> 
+                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">
+                            <i class="la la-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+    $(document).ready(function () {
+        $('#data-table').DataTable();
+    });
+    </script>
 }
-    </tbody>
-</table>
+

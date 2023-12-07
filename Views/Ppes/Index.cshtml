@@ -1,46 +1,47 @@
-@model IEnumerable<PPE.Models.Project>
+@model IEnumerable<PPE.Models.Ppe>
 
 @{
-    ViewData["Title"] = "Project List";
+    ViewData["Title"] = "List PPEs";
     ViewBag.Buttons = new List<ButtonModel> {
         new ButtonModel {
             Text = "Create New",
             Action = "Create",
-            Controller = "Projects",
+            Controller = "Ppes",
             ButtonType = "primary"
         }
     };
 }
-<div class="table-responsive">
-    <table class="table bg-white">
+
+<div class="bg-white table-responsive">
+    <table class="table">
         <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Prefix)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmployeeCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Threshold)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th></th>
+            </tr>
         </thead>
         <tbody>
-        @foreach (var item in Model) {
+    @foreach (var item in Model) {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Prefix)
+                    @Html.DisplayFor(modelItem => item.Category.Title)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmployeeCount)
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.Threshold)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)
@@ -59,7 +60,7 @@
                     </div>
                 </td>
             </tr>
-        }
+    }
         </tbody>
     </table>
 </div>

@@ -1,30 +1,50 @@
 @model PPE.Models.Category
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Details Category - " + Model.Title;
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "Categories",
+            ButtonType = "dark"
+        }
+    };
 }
 
-<h1>Details</h1>
+<section class="bg-white p-2">
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <h5>@Html.DisplayNameFor(model => model.Title)</h5>
+            <strong>@Html.DisplayFor(model => model.Title)</strong>
+        </div>
+        <div class="col-12 col-md-4">
+            <h5>@Html.DisplayNameFor(model => model.PpeCount)</h5>
+            <strong>@Html.DisplayFor(model => model.PpeCount)</strong>
+        </div>
+        <div class="col-12 col-md-4">
+            <h5>@Html.DisplayNameFor(model => model.Description)</h5>
+            <strong>@Html.DisplayFor(model => model.Description)</strong>
+        </div>
+    </div>
+</section>
 
-<div>
-    <h4>Category</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<section class="mt-2">
+<h3>Related PPEs</h3>
+    <div class="bg-white">
+        <table class="table">
+            <thead>
+            <th>Title</th>
+            <th>Description</th>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.Ppes)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                </tr>
+            }
+        </table>
+    </div>
+</section>

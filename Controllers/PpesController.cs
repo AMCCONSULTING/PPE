@@ -10,90 +10,94 @@ using PPE.Models;
 
 namespace PPE.Controllers
 {
-    public class CategoriesController : Controller
+    public class PpesController : Controller
     {
         private readonly AppDbContext _context;
 
-        public CategoriesController(AppDbContext context)
+        public PpesController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: Categories
+        // GET: Ppes
         public async Task<IActionResult> Index()
         {
-              return _context.Categories != null ? 
-                          View(await _context.Categories
-                                .Include(c => c.Ppes)
-                              .ToListAsync()) :
-                          Problem("Entity set 'AppDbContext.Categories'  is null.");
+            var appDbContext = _context.Ppes.Include(p => p.Category);
+            return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Categories/Details/5
+        // GET: Ppes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.Ppes == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .Include(c => c.Ppes)
+            var ppe = await _context.Ppes
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (ppe == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(ppe);
         }
 
-        // GET: Categories/Create
+        // GET: Ppes/Create
         public IActionResult Create()
         {
+            ViewData["CategoryId"] = new SelectList(_context.Categories, 
+                "Id", 
+                "Title");
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: Ppes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,CategoryId,Threshold")] Ppe ppe)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(ppe);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", 
+                "Title", ppe.CategoryId);
+            return View(ppe);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Ppes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.Ppes == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var ppe = await _context.Ppes.FindAsync(id);
+            if (ppe == null)
             {
                 return NotFound();
             }
-            return View(category);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", 
+                "Title", ppe.CategoryId);
+            return View(ppe);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Ppes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,CategoryId,Threshold")] Ppe ppe)
         {
-            if (id != category.Id)
+            if (id != ppe.Id)
             {
                 return NotFound();
             }
@@ -102,12 +106,12 @@ namespace PPE.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(ppe);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!PpeExists(ppe.Id))
                     {
                         return NotFound();
                     }
@@ -118,49 +122,51 @@ namespace PPE.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Id", ppe.CategoryId);
+            return View(ppe);
         }
 
-        // GET: Categories/Delete/5
+        // GET: Ppes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.Ppes == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var ppe = await _context.Ppes
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (ppe == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(ppe);
         }
 
-        // POST: Categories/Delete/5
+        // POST: Ppes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Categories == null)
+            if (_context.Ppes == null)
             {
-                return Problem("Entity set 'AppDbContext.Categories'  is null.");
+                return Problem("Entity set 'AppDbContext.Ppes'  is null.");
             }
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            var ppe = await _context.Ppes.FindAsync(id);
+            if (ppe != null)
             {
-                _context.Categories.Remove(category);
+                _context.Ppes.Remove(ppe);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool PpeExists(int id)
         {
-          return (_context.Categories?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Ppes?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

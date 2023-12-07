@@ -12,8 +12,8 @@ using PPE.Data;
 namespace PPE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231205163000_stockEmployeesMigration")]
-    partial class stockEmployeesMigration
+    [Migration("20231206154818_modifyingSizeEmployee")]
+    partial class modifyingSizeEmployee
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -126,13 +126,11 @@ namespace PPE.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ShoeSize")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ShoeSize")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Size")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Size")
+                        .HasColumnType("int");
 
                     b.Property<string>("Tel")
                         .HasColumnType("nvarchar(max)");
@@ -160,6 +158,12 @@ namespace PPE.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
+                    b.Property<int>("FunctionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
@@ -178,6 +182,10 @@ namespace PPE.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
+
+                    b.HasIndex("FunctionId");
+
+                    b.HasIndex("ProjectId");
 
                     b.HasIndex("VariantValueId");
 
@@ -375,6 +383,9 @@ namespace PPE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PpeId")
                         .HasColumnType("int");
 
@@ -383,6 +394,8 @@ namespace PPE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("PpeId");
 
@@ -397,14 +410,15 @@ namespace PPE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ValueId")
+                        .HasColumnType("int");
 
                     b.Property<int>("VariantId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ValueId");
 
                     b.HasIndex("VariantId");
 
@@ -476,6 +490,18 @@ namespace PPE.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PPE.Models.Function", "Function")
+                        .WithMany()
+                        .HasForeignKey("FunctionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PPE.Models.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PPE.Models.VariantValue", "VariantValue")
                         .WithMany()
                         .HasForeignKey("VariantValueId")
@@ -483,6 +509,10 @@ namespace PPE.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
+
+                    b.Navigation("Function");
+
+                    b.Navigation("Project");
 
                     b.Navigation("VariantValue");
                 });
@@ -541,22 +571,38 @@ namespace PPE.Migrations
 
             modelBuilder.Entity("PPE.Models.Variant", b =>
                 {
+                    b.HasOne("PPE.Models.Category", "Category")
+                        .WithMany("Variants")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PPE.Models.Ppe", "Ppe")
                         .WithMany("Variants")
                         .HasForeignKey("PpeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Category");
+
                     b.Navigation("Ppe");
                 });
 
             modelBuilder.Entity("PPE.Models.VariantValue", b =>
                 {
+                    b.HasOne("PPE.Models.Value", "Value")
+                        .WithMany()
+                        .HasForeignKey("ValueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PPE.Models.Variant", "Variant")
                         .WithMany("VariantValues")
                         .HasForeignKey("VariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Value");
 
                     b.Navigation("Variant");
                 });
@@ -569,6 +615,8 @@ namespace PPE.Migrations
             modelBuilder.Entity("PPE.Models.Category", b =>
                 {
                     b.Navigation("Ppes");
+
+                    b.Navigation("Variants");
                 });
 
             modelBuilder.Entity("PPE.Models.Employee", b =>
