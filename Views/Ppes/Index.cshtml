@@ -12,9 +12,17 @@
     };
 }
 
-<div class="bg-white table-responsive">
-    <table class="table">
-        <thead>
+<div class="bg-white card-body">
+    <select class="form-control select2" id="filter-category">
+        <option></option>
+        @foreach(var category in ViewBag.Categories){
+            <option value="@category.Value">@category.Text</option>
+        }
+    </select>
+        <table class="table responsive w-100"
+               data-column="title,category,threshold,description,actions"
+               data-url="/api/ppe">
+            <thead>
             <tr>
                 <th>
                     @Html.DisplayNameFor(model => model.Title)
@@ -30,37 +38,6 @@
                 </th>
                 <th></th>
             </tr>
-        </thead>
-        <tbody>
-    @foreach (var item in Model) {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Category.Title)
-                </td>
-                <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.Threshold)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">
-                            <i class="la la-edit"></i>
-                        </a> 
-                        <a class="btn btn-sm btn-dark" asp-action="Details" asp-route-id="@item.Id">
-                            <i class="la la-eye"></i>
-                        </a> 
-                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">
-                            <i class="la la-trash"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table>
+            </thead>
+        </table>
 </div>

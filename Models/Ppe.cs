@@ -12,3 +12,9 @@ public class Ppe
     public virtual ICollection<Variant>? Variants { get; set; }
 }
 
+public class PpeFilter
+{
+    public int Category { get; set; }
+    public string Title { get; set; }
+}
+

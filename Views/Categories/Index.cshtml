@@ -12,8 +12,11 @@
     };
 }
 
-<div class="table-responsive bg-white">
-    <table class="table data-table" id="data-table">
+<div class="table-responsive bg-white p-2">
+    <table class="table data-table w-100"
+           data-column="title,ppeCount,description,actions"
+           data-url="/api/value"
+           id="data-table">
         <thead>
         <tr>
             <th>
@@ -25,10 +28,11 @@
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-            <th></th>
+            <th>Actions</th>
+            @*<th></th>*@
         </tr>
         </thead>
-        <tbody>
+        @*<tbody>
         @foreach (var item in Model) {
             <tr>
                 <td>
@@ -55,15 +59,48 @@
                 </td>
             </tr>
         }
-        </tbody>
+        </tbody>*@
     </table>
 </div>
 
 @section Scripts {
     <script>
     $(document).ready(function () {
-        $('#data-table').DataTable();
+      /*  $('table[data-column]').each(function () {
+                    var table = $(this);
+                    var columns = table.data('column').split(',');
+                    var url = table.data('url');
+       
+                    var dataTable = table.DataTable({
+                        processing: true,
+                        serverSide: true,
+                        ajax: {
+                            url: url,
+                            type: 'GET',
+                            dataSrc: 'data'
+                        },
+                        columns: columns.map(function (col) {
+                            //console.log(col)
+                            return {
+                                data: col,
+                                name: col
+                            };
+                        }),
+                        order: [[0, 'desc']]
+                    });
+        
+                    // Event listener for filter inputs
+                    columns.forEach(function (col) {
+                        $('#filter-' + col).on('change', function () {
+                            // Redraw DataTable when filter value changes
+                            dataTable.draw();
+                        });
+                    });
+                });
+        */
     });
+    
     </script>
+    
 }
 

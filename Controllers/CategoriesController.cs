@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataTables.AspNetCore.Mvc.Binder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,52 @@ namespace PPE.Controllers
                               .ToListAsync()) :
                           Problem("Entity set 'AppDbContext.Categories'  is null.");
         }
+        
+        [HttpGet()]
+        [Route("api/value")]
+        public IActionResult Get([DataTablesRequest] DataTablesRequest dataRequest)
+        {
+            IEnumerable<Category> categories = _context.Categories.Include(c => c.Ppes);
+            int recordsTotal = categories.Count();
+            int recordsFilterd = recordsTotal;
 
+            if (!string.IsNullOrEmpty(dataRequest.Search?.Value))
+            {
+                categories = categories
+                    .Where(e => e.Title.Contains(dataRequest.Search.Value));
+                recordsFilterd = categories.Count();
+            }
+            categories = categories.Skip(dataRequest.Start).Take(dataRequest.Length);
+            var deleteUrl = "Categories/DeleteCategory";
+            return Json(categories
+                .Select(e => new
+                {
+                    Id = e.Id,
+                    Title = e.Title,
+                    PpeCount = e.Ppes!.Count,
+                    Description = e.Description,
+                    Actions = $"<div class='btn-group'>" +
+                              $"<a class='btn btn-primary btn-sm' href='/Categories/Edit/{e.Id}'>" +
+                              $"<i class='la la-edit'></i>"+
+                              $"</a>"+
+                              $"<a class='btn btn-danger btn-sm' onclick='confirmDelete(\"{deleteUrl}\", {e.Id})' id='12'>" +
+                              $"<i class='la la-trash text-white'></i>"+
+                              $"</a>"+
+                              $"</div>"
+                              
+                })
+                .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
+        }
+
+        [HttpGet]
+        public IActionResult GetDataForDataTable()
+        {
+            // Your logic to fetch data from the database
+            var data = _context.Categories.ToList();
+
+            return Json(new { data });
+        }
+        
         // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -121,23 +167,26 @@ namespace PPE.Controllers
             return View(category);
         }
 
-        // GET: Categories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        /*// Delete: Categories/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null || _context.Categories == null)
+            if (_context.Categories == null)
             {
-                return NotFound();
+                return Problem("Entity set 'AppDbContext.Categories'  is null.");
             }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category != null)
             {
-                return NotFound();
+                _context.Categories.Remove(category);
             }
-
-            return View(category);
+            
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, message = "Delete successful" });
         }
+        
+        // DELETE: api
 
         // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -156,6 +205,24 @@ namespace PPE.Controllers
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }*/
+        
+        // delete using ajax
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            if (_context.Categories == null)
+            {
+                return Problem("Entity set 'AppDbContext.Categories'  is null.");
+            }
+            var category = await _context.Categories.FindAsync(id);
+            if (category != null)
+            {
+                _context.Categories.Remove(category);
+            }
+            
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, message = "Delete successful" });
         }
 
         private bool CategoryExists(int id)

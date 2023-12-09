@@ -61,6 +61,17 @@ ViewBag.Title = "Add To Employee Stock";
                 </select>
                 <span class="text-danger"></span>
             </div>
+            <div class="col-12 col-md-6">
+                <select class="form-control select2">
+                    <option></option>
+                    @*@foreach(var category in ViewBag.Category)
+                    {
+                        <option value="@category.Id">@category.Text</option>
+                    }*@
+                </select>
+            </div>
+            
+            
         </div>
         <div class="form-group">
             <button class="btn btn-info" type="submit">Save changes</button>

@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -61,8 +67,8 @@ namespace PPE.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToEmployeeStock([Bind("Id,Date,StockIn,StockOut,Status,Remarks,VariantValueId,EmployeeId,ProjectId,FunctionId")] EmployeeStock employeeStock)
         {
+
             employeeStock.Status = StockEmployeeStatus.Current;
-            employeeStock.Id = 5;
             //return Json(employeeStock);
             if (ModelState.IsValid)
             {
@@ -70,6 +76,11 @@ namespace PPE.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Details", new {id = employeeStock.EmployeeId});
             }
+
+            ViewBag.Category = new SelectList(_context.Categories, "Id", "Title", employeeStock.VariantValue.Variant.CategoryId);
+
+            Console.WriteLine(ViewBag.Category);
+            
             ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeStock.EmployeeId);
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", employeeStock.ProjectId);
@@ -83,6 +94,8 @@ namespace PPE.Controllers
             return View();
         }
 
+        // GET: Employees/
+        
         // GET: Employees/Details/5
         public async Task<IActionResult> Details(int? id)
         {

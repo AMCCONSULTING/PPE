@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PPE.Models;
+using Attribute = PPE.Models.Attribute;
 
 namespace PPE.Data;
 
@@ -78,6 +79,10 @@ public class AppDbContext : DbContext
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Value> Values { get; set; }
     public DbSet<EmployeeStock> EmployeeStocks { get; set; }
+    public DbSet<Attribute> Attributes { get; set; }
+    public DbSet<AttributeValue> AttributeValues { get; set; }
+    public DbSet<AttributeValueAttributeCategory> AttrValueAttrCategories { get; set; }
+    
     
     
 }

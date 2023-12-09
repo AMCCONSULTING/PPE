@@ -46,7 +46,7 @@ public class HomeController : Controller
         ppe.AddRange(ppeNotInStock);
         
         ViewBag.Ppe = ppe;
-        var labels = ppe.Select(s => $"{s.VariantValue.Variant.Ppe.Title} - {s.VariantValue.Value}").ToList();
+        var labels = ppe.Select(s => $"{s.VariantValue.Variant.Ppe.Title} - {s.VariantValue.Value.Text}").ToList();
         var data = ppe.Select(s => s.StockIn - s.StockOut).ToList();
 
         ViewBag.Labels = labels;

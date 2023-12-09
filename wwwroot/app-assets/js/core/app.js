@@ -563,7 +563,7 @@
   // main menu internationalization
 
   // init i18n and load language file
-  i18next
+  /*i18next
     .use(window.i18nextXHRBackend)
     .init({
       debug: false,
@@ -576,10 +576,10 @@
       function (err, t) {
         // resources have been loaded
         jqueryI18next.init(i18next, $);
-      });
+      });*/
 
   // change language according to data-language of dropdown item
-  $(".dropdown-language .dropdown-item").on("click", function () {
+  /*$(".dropdown-language .dropdown-item").on("click", function () {
     var $this = $(this);
     $this.siblings(".selected").removeClass("selected")
     $this.addClass("selected");
@@ -591,5 +591,5 @@
     i18next.changeLanguage(currentLanguage, function (err, t) {
       $(".main-menu , .navbar-horizontal").localize();
     });
-  })
+  })*/
 })(window, document, jQuery);
