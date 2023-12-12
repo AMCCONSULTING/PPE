@@ -7,4 +7,5 @@ public class ButtonModel
     public string Controller { get; set; }
     public string Icon { get; set; }
     public string ButtonType { get; set; }
+    public string? Route { get; set; }
 }

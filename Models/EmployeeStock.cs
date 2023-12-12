@@ -10,8 +10,12 @@ public class EmployeeStock
     public int StockOut { get; set; }
     public StockEmployeeStatus Status { get; set; } = StockEmployeeStatus.Current;
     public string? Remarks { get; set; }
-    public int VariantValueId { get; set; }
-    public VariantValue? VariantValue { get; set; } = null!;
+    public bool IsArchived { get; set; } = false;
+    public StockType StockType { get; set; } = StockType.Normal;
+    public Designation Designation { get; set; } = Designation.Donation;
+    public PpeCondition PpeCondition { get; set; } = PpeCondition.Good;
+    public int? PpeAttributeCategoryAttributeValueId { get; set; }
+    public PpeAttributeCategoryAttributeValue? PpeAttributeCategoryAttributeValue { get; set; }
     public int EmployeeId { get; set; }
     public Employee? Employee { get; set; }
     public int ProjectId { get; set; }
@@ -19,9 +23,6 @@ public class EmployeeStock
     public int FunctionId { get; set; }
     public Function? Function { get; set; } = null!;
     public int Total => StockIn - StockOut;
-
-    /*public EmployeeStock()
-    {
-        Status = StockEmployeeStatus.Current;
-    }*/
+    public virtual ICollection<StockToBePaid> StockToBePaids { get; set; } = null!;
+    
 }

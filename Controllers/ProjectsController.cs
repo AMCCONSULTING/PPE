@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PPE.Data;
+using PPE.Data.Enums;
 using PPE.Models;
 
 namespace PPE.Controllers
@@ -36,29 +37,26 @@ namespace PPE.Controllers
             {
                 return NotFound();
             }
-
+            
             var project = await _context.Projects
-                .Include(s => s.Stocks)
-                .ThenInclude(s => s.VariantValue)
-                .ThenInclude(s => s.Variant)
-                .ThenInclude(s => s.Ppe)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            
             if (project == null)
             {
                 return NotFound();
             }
-
-            var groupedStocks = project.Stocks
-                .GroupBy(s => s.VariantValue!.Variant.Ppe)
+            
+            var groupedStocks = _context.Stocks
+                .Where(s => s.ProjectId == id)
+                .GroupBy(s => s.Ppe)
                 .Select(g => new
                 {
-                    PPE = g.Key,
-                    TotalStockIn = g.Sum(s => s.StockIn),
-                    TotalStockOut = g.Sum(s => s.StockOut),
-                    TotalStock = g.Sum(s => s.StockIn) - g.Sum(s => s.StockOut)
-                }).ToList();
-            
-            //return Json(groupedStocks);
+                    Ppe = g.Key,
+                    StockIn = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockIn),
+                    StockOut = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockOut),
+                    CurrentStock = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockIn) - g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockOut),
+                })
+                .ToList();
             ViewBag.GroupedStocks = groupedStocks;
             return View(project);
         }

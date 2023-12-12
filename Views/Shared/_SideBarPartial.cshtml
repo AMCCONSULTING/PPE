@@ -33,6 +33,11 @@
                 <a href="#"><i class="la la-industry"></i>
                     <span class="menu-title">PPE</span></a>
                 <ul class="menu-content">
+                    <li class="@(IsLinkActive("Attributes", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Attributes" asp-action="Index"><i></i>
+                            <span>Custom attributes</span>
+                        </a>
+                    </li>
                     <li class="@(IsLinkActive("Categories", "Index") ? "active" : "")">
                         <a class="menu-item" asp-controller="Categories" asp-action="Index"><i></i>
                             <span>PPE Categories</span>
@@ -57,26 +62,37 @@
                 <ul class="menu-content">
                     <li class="@(IsLinkActive("Stocks", "Index") ? "active" : "")">
                         <a class="menu-item" asp-controller="Stocks" asp-action="Index"><i></i>
-                            <span>Stocks movements</span>
+                            <span>Stock normal</span>
                         </a>
                     </li>
-                    <li class="@(IsLinkActive("Stocks", "Index") ? "activee" : "")">
+                    <li class="@(IsLinkActive("Stocks", "StockReturn") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Stocks" asp-action="StockReturn"><i></i>
+                            <span>Stock return</span>
+                        </a>
+                    </li>
+                    <li class="@(IsLinkActive("Stocks", "StockLost") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Stocks" asp-action="StockLost"><i></i>
+                            <span>Stock lost</span>
+                        </a>
+                    </li>
+                    
+                    @*<li class="@(IsLinkActive("Stocks", "Index") ? "activee" : "")">
                         <a class="menu-item" asp-controller="Stocks" asp-action="Index"><i></i>
                             <span>Stock adjustment</span>
+                        </a>
+                    </li>*@
+                    <li class="@(IsLinkActive("Stocks", "CreateMovement") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Stocks" asp-action="CreateMovement"><i></i>
+                            <span>Stock movement</span>
                         </a>
                     </li>
                 </ul>
             </li>
             
             <li class=" nav-item">
-                <a href="#"><i class="la la-cog"></i>
-                    <span class="menu-title">Administration</span></a>
+                <a href="#"><i class="la la-users"></i>
+                    <span class="menu-title">Employees</span></a>
                 <ul class="menu-content">
-                    <li class="@(IsLinkActive("Functions", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Functions" asp-action="Index"><i></i>
-                            <span>List functions</span>
-                        </a>
-                    </li>
                     <li class="@(IsLinkActive("Employees", "Index") ? "active" : "")">
                         <a class="menu-item" asp-controller="Employees" asp-action="Index">
                             <i></i>
@@ -87,6 +103,17 @@
                         <a class="menu-item" asp-controller="Managers" asp-action="Index">
                             <i></i>
                             <span>Mangers</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class=" nav-item">
+                <a href="#"><i class="la la-cog"></i>
+                    <span class="menu-title">References</span></a>
+                <ul class="menu-content">
+                    <li class="@(IsLinkActive("Functions", "Index") ? "active" : "")">
+                        <a class="menu-item" asp-controller="Functions" asp-action="Index"><i></i>
+                            <span>List functions</span>
                         </a>
                     </li>
                 </ul>

@@ -1,12 +1,19 @@
 @model IEnumerable<PPE.Models.Manager>
 
 @{
-    ViewData["Title"] = "Liste des managers";
+    ViewData["Title"] = "Manager List";
+    ViewBag.Buttons = new List<ButtonModel>
+    {
+        new ButtonModel
+        {
+            Text = "Create New",
+            Action = "Create",
+            Controller = "Managers",
+            ButtonType = "primary"
+        }
+    };
 }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table bg-white">
     <thead>
         <tr>

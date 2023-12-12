@@ -21,6 +21,19 @@
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group col-12">
+                <label asp-for="AttributeCategories" class="control-label"></label>
+                <select name="attributes[]" class="form-control select2" multiple>
+                    <option></option>
+                    @foreach (var value in ViewBag.Attributes )
+                    {
+                        <option value="@value.Value">
+                            @value.Text
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="AttributeCategories" class="text-danger"></span>
+                </div>
+            <div class="form-group col-12">
                 <label asp-for="Description" class="control-label"></label>
                 <textarea asp-for="Description" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>

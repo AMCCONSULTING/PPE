@@ -1,0 +1,61 @@
+@model IEnumerable<PPE.Models.Attribute>
+
+@{
+    ViewData["Title"] = "Attributes List";
+    ViewBag.Buttons = new List<ButtonModel>
+    {
+        new ButtonModel
+        {
+            Text = "Create New",
+            Action = "Create",
+            Controller = "Attributes",
+            ButtonType = "primary"
+        }
+    };
+}
+
+<div class="bg-white">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AttributeValues)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @foreach (var value in item.AttributeValues)
+                    {
+                        <span class="badge bg-info">
+                            @value.Value.Text
+                        </span>
+                    }
+                <td>
+                    <div class="btn-group">
+                        <a class="btn btn-sm btn-dark" asp-action="Details" asp-route-id="@item.Id">
+                            <i class="la la-eye"></i>
+                        </a>
+                        <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">
+                            <i class="la la-edit"></i>
+                        </a>
+                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">
+                            <i class="la la-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>
+</div>
+

@@ -1,56 +1,66 @@
 @model PPE.Models.Manager
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Manager";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "Managers",
+            ButtonType = "dark",
+        }
+    };
 }
 
-<h1>Create</h1>
-
-<h4>Manager</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+<div class="card-body bg-white">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <div class="form-group col-12 col-md-6">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group col-12 col-md-6">
                 <label asp-for="LastName" class="control-label"></label>
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+        </div>
+        <div class="row">
+            <div class="form-group col-12 col-md-6">
                 <label asp-for="PhoneNumber" class="control-label"></label>
                 <input asp-for="PhoneNumber" class="form-control" />
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group col-12 col-md-6">
                 <label asp-for="Fonction" class="control-label"></label>
                 <select asp-for="Fonction"
                         data-live-search="true" 
-                        data-placeholder="-- Select Gender --"
+                        data-placeholder="-- Select Role --"
                         class="form-control select2" 
                         asp-items="ViewBag.Fonction">
                     <option></option>
                 </select>
-                
                 <span asp-validation-for="Fonction" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+            </div> 
+        </div>
+        <div class="row">
+            <div class="form-group col-12 col-md-6">
                 <label asp-for="ProjectId" class="control-label"></label>
-                <select asp-for="ProjectId" class ="form-control" asp-items="ViewBag.ProjectId"></select>
-            </div>
-            <div class="form-group">
+                <select asp-for="ProjectId"
+                        data-placeholder="-- Select Project --"
+                        class="form-control select2" asp-items="ViewBag.ProjectId">
+                    <option></option>
+                </select>
+            </div> 
+        </div>
+        <div class="row">
+            <div class="form-group col-12 col-md-6">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 

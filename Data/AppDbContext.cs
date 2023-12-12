@@ -18,7 +18,7 @@ public class AppDbContext : DbContext
             .Property(s => s.CurrentStock)
             .HasColumnName("CurrentStock");*/
         
-        modelBuilder.Entity<Variant>()
+        /*modelBuilder.Entity<Variant>()
             .HasMany(v => v.VariantValues)
             .WithOne(vv => vv.Variant)
             .HasForeignKey(vv => vv.VariantId);
@@ -31,17 +31,17 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Ppe>()
             .HasMany(p => p.Variants)
             .WithOne(v => v.Ppe)
-            .HasForeignKey(v => v.PpeId);
+            .HasForeignKey(v => v.PpeId);*/
         
         modelBuilder.Entity<Stock>()
             .HasOne(s => s.Project)
             .WithMany(p => p.Stocks)
             .HasForeignKey(s => s.ProjectId);
         
-        modelBuilder.Entity<Stock>()
+        /*modelBuilder.Entity<Stock>()
             .HasOne(s => s.VariantValue)
             .WithMany(v => v.Stocks)
-            .HasForeignKey(s => s.VariantValueId);
+            .HasForeignKey(s => s.VariantValueId);*/
         
         modelBuilder.Entity<Function>()
             .HasMany(f => f.Employees)
@@ -63,6 +63,16 @@ public class AppDbContext : DbContext
             .WithMany(p => p.Stocks)
             .HasForeignKey(s => s.ProjectId);
         
+        modelBuilder.Entity<AttributeValue>()
+            .HasOne(av => av.Value)
+            .WithMany(es => es.AttributeValues)
+            .HasForeignKey(es => es.ValueId);
+        
+        modelBuilder.Entity<AttributeValue>()
+            .HasOne(av => av.Attribute)
+            .WithMany(es => es.AttributeValues)
+            .HasForeignKey(es => es.AttributeId);
+        
         
         
     }
@@ -72,8 +82,8 @@ public class AppDbContext : DbContext
     public DbSet<Stock> Stocks { get; set; }
     public DbSet<StockDetail> StockDetails { get; set; }
     public DbSet<Project> Projects { get; set; }
-    public DbSet<Variant> Variants { get; set; }
-    public DbSet<VariantValue> VariantValues { get; set; }
+    /*public DbSet<Variant> Variants { get; set; }
+    public DbSet<VariantValue> VariantValues { get; set; }*/
     public DbSet<Function> Functions { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Manager> Managers { get; set; }
@@ -82,6 +92,10 @@ public class AppDbContext : DbContext
     public DbSet<Attribute> Attributes { get; set; }
     public DbSet<AttributeValue> AttributeValues { get; set; }
     public DbSet<AttributeValueAttributeCategory> AttrValueAttrCategories { get; set; }
+    public DbSet<AttributeCategory> AttributeCategories { get; set; }
+    public DbSet<PpeAttributeCategoryAttributeValue> PpeAttributeCategoryAttributeValues { get; set; }
+    public DbSet<StockToBePaid> StocksToBePaid { get; set; }
+    
     
     
     

@@ -12,32 +12,44 @@
     };
 }
 
+
 <div class="bg-white card-body">
-    <select class="form-control select2" id="filter-category">
-        <option></option>
-        @foreach(var category in ViewBag.Categories){
-            <option value="@category.Value">@category.Text</option>
-        }
-    </select>
-        <table class="table responsive w-100"
-               data-column="title,category,threshold,description,actions"
-               data-url="/api/ppe">
-            <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Title)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Category)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Threshold)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Description)
-                </th>
-                <th></th>
-            </tr>
-            </thead>
-        </table>
+    <div class="p-2 row">
+        <div class="col-12 col-md-6 form-group">
+            <label> <i class="la la-filter"></i>Category</label>
+            <select class="form-control select2" id="filter-category">
+                <option></option>
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <option value="@category.Value">@category.Text</option>
+                }
+            </select>
+        </div>
+        <div class="col-12 col-md-6 form-group">
+            <label><i class="la la-filter"></i>Title</label>
+            <input type="text" class="form-control" placeholder="-- Search --" id="filter-title">
+        </div>
+        
+    </div>
+    <table class="table responsive w-100"
+           data-column="title,category,threshold,description,actions"
+           data-url="/api/ppe">
+        <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Threshold)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
 </div>

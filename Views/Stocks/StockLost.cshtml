@@ -1,0 +1,55 @@
+﻿@model IEnumerable<PPE.Models.Stock>
+
+@{
+    ViewData["Title"] = "Stock lost";
+}
+
+
+
+<div class="bg-white mt-2">
+   <table class="table">
+       <thead>
+           <tr>
+               <th>
+                   @Html.DisplayNameFor(model => model.Ppe)
+               </th>
+               <th>
+                   @Html.DisplayNameFor(model => model.Ppe.Category)
+               </th>
+               <th>
+                   Quantity
+               </th>
+               <th></th>
+           </tr>
+       </thead>
+       <tbody>
+   @foreach (var item in ViewBag.StockOfPpe) {
+       <tr>
+           <td>
+               @item.Ppe.Title
+           </td>
+           <td>
+               @item.Category
+           </td>
+           <td>
+               @item.StockIn
+           </td>
+           <td>
+               @*<div class="btn-group">
+                       <a asp-action="Edit" class="btn btn-sm btn-primary" asp-route-id="@item.Id">
+                           <i class="la la-edit"></i>
+                       </a> 
+                       <a asp-action="Details" class="btn btn-sm btn-dark" asp-route-id="@item.Id">
+                            <i class="la la-eye"></i>
+                       </a> 
+                       <a asp-action="Delete" class="btn btn-sm btn-danger" asp-route-id="@item.Id">
+                           <i class="la la-trash"></i>
+                       </a>
+                   </div>*@
+           </td>
+       </tr>
+   }
+       </tbody>
+   </table> 
+</div>
+

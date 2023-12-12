@@ -39,7 +39,7 @@ public static class DataSeeder
         }
         
         // Seed Variants
-        if (!dbContext.Variants.Any())
+        /*if (!dbContext.Variants.Any())
         {
             var helmet = new Variant { Title = "Color", PpeId = 1 };
             var glasses = new Variant { Title = "Size", PpeId = 2 };
@@ -48,7 +48,7 @@ public static class DataSeeder
 
             dbContext.Variants.AddRange(helmet, glasses, glove, vest);
             dbContext.SaveChanges();
-        }
+        }*/
         
         // Seed VariantValues
         /*if (!dbContext.VariantValues.Any())
@@ -118,7 +118,7 @@ public static class DataSeeder
         }
 
         // Seed Stocks
-        if (!dbContext.Stocks.Any())
+        /*if (!dbContext.Stocks.Any())
         {
             var stock1 = new Stock { ProjectId = 1, Date = new DateTime(), StockIn = 10, StockOut = 0, VariantValueId = 1};
             var stock2 = new Stock { ProjectId = 1, Date = new DateTime(), StockIn = 12, StockOut = 0, VariantValueId = 2};  
@@ -128,10 +128,10 @@ public static class DataSeeder
             
             dbContext.Stocks.AddRange(stock1, stock2, stock3, stock4,stock5);
             dbContext.SaveChanges();
-        }
+        }*/
         
         // Seed StockDetails
-        if (!dbContext.StockDetails.Any())
+        /*if (!dbContext.StockDetails.Any())
         {
             var stockDetail1 = new StockDetail
                 { StockId = 1, Date = new DateTime(), Price = 100, Quantity = 10, Total = 1000,};
@@ -144,7 +144,7 @@ public static class DataSeeder
 
             dbContext.StockDetails.AddRange(stockDetail1, stockDetail2, stockDetail3, stockDetail4);
             dbContext.SaveChanges();
-        }
+        }*/
         }
         catch (DbUpdateException ex)
         {

@@ -10,7 +10,9 @@ public class Category
     public int PpeCount => Ppes?.Count ?? 0;
     public string? Description { get; set; }
     public virtual ICollection<Ppe>? Ppes { get; set; }
+    /*
     public virtual ICollection<Variant>? Variants { get; set; }
-    public virtual ICollection<AttributeValueAttributeCategory>? AttrValueAttrCategories { get; set; }
-    
+    */
+    [DisplayName("Attribute Categories")]
+    public virtual ICollection<AttributeCategory>? AttributeCategories { get; set; }    
 }

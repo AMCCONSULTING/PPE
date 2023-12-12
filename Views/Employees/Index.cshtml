@@ -12,35 +12,68 @@
     };
 }
 
-<div class="table-responsive mt-1">
-        <table class="table bg-white">
-            <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.FullName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.NNI)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Phone)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Tel)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Gender)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Project)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Function)
-                </th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
+<div class="card-body bg-white">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-12 col-md-4 form-group">
+                <label> <i class="la la-filter"></i>Project</label>
+                <select class="form-control select2" id="filter-project">
+                    <option></option>
+                    @foreach (var project in ViewBag.Projects)
+                    {
+                        <option value="@project.Id">@project.Title</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-md-4 form-group">
+                <label><i class="la la-filter"></i>Function</label>
+                <select class="form-control select2" id="filter-function">
+                    <option></option>
+                    @foreach (var function in ViewBag.Functions)
+                    {
+                        <option value="@function.Id">@function.Title</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-md-4 form-group">
+                <label><i class="la la-filter"></i>Search by (name, phone, nni)</label>
+                <input type="text" class="form-control" placeholder="-- Search --" id="filter-name">
+            </div>
+        </div>
+    </div>
+    <table class="table responsive w-100"
+           data-column="firstName,lastName,nni,project,function,actions"
+           data-url="/api/employees">
+        <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NNI)
+            </th>
+            @*<th>
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Tel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gender)
+            </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Function)
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+        @*<tbody>
             @foreach (var item in Model) {
                 <tr>
                     <td>
@@ -79,6 +112,6 @@
                     </td>
                 </tr>
             }
-            </tbody>
-        </table>
-    </div>
+            </tbody>*@
+    </table>
+</div>

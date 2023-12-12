@@ -2,10 +2,15 @@
 
 @{
     ViewData["Title"] = "Create PPE";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "Ppes",
+            ButtonType = "dark"
+        }};
 }
-<div class="d-flex justify-content-end mb-2">
-    <a asp-action="Index" class="btn btn-dark btn-sm">Back to List</a>
-</div>
+
 <section class="p-2 bg-white">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>

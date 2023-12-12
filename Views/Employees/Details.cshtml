@@ -18,121 +18,183 @@
 <div class="bg-white mb-2">
     <div class="card-body">
         <div class="row justify-content-between align-items-center">
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="col-12 col-sm-6 col-md-4">
                 <h5>@Html.DisplayNameFor(model => model.FullName) | @Html.DisplayNameFor(model => model.Phone) </h5>
                 <strong>@Html.DisplayFor(model => model.FullName) | @Html.DisplayFor(model => model.Phone)</strong> 
             </div>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <h6>@Html.DisplayNameFor(model => model.Project)</h6> 
-                <strong>@Html.DisplayFor(model => model.Project!.Title)</strong>
+            <div class="col-12 col-sm-6 col-md-4">
+                <h5>@Html.DisplayNameFor(model => model.Project) | @Html.DisplayNameFor(model => model.Function)</h5> 
+                <strong>@Html.DisplayFor(model => model.Project!.Title) | @Html.DisplayNameFor(model => model.Function)</strong> 
             </div>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <h6>@Html.DisplayNameFor(model => model.Function)</h6> 
-                <strong>@Html.DisplayFor(model => model.Function!.Title)</strong> 
-            </div>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <h6>@Html.DisplayNameFor(model => model.Size) | @Html.DisplayNameFor(model => model.ShoeSize)</h6> 
+            <div class="col-12 col-sm-6 col-md-4">
+                <h5>@Html.DisplayNameFor(model => model.Size) | @Html.DisplayNameFor(model => model.ShoeSize)</h5> 
                 <strong>@Html.DisplayFor(model => model.Size) | @Html.DisplayFor(model => model.ShoeSize)</strong>
             </div>
-            @*<div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <h6>@Html.DisplayNameFor(model => model.Phone)</h6> 
-                <strong>@Html.DisplayFor(model => model.Phone)</strong> 
-            </div>*@
-            @*<div class="col-12 col-md-6">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                    </li>
-                    <li class="list-group-item">
-                    </li>
+        </div>
+    </div>
+</div>
 
-                    <li class="list-group-item">
-                        <strong>@Html.DisplayNameFor(model => model.NNI)</strong> : <span>@Html.DisplayFor(model => model.NNI)</span>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>@Html.DisplayNameFor(model => model.Phone)</strong> : <span>@Html.DisplayFor(model => model.Phone)</span>
-                    </li>
-                </ul>
+<div class="card-body bg-white">
+    <ul class="nav nav-tabs nav-linetriangle no-hover-bg">
+        <li class="nav-item">
+            <a class="nav-link active" id="base-tab41" data-toggle="tab" aria-controls="tab41" href="#tab41" aria-expanded="true">
+                Current PPEs
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="base-tab42" data-toggle="tab" aria-controls="tab42" href="#tab42" aria-expanded="false">
+                <span class="d-flex justify-content-center align-items-center">
+                    <span> To be payed</span> &nbsp; &nbsp;
+                    @if (ViewBag.StockToPayCount > 0){
+                        <div class="badge badge-warning">@ViewBag.StockToPayCount</div>
+                    }
+                </span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="base-tab43" data-toggle="tab" aria-controls="tab43" href="#tab43" aria-expanded="false">
+                History PPEs
+            </a>
+        </li>
+    </ul>
+    
+    <div class="tab-content px-1 pt-1">
+        <div role="tabpanel" class="tab-pane active" id="tab41" aria-expanded="true" aria-labelledby="base-tab41">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Current PPEs</h3>
+                <a asp-action="Create" asp-controller="EmployeeStocks" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Add new PPE</a>
             </div>
-            <div class="col-12 col-md-6">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <strong>@Html.DisplayNameFor(model => model.Tel)</strong> : <span>@Html.DisplayFor(model => model.Tel)</span>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>@Html.DisplayNameFor(model => Model.Project)</strong> : <span>@Html.DisplayFor(model => Model.Project.Prefix)</span>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>@Html.DisplayNameFor(model => Model.Function)</strong> : <span>@Html.DisplayFor(model => Model.Function.Title)</span>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>@Html.DisplayNameFor(model => Model.Gender)</strong> : <span>@Html.DisplayFor(model => Model.Gender)</span>
-                    </li>
-                </ul>
-            </div>*@
+            <div class="bg-white">
+                <table class="table">
+                    <thead>
+                    <tr class="bg-primary text-white">
+                        <th>Date</th>
+                        <th>PPE</th>
+                        <th>Variant</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in ViewBag.CurrentStock)
+                    {
+                        <tr>
+                            <td>@item._Date.ToString("d")</td>
+                            <td>@item.Ppe</td>
+                            <td>@item.AttributeValue</td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">Return</button>
+                                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <form asp-action="ReturnPpe">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Confirm return ppe</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="form-group col-12 col-md-6">
+                                                            <label for="" class="col-form-label">HSE Check status:</label>
+                                                            <select name="status"
+                                                                    data-placeholder="-- Select Status --"
+                                                                    class="form-control select2">
+                                                                <option></option>
+                                                                <option value="0">@PpeStatus.Good</option>
+                                                                <option value="1">@PpeStatus.Damaged</option>
+                                                                <option value="2">@PpeStatus.Lost</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group col-12 col-md-6">
+                                                            <label for="" class="col-form-label">Date</label>
+                                                            <input type="date" name="date" class="form-control" placeholder="-- Date --"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Return</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane" id="tab42" aria-labelledby="base-tab42">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title">PPEs to be paid</h3>
+            </div>
+            <div class="bg-white">
+                <table class="table">
+                    <thead>
+                    <tr class="bg-dark text-white">
+                        <th>Date</th>
+                        <th>PPE</th>
+                        <th>Designation</th>
+                        <th>Variant</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in ViewBag.StockToPay)
+                    {
+                        <tr>
+                            <td>@item._Date.ToString("d")</td> 
+                            <td>@item.Ppe</td>
+                            <td>@item.Designation</td>
+                            <td>@item.AttributeValue</td>
+                            <td>
+                                <button class="btn btn-sm btn-danger">
+                                    Remboursé
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane" id="tab43" aria-labelledby="base-tab43">
+            <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">History PPEs</h3>
+                    </div>
+            <div class="bg-white">
+                <table class="table">
+                    <thead>
+                    <tr class="bg-dark text-white">
+                        <th>Date</th>
+                        <th>PPE</th>
+                        <th>Designation</th>
+                        <th>Variant</th>
+                        <th>Quantity</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in ViewBag.StockReturned)
+                    {
+                        <tr>
+                            <td>@item._Date.ToString("d")</td> 
+                            <td>@item.Ppe</td>
+                            <td>@item.Designation</td>
+                            <td>@item.AttributeValue</td>
+                            <td>@item.StockIn</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+    
 </div>
 
-<div class="row">
-    <div class="col-12 col-md-6">
-        <div class="d-flex justify-content-between align-items-center">
-            <h3 class="card-title">Current PPEs</h3>
-            <a asp-action="AddToEmployeeStock" asp-controller="Employees" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Add new PPE</a>
-        </div>
-        <div class="bg-white">
-            <table class="table">
-                <thead>
-                <tr class="bg-primary text-white">
-                    <th>Date</th>
-                    <th>PPE</th>
-                    <th>Variant</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var item in ViewBag.EmployeeStocks)
-                {
-                    <tr>
-                        <td>@item.Date.ToString("g")</td>
-                        <td>@item.VariantValue.Variant.Ppe.Title</td>
-                        <td>@item.VariantValue.Value.Text</td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Return</a>
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="col-12 col-md-6">
-        <div class="d-flex justify-content-between align-items-center">
-                            <h3 class="card-title">History PPEs</h3>
-                            @* <a asp-action="Create" class="btn btn-primary btn-sm">Add PPE</a> *@
-                        </div>
-        <div class="bg-white">
-            <table class="table">
-                <thead>
-                <tr class="bg-dark text-white">
-                    <th>Date</th>
-                    <th>PPE</th>
-                    <th>Variant</th>
-                    <th>Status</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var item in ViewBag.EmployeeStocksHistory)
-                {
-                    <tr>
-                        <td>@item.Date.ToString("g")</td>
-                        <td>@item.VariantValue.Variant.Ppe.Title</td>
-                        <td>@item.VariantValue.Value</td>
-                        <td class="@(item.Status == StockEmployeeStatus.Lost ? "text-danger": item.Status == StockEmployeeStatus.Returned ? "text-success" : "text-warning")">@item.Status</td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 

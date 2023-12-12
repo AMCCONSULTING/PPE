@@ -51,23 +51,21 @@ ViewBag.Title = "Add To Employee Stock";
                 <label for=""></label>
                 <select name="VariantValueId" 
                         data-live-search="true" 
-                        data-placeholder="-- Select Size --" 
-                        class="form-control select2">
+                        data-placeholder="-- Select Category --" 
+                        class="form-control select2 categorySelect">
                     <option></option>
-                    @foreach(var variantValue in ViewBag.VariantValues)
+                    @*@foreach(var category in ViewBag.Category)
                     {
-                        <option value="@variantValue.Value">@variantValue.Text</option>
-                    }
+                        <option value="@category.Id">@category.Title</option>
+                    }*@
                 </select>
                 <span class="text-danger"></span>
             </div>
             <div class="col-12 col-md-6">
-                <select class="form-control select2">
-                    <option></option>
-                    @*@foreach(var category in ViewBag.Category)
-                    {
-                        <option value="@category.Id">@category.Text</option>
-                    }*@
+                <select 
+                    data-live-search="true" 
+                    data-placeholder="-- Select Ppe --" 
+                    class="form-control select2 ppeSelect">
                 </select>
             </div>
             
@@ -78,6 +76,33 @@ ViewBag.Title = "Add To Employee Stock";
         </div>
     </form>
 </section>
+
+@section Scripts
+{
+    <script >
+        $(document).ready(function() {
+            $('.select2').select2();
+            $('.categorySelect').on('change', function() {
+                let categoryId = $(this).val();
+                let ppeSelect = $('.ppeSelect');
+                ppeSelect.empty();
+                $.ajax({
+                    url: '/EmployeeStocks/GetPpes',
+                    type: 'GET',
+                    data: { categoryId: categoryId },
+                    success: function (data) {
+                        $.each(data, function (i, item) {
+                            ppeSelect.append($('<option>', {
+                                value: item.id,
+                                text: item.title
+                            }));
+                        });
+                    }
+                });
+            });
+        })
+    </script>
+}
 
  
 

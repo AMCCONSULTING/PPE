@@ -1,48 +1,63 @@
 @model PPE.Models.Stock
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create stock adjusment";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "Stocks",
+            ButtonType = "dark"
+        }};
 }
 
-<h1>Create</h1>
-
-<h4>Stock</h4>
-<hr />
-<form asp-action="SaveStocks" asp-controller="Stocks">
+<div class="bg-white card-body">
+<form asp-action="Create" asp-controller="Stocks">
     <div class="row">
         <div class="col-md-12">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row">
-                <div class="col-md-4 col-12">
+                <div class="form-group col-md-6 col-12">
                     <label asp-for="Date" class="control-label"></label>
                     <input 
                         asp-for="Date"  
                         class="form-control"/>
                     <span asp-validation-for="Date" class="text-danger"></span>
                 </div>
-                <div class="col-md-4 col-12">
-                    <label asp-for="ProjectId" class="control-label"></label>
+                <div class="form-group col-md-6 col-12">
+                    <label asp-for="Ppe.CategoryId" class="control-label">Category</label>
                     <select 
-                        asp-for="ProjectId" 
-                        data-placeholder="Select a project"
-                        class="form-control select2 selectProject"
-                        asp-items="ViewBag.ProjectId">
+                        asp-for="Ppe.CategoryId" 
+                        data-placeholder="Select a category"
+                        class="form-control select2 categorySelect"
+                        asp-items="ViewBag.CategoryId">
                         <option></option>
                     </select>
                 </div>
-                <div class="col-md-4 col-12">
-                    <label asp-for="VariantValueId" class="control-label"></label>
-                    <select class="form-control select2 selectVariantValue">
-                        @foreach (var item in ViewBag.VariantValueId)
-                        {
-                            <option value="@item.Value" selected="@item.Selected">
-                                @item.Text
-                            </option>
-                        }
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4 col-12">
+                    <label  class="control-label">Ppe</label>
+                    <select 
+                        name="ppeId"
+                        data-placeholder="Select a ppe"
+                        class="form-control select2 ppeSelect">
                     </select>
                 </div>
+                <div class="form-group col-md-4 col-12">
+                    <label  class="control-label">Value</label>
+                    <select 
+                        name="attributeValueId"
+                        data-placeholder="Select a value"
+                        class="form-control select2 attributeValueSelect">
+                    </select>
+                </div>
+                <div class="col-md-4 col-12">
+                    <label asp-for="StockIn" class="control-label">Qte</label>
+                    <input asp-for="StockIn" class="form-control"/>
+                    <span asp-validation-for="StockIn" class="text-danger"></span>
+                </div>
             </div>
-            
                 @*<div class="form-group">
                 <label asp-for="StockIn" class="control-label"></label>
                 <input asp-for="StockIn" class="form-control"/>
@@ -53,8 +68,6 @@
                 <input asp-for="StockOut" class="form-control"/>
                 <span asp-validation-for="StockOut" class="text-danger"></span>
             </div>*@
-            
-            
                 <div class="form-group mt-2">
                     <input type="submit" value="Create" class="btn btn-primary"/>
                 </div>
@@ -76,11 +89,7 @@
             </div>
         </div>
 </form>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
-
 
 @section Scripts {
    <script>
@@ -132,6 +141,37 @@
            $(".stockTable").on('click', '.remove', function () {
                $(this).closest('tr').remove();
            });
+           
+           $('.categorySelect').on('change', function () {
+               const id = $(this).val();
+               $.ajax({
+                   url: '/Stocks/GetPpeOfCategory',
+                   type: 'POST',
+                   data: { id: id },
+                   success: function (data) {
+                       $('.ppeSelect').html(data);
+                   },
+                   error: function (err) {
+                       alert(JSON.stringify(err));
+                   }
+               });
+           });
+          
+          $('.ppeSelect').on('change', function () {
+               const id = $(this).val();
+               $.ajax({
+                   url: '/Stocks/GetPpeAttributeCategoryAttributeValueOfPpe',
+                   type: 'POST',
+                   data: { id: id },
+                   success: function (data) {
+                       $('.attributeValueSelect').html(data);
+                   },
+                   error: function (err) {
+                       alert(JSON.stringify(err));
+                   }
+               });
+           });
+          
        });
    </script>
 }

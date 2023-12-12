@@ -65,15 +65,6 @@ namespace PPE.Controllers
                 })
                 .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
         }
-
-        [HttpGet]
-        public IActionResult GetDataForDataTable()
-        {
-            // Your logic to fetch data from the database
-            var data = _context.Categories.ToList();
-
-            return Json(new { data });
-        }
         
         // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -97,6 +88,14 @@ namespace PPE.Controllers
         // GET: Categories/Create
         public IActionResult Create()
         {
+
+            ViewBag.Attributes = _context.Attributes.
+                Select(a => new SelectListItem
+                {
+                    Value = a.Id.ToString(),
+                    Text = a.Title
+                }).ToList();
+            
             return View();
         }
 
@@ -105,8 +104,114 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description")] Category category, List<string> attributes)
         {
+            
+           //return Json(attributes);
+            
+            if (ModelState.IsValid)
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    _context.Add(category);
+                    await _context.SaveChangesAsync();
+                    if (attributes != null)
+                    {
+                        foreach (var attributeIdString in attributes)
+                        {
+                            if (int.TryParse(attributeIdString, out var attributeId))
+                            {
+                                
+                                // get all valueIds from attributeValues
+                                var attributeValues = _context.AttributeValues.Where(av => av.AttributeId == attributeId);
+                                var valueIds = attributeValues.Select(av => av.ValueId).ToList();
+
+                                var attributeCategory = new AttributeCategory
+                                {
+                                    AttributeId = attributeId,
+                                    CategoryId = category.Id,
+                                    // Set other properties as needed
+                                };
+
+                                await _context.AttributeCategories.AddAsync(attributeCategory);
+                                await _context.SaveChangesAsync();
+                                
+                                foreach (var valueId in valueIds)
+                                {
+                                    // if attributeValue is already in the database, don't add it again
+                                    if (_context.AttributeValues.Any(av => av.AttributeId == attributeId && av.ValueId == valueId))
+                                    {
+                                        // get the the record from the database and add it to the AttributeValueAttributeCategory table
+                                        var attributeValue = _context.AttributeValues.FirstOrDefault(av => av.AttributeId == attributeId && av.ValueId == valueId);
+                                        _context.AttrValueAttrCategories.Add(new AttributeValueAttributeCategory
+                                        {
+                                            AttributeCategoryId = attributeCategory.Id,
+                                            AttributeValueId = attributeValue.Id,
+                                            // Set other properties as needed
+                                        });
+                                    } else
+                                    {
+                                        // add the attributeValue to the database and then add it to the AttributeValueAttributeCategory table
+                                        var attributeValue = new AttributeValue
+                                        {
+                                            AttributeId = attributeId,
+                                            ValueId = valueId,
+                                            // Set other properties as needed
+                                        };
+                                        await _context.AttributeValues.AddAsync(attributeValue);
+                                        await _context.SaveChangesAsync();
+                                        _context.AttrValueAttrCategories.Add(new AttributeValueAttributeCategory
+                                        {
+                                            AttributeCategoryId = attributeCategory.Id,
+                                            AttributeValueId = attributeValue.Id,
+                                            // Set other properties as needed
+                                        });
+                                    }
+                                }
+                            }
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+                    
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException e)
+                {
+                    await transaction.RollbackAsync();
+                    ModelState.AddModelError("", GetFullErrorMessage(e));
+                }
+
+                /*_context.Add(category);
+                await _context.SaveChangesAsync();
+                if (attributes != null)
+                {
+                    var attrCategories = attributes.Select(a => new AttributeCategory
+                    {
+                        AttributeId = int.Parse(a),
+                        CategoryId = category.Id
+                    });
+                   return Json(attrCategories);
+                   //attrCategories.ToList().ForEach(ac => _context.AttrValueAttrCategories.Add(ac));
+                   
+                }
+                
+                
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));*/
+            }
+            ViewBag.Attributes = _context.Attributes.
+                Select(a => new SelectListItem
+                {
+                    Value = a.Id.ToString(),
+                    Text = a.Title
+                }).ToList();
+            return View(category);
+        }
+        /*{
             if (ModelState.IsValid)
             {
                 _context.Add(category);
@@ -114,7 +219,7 @@ namespace PPE.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
-        }
+        }*/
 
         // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -229,5 +334,20 @@ namespace PPE.Controllers
         {
           return (_context.Categories?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+        
+        private string GetFullErrorMessage(DbUpdateException ex)
+        {
+            var messages = new List<string>();
+            Exception currentException = ex;
+
+            while (currentException != null)
+            {
+                messages.Add(currentException.Message);
+                currentException = currentException.InnerException;
+            }
+
+            return string.Join(" ", messages);
+        }
     }
 }
+

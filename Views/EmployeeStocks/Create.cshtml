@@ -1,58 +1,131 @@
 @model PPE.Models.EmployeeStock
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Dotations";
+    ViewBag.Buttons = new List<ButtonModel>
+    {
+        new ButtonModel
+        {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "EmployeeStocks",
+            ButtonType = "dark",
+        }
+    };
 }
 
-<h1>Create</h1>
-
-<h4>EmployeeStock</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StockIn" class="control-label"></label>
-                <input asp-for="StockIn" class="form-control" />
-                <span asp-validation-for="StockIn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StockOut" class="control-label"></label>
-                <input asp-for="StockOut" class="form-control" />
-                <span asp-validation-for="StockOut" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control select2" asp-items="ViewBag.Status"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="VariantValueId" class="control-label"></label>
-                <select asp-for="VariantValueId" class ="form-control select2" asp-items="ViewBag.VariantValueId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <select asp-for="EmployeeId" class ="form-control select2" asp-items="ViewBag.EmployeeId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Remarks" class="control-label"></label>
-                <textarea asp-for="Remarks" class="form-control"></textarea>
-                <span asp-validation-for="Remarks" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+@*<div class="card-body bg-white">
+    <div class="row">
+        <div class="col-12 col-lg-3">
+            <h5>@Html.DisplayNameFor(model => model.FullName) | @Html.DisplayNameFor(model => model.Phone) </h5>
+            <strong>@Html.DisplayFor(model => model.FullName) | @Html.DisplayFor(model => model.Phone)</strong>
+        </div>
+        <div class="col-12 col-lg-3">
+            <h6>@Html.DisplayNameFor(model => model.Project)</h6>
+            <strong>@Html.DisplayFor(model => model.Project!.Title)</strong>
+        </div>
+        <div class="col-12 col-lg-3">
+            <h6>@Html.DisplayNameFor(model => model.Function)</h6>
+            <strong>@Html.DisplayFor(model => model.Function!.Title)</strong>
+        </div>
+        <div class="col-12 col-lg-3">
+            <h6>@Html.DisplayNameFor(model => model.Size) | @Html.DisplayNameFor(model => model.ShoeSize)</h6>
+            <strong>@Html.DisplayFor(model => model.Size) | @Html.DisplayFor(model => model.ShoeSize)</strong>
+        </div>
     </div>
-</div>
+</div>*@
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<section class="card-body bg-white">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" name="projectId" value="@ViewData["ProjectId"]">
+        <input type="hidden" name="functionId" value="@ViewData["FunctionId"]">
+        <input type="hidden" name="EmployeeId" value="@ViewData["EmployeeId"]">
+        <input type="hidden" name="StockIn" value="1">
+        <div class="row">
+            <div class="col-12 col-md-6 form-group">
+                <label for=""></label>
+                <input type="date" class="form-control" name="Date">
+                <span class="text-danger"></span>
+            </div>
+            <div class="col-12 col-md-6 form-group">
+                <label for=""></label>
+                <select name="CategoryId" 
+                        data-live-search="true" 
+                        data-placeholder="-- Select Category --" 
+                        class="form-control select2 categorySelect">
+                    <option></option>
+                    @foreach(var category in ViewBag.Category)
+                    {
+                        <option value="@category.Id">@category.Title</option>
+                    }
+                </select>
+                <span class="text-danger"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <select 
+                    name="PpeId"
+                    data-live-search="true" 
+                    data-placeholder="-- Select Ppe --" 
+                    class="form-control select2 ppeSelect">
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <select 
+                    name="ppeAttributeCategoryAttributeValueId"
+                    data-live-search="true" 
+                    data-placeholder="-- Select Variant --" 
+                    class="form-control select2 valueSelect">
+                </select>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <button class="btn btn-info" type="submit">Save changes</button>
+        </div>
+    </form>
+</section>
+
+@section Scripts
+{
+    <script >
+        $(document).ready(function() {
+            $('.select2').select2();
+            $('.categorySelect').on('change', function() {
+                let categoryId = $(this).val();
+                let ppeSelect = $('.ppeSelect');
+                ppeSelect.empty();
+                $.ajax({
+                    url: '/EmployeeStocks/GetPpes',
+                    type: 'GET',
+                    data: { categoryId: categoryId, projectId: @ViewBag.ProjectId },
+                    success: function (data) {
+                        ppeSelect.html(data)
+                    }
+                });
+            });
+            
+            $('.ppeSelect').on('change', function() {
+                let ppeId = $(this).val();
+                let valueSelect = $('.valueSelect');
+                valueSelect.empty();
+                $.ajax({
+                    url: '/EmployeeStocks/GetAttributesValues',
+                    type: 'GET',
+                    data: { ppeId: ppeId },
+                    success: function (data) {
+                        console.log(data)
+                        valueSelect.html(data)
+                    },
+                    error: function (error) {
+                        console.log(error)
+                    }
+                });
+            });
+        })
+    </script>
+}
+
+ 
+
+
 

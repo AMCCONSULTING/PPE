@@ -2,51 +2,30 @@
 
 @{
     ViewData["Title"] = "Stock List";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Create New",
+            Action = "Create",
+            Controller = "Stocks",
+            ButtonType = "primary"
+        }};
 }
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-@*<div class="bg-white">
-    <form asp-action="Index">
-        <div class="row">
-            <div class="col-12 col-md-">
-                <select asp-for="ProjectId" id="" asp-items="">
-                    <option value="">P1</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-"></div>
-            <div class="col-12 col-md-">
-
-            </div>
-        </div>
-        <div class="mt-2">
-            <button type="submit" class="btn btn-primary">
-                Apply filter
-            </button>
-        </div>
-    </form>
-</div>*@
 
 <div class="bg-white mt-2">
    <table class="table">
        <thead>
            <tr>
                @*<th>
-                   @Html.DisplayNameFor(model => model.Quantity)
-               </th>*@
-               <th>
-                   @Html.DisplayNameFor(model => model.Date)
-               </th>
-               <th>
                    @Html.DisplayNameFor(model => model.VariantValue.Variant.Ppe)
                </th>
                <th>
                    @Html.DisplayNameFor(model => model.VariantValue.Variant)
+               </th>*@
+               <th>
+                   @Html.DisplayNameFor(model => model.Ppe)
                </th>
                <th>
-                   @Html.DisplayNameFor(model => model.Project)
+                   @Html.DisplayNameFor(model => model.Ppe.Category)
                </th>
                <th>
                    @Html.DisplayNameFor(model => model.StockIn)
@@ -57,51 +36,47 @@
                <th>
                    @Html.DisplayNameFor(model => model.CurrentStock)
                </th>
-               <th></th>
+               <th>
+                     @Html.DisplayNameFor(model => model.Ppe.Threshold)
+               </th>
+               <th>Actions</th>
            </tr>
        </thead>
        <tbody>
-   @foreach (var item in Model) {
-           <tr>
-               @*<td>
-                   @Html.DisplayFor(modelItem => item.Quantity)
-               </td>*@
-               <td>
-                   @* @Html.DisplayFor(modelItem => item.Date) *@
-                   @item.Date.ToString("dd/MM/yyyy")
-               </td>
-               <td>
-                   @Html.DisplayFor(modelItem => item.VariantValue.Variant.Ppe.Title)
-               </td>
-               <td>
-                   @Html.DisplayFor(modelItem => item.VariantValue.Value) 
-               </td>
-               <td>
-                   @Html.DisplayFor(modelItem => item.Project.Prefix)
-               </td>
-               <td>
-                   @Html.DisplayFor(modelItem => item.StockIn)
-               </td>
-               <td>
-                   @Html.DisplayFor(modelItem => item.StockOut)
-               </td>
-               <td>
-                   @Html.DisplayFor(modelItem => item.CurrentStock)
-               </td>
-               <td>
-                   <div class="btn-group">
-                       <a asp-action="Edit" class="btn btn-sm btn-primary" asp-route-id="@item.Id">
+   @foreach (var item in ViewBag.StockOfPpe) {
+       <tr>
+           <td>
+               @item.Ppe.Title
+           </td>
+           <td>
+               @item.Ppe.Category.Title
+           </td>
+           <td>
+               @item.StockIn
+           </td>
+           <td>
+               @item.StockOut
+           </td>
+           <td>
+               @item.CurrentStock
+           </td>
+           <td>
+               @item.Threshold
+           </td>
+           <td>
+               <div class="btn-group">
+                       @*<a asp-action="Edit" class="btn btn-sm btn-primary" asp-route-id="@item.Ppe.Id">
                            <i class="la la-edit"></i>
-                       </a> 
-                       <a asp-action="Details" class="btn btn-sm btn-dark" asp-route-id="@item.Id">
+                       </a> *@
+                       <a asp-action="Details" class="btn btn-sm btn-dark" asp-route-id="@item.Ppe.Id">
                             <i class="la la-eye"></i>
                        </a> 
-                       <a asp-action="Delete" class="btn btn-sm btn-danger" asp-route-id="@item.Id">
-                           <i class="la la-trash"></i>
-                       </a>
+                   @*<a asp-action="Delete" class="btn btn-sm btn-danger" asp-route-id="@item.Id">
+                       <i class="la la-trash"></i>
+                   </a>*@
                    </div>
-               </td>
-           </tr>
+           </td>
+       </tr>
    }
        </tbody>
    </table> 

@@ -6,4 +6,5 @@ public enum Fonction
     Coordinateur,
     Magasinier,
     Transporteur,
+    HSE,
 }

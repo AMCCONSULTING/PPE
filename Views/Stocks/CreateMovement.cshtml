@@ -1,0 +1,189 @@
+@model PPE.Models.Stock
+
+@{
+    ViewData["Title"] = "Create stock adjusment";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "Stocks",
+            ButtonType = "dark"
+        }};
+}
+
+<div class="bg-white card-body">
+<form asp-action="Create" asp-controller="Stocks">
+    <div class="row">
+        <div class="col-md-12">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="form-group col-md-4 col-12">
+                    <label asp-for="Date" class="control-label"></label>
+                    <input 
+                        asp-for="Date"  
+                        class="form-control"/>
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4 col-12">
+                    <label asp-for="ProjectId" class="control-label"></label>
+                    <select 
+                        asp-for="ProjectId" 
+                        data-placeholder="Select a category"
+                        class="form-control select2 categorySelect"
+                        asp-items="ViewBag.ProjectId">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4 col-12">
+                    <label asp-for="Ppe.CategoryId" class="control-label">Category</label>
+                    <select 
+                        asp-for="Ppe.CategoryId" 
+                        data-placeholder="Select a category"
+                        class="form-control select2 categorySelect"
+                        asp-items="ViewBag.CategoryId">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4 col-12">
+                    <label  class="control-label">Ppe</label>
+                    <select 
+                        name="ppeId"
+                        data-placeholder="Select a ppe"
+                        class="form-control select2 ppeSelect">
+                    </select>
+                </div>
+                <div class="form-group col-md-4 col-12">
+                    <label  class="control-label">Value</label>
+                    <select 
+                        name="attributeValueId"
+                        data-placeholder="Select a value"
+                        class="form-control select2 attributeValueSelect">
+                    </select>
+                </div>
+                <div class="col-md-4 col-12">
+                    <label asp-for="StockIn" class="control-label">Qte</label>
+                    <input asp-for="StockIn" class="form-control"/>
+                    <span asp-validation-for="StockIn" class="text-danger"></span>
+                </div>
+            </div>
+                @*<div class="form-group">
+                <label asp-for="StockIn" class="control-label"></label>
+                <input asp-for="StockIn" class="form-control"/>
+                <span asp-validation-for="StockIn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StockOut" class="control-label"></label>
+                <input asp-for="StockOut" class="form-control"/>
+                <span asp-validation-for="StockOut" class="text-danger"></span>
+            </div>*@
+                <div class="form-group mt-2">
+                    <input type="submit" value="Create" class="btn btn-primary"/>
+                </div>
+
+            </div>
+            <div class="col-md-12">
+                <table class="table stockTable">
+                    <thead>
+                    <tr>
+                        <th>PPE - Variant</th>
+                        <th>Stock In</th>
+                        <th>Stock Out</th>
+                        <th>Options</th>
+                    </tr></thead>
+                    <tbody id="stockTable">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</form>
+</div>
+
+@section Scripts {
+   <script>
+       $(document).ready(function () {
+           $('.selectProject').on('change',function () {
+               const id = $(this).val();
+               $.ajax({
+                   url: '/Stocks/GetVariantValueNotInProjectStocks',
+                   type: 'POST',
+                   data: { id: id },
+                   success: function (data) {
+                       $('.selectVariantValue').html(data);
+                   },
+                   error: function (err) {
+                       alert(JSON.stringify(err));
+                   }
+               });
+           });
+           let counter = 0;
+           $('.selectVariantValue').on('change',function () {
+               let id = $(this).val();
+               let variantValue = $('.selectVariantValue').find(':selected').text();
+               if ($('.stockTable').find(`input[value="${id}"]`).length > 0) {
+                   alert('This PPE already exists');
+                   return;
+               }
+               counter++;
+               $("#stockTable").append(
+                   `<tr>
+                       <td style="vertical-align: center">
+                           <input type="hidden" name="VariantValue[${counter}]" value="${id}" class="form-control" />
+                           ${variantValue} - ${counter}
+                       </td>
+                       <td>
+                           <input type="text" name="StockIn[${counter}]" value="0" class="form-control" />
+                       </td>
+                       <td>
+                           <input type="text" name="StockOut[${counter}]" value="0" class="form-control" />  
+                       </td>
+                       <td>
+                           <input type="hidden" name="Date" value="12/12/2022" />
+                           <input type="hidden" name="ProjectId" value="1" />
+                           <a href="#" class="btn btn-danger btn-sm remove">Remove</a>
+                       </td>   
+                   </tr>`
+               );
+           });
+           
+           $(".stockTable").on('click', '.remove', function () {
+               $(this).closest('tr').remove();
+           });
+           
+           $('.categorySelect').on('change', function () {
+               const id = $(this).val();
+               $.ajax({
+                   url: '/Stocks/GetPpeOfCategory',
+                   type: 'POST',
+                   data: { id: id },
+                   success: function (data) {
+                       $('.ppeSelect').html(data);
+                   },
+                   error: function (err) {
+                       alert(JSON.stringify(err));
+                   }
+               });
+           });
+          
+          $('.ppeSelect').on('change', function () {
+               const id = $(this).val();
+               $.ajax({
+                   url: '/Stocks/GetAttributeValueOfPpe',
+                   type: 'POST',
+                   data: { id: id },
+                   success: function (data) {
+                       $('.attributeValueSelect').html(data);
+                       console.log(data);
+                   },
+                   error: function (err) {
+                       alert(JSON.stringify(err));
+                   }
+               });
+           });
+          
+       });
+   </script>
+}
+

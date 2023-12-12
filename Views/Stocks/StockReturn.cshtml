@@ -1,0 +1,51 @@
+﻿@model IEnumerable<PPE.Models.Stock>
+
+@{
+    ViewData["Title"] = "Stock return";
+}
+
+<div class="bg-white mt-2">
+   <table class="table">
+       <thead>
+           <tr>
+               @*<th>
+                   @Html.DisplayNameFor(model => model.VariantValue.Variant.Ppe)
+               </th>
+               <th>
+                   @Html.DisplayNameFor(model => model.VariantValue.Variant)
+               </th>*@
+               <th>
+                   @Html.DisplayNameFor(model => model.Ppe)
+               </th>
+               @*<th>
+                   @Html.DisplayNameFor(model => model.Ppe.Category)
+               </th>*@
+               <th>
+                   Quantity
+               </th>
+               <th>
+                   Status
+               </th>
+           </tr>
+       </thead>
+       <tbody>
+   @foreach (var item in ViewBag.StockOfPpe) {
+       <tr>
+           <td>
+               @item.Ppe
+           </td>
+           @*<td>
+               @item.Category
+           </td>*@
+           <td>
+               @item.StockIn
+           </td>
+           <td>
+               @item.Status
+           </td>
+       </tr>
+   }
+       </tbody>
+   </table> 
+</div>
+

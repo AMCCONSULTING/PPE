@@ -23,7 +23,8 @@ namespace PPE.Controllers
         // GET: EmployeeStocks
         public async Task<IActionResult> Index()
         {
-            var appDbContext = _context.EmployeeStocks.Include(e => e.Employee).Include(e => e.VariantValue);
+            var appDbContext = _context.EmployeeStocks.Include(e => e.Employee);
+                //.Include(e => e.VariantValue);
             return View(await appDbContext.ToListAsync());
         }
 
@@ -37,7 +38,7 @@ namespace PPE.Controllers
 
             var employeeStock = await _context.EmployeeStocks
                 .Include(e => e.Employee)
-                .Include(e => e.VariantValue)
+              //  .Include(e => e.VariantValue)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employeeStock == null)
             {
@@ -48,11 +49,35 @@ namespace PPE.Controllers
         }
 
         // GET: EmployeeStocks/Create
-        public IActionResult Create()
+        public IActionResult Create(int? id)
         {
-            ViewData["Status"] = new SelectList(Enum.GetValues(typeof(StockEmployeeStatus)));
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName");
-            ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id");
+            
+            if (id == null || _context.Employees == null)
+            {
+                return NotFound();
+            }
+            
+            var employee = _context.Employees.Find(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            
+            ViewBag.Employee = employee;
+            
+            ViewBag.Category = ViewBag.Category = _context.Categories
+                .Include(c => c.Ppes)
+                .ThenInclude(p => p.PpeAttributeCategoryAttributeValues)
+                .ThenInclude(p => p.StockDetails)
+                .ThenInclude(p => p.Stock)
+                .Where(c => c.Ppes.Any(p => p.PpeAttributeCategoryAttributeValues.Any(p => p.StockDetails.Any(s => s.Stock.ProjectId == employee.ProjectId))))
+                .ToList();
+            ViewBag.Status = new SelectList(Enum.GetValues(typeof(StockEmployeeStatus)));
+            ViewData["ProjectId"] = employee.ProjectId.ToString();
+            ViewData["FunctionId"] = employee.FunctionId.ToString();
+            ViewData["EmployeeId"] = employee.Id.ToString();
+
+            //return Json(ViewBag.Category);
             return View();
         }
 
@@ -61,17 +86,101 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,StockIn,StockOut,Status,Remarks,VariantValueId,EmployeeId")] EmployeeStock employeeStock)
+        public async Task<IActionResult> Create([Bind("Id,Date,StockIn,StockOut,Status")] EmployeeStock employeeStock, int employeeId,
+            int ppeAttributeCategoryAttributeValueId, int PpeId)
         {
+            var employee = _context.Employees.Find(employeeId);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var newStock = new Stock
+                    {
+                        ProjectId = employee.ProjectId,
+                        Date = employeeStock.Date,
+                        //StockIn = employeeStock.StockIn,
+                        PpeId = PpeId,
+                        StockType = StockType.Normal,
+                        StockOut = employeeStock.StockIn,
+                    };
+                    _context.Stocks.Add(newStock);
+                    await _context.SaveChangesAsync();
+
+
+                   // return Json(newStock);
+                    
+                    var newStockDetail = new StockDetail
+                    {
+                        StockId = newStock.Id,
+                        PpeAttributeCategoryAttributeValueId = ppeAttributeCategoryAttributeValueId,
+                        //StockIn = employeeStock.StockIn,
+                        StockOut = employeeStock.StockIn,
+                    };
+                    _context.StockDetails.Add(newStockDetail);
+                    await _context.SaveChangesAsync();
+                    
+                    //return Json(newStockDetail);
+                    
+                    var newEmployeeStock = new EmployeeStock
+                    {
+                        ProjectId = employee.ProjectId,
+                        FunctionId = employee.FunctionId,
+                        EmployeeId = employee.Id,
+                        PpeAttributeCategoryAttributeValueId = ppeAttributeCategoryAttributeValueId,
+                        Date = employeeStock.Date,
+                        StockIn = employeeStock.StockIn,
+                        StockOut = employeeStock.StockOut,
+                        Status = employeeStock.Status,
+                        Remarks = employeeStock.Remarks
+                    };
+                    _context.EmployeeStocks.Add(newEmployeeStock);
+                    await _context.SaveChangesAsync();
+                    
+                    await transaction.CommitAsync();
+                    return RedirectToAction("Details", "Employees", new { id = employeeId});
+                    
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+            
+            var newStockEmployee = new EmployeeStock
+            {
+                ProjectId = employee.ProjectId,
+                FunctionId = employee.FunctionId,
+                EmployeeId = employee.Id,
+                PpeAttributeCategoryAttributeValueId = ppeAttributeCategoryAttributeValueId,
+                Date = employeeStock.Date,
+                StockIn = employeeStock.StockIn,
+                StockOut = employeeStock.StockOut,
+                Status = employeeStock.Status,
+                Remarks = employeeStock.Remarks
+            };
+            
+            //return Json(employeeStock);
             if (ModelState.IsValid)
             {
-                _context.Add(employeeStock);
+                _context.EmployeeStocks.Add(newStockEmployee);
                 await _context.SaveChangesAsync();
+                
+                return RedirectToAction("Details", "Employees", new { id = employeeStock.EmployeeId });
                 return RedirectToAction(nameof(Index));
             }
+            
+            //return Json(ModelState.Values.SelectMany(v => v.Errors));
+            
             ViewData["Status"] = new SelectList(Enum.GetValues(typeof(StockEmployeeStatus)));
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeStock.EmployeeId);
-            ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
+            ;//ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
             return View(employeeStock);
         }
 
@@ -90,7 +199,7 @@ namespace PPE.Controllers
             }
             ViewData["Status"] = new SelectList(Enum.GetValues(typeof(StockEmployeeStatus)));
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeStock.EmployeeId);
-            ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
+            //ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
             return View(employeeStock);
         }
 
@@ -128,12 +237,12 @@ namespace PPE.Controllers
             }
             ViewData["Status"] = new SelectList(Enum.GetValues(typeof(StockEmployeeStatus)));
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeStock.EmployeeId);
-            ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
+            //ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
             return View(employeeStock);
         }
 
         // GET: EmployeeStocks/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        /*public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.EmployeeStocks == null)
             {
@@ -142,7 +251,7 @@ namespace PPE.Controllers
 
             var employeeStock = await _context.EmployeeStocks
                 .Include(e => e.Employee)
-                .Include(e => e.VariantValue)
+                //.Include(e => e.VariantValue)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employeeStock == null)
             {
@@ -150,7 +259,7 @@ namespace PPE.Controllers
             }
 
             return View(employeeStock);
-        }
+        }*/
 
         // POST: EmployeeStocks/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -175,5 +284,58 @@ namespace PPE.Controllers
         {
           return (_context.EmployeeStocks?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+        
+        public IActionResult GetPpes(int? categoryId, int? projectId)
+        {
+            if (categoryId == null)
+            {
+                return NotFound();
+            }
+
+            var ppes = _context.Ppes
+                .Include(p => p.Category)
+                .Include(p => p.PpeAttributeCategoryAttributeValues)
+                .ThenInclude(p => p.AttributeValueAttributeCategory)
+                .ThenInclude(p => p.AttributeValue)
+                .Where(p => p.CategoryId == categoryId)
+                .Where(p => p.PpeAttributeCategoryAttributeValues.Any(p => p.StockDetails.Any(s => s.Stock.ProjectId == projectId)))
+                .ToList();
+            
+            var options = "<option value=\"\">Select PPE</option>";
+            foreach (var ppe in ppes)
+            {
+                options += $"<option value=\"{ppe.Id}\">{ppe.Title} | {ppe.Id}</option>";
+            }
+            
+            return Json(options);
+        }
+        
+        // GET: EmployeeStocks/GetAttributesValues/5
+        public IActionResult GetAttributesValues(int? ppeId, int? projectId)
+        {
+            if (ppeId == null)
+            {
+                return NotFound();
+            }
+
+            var ppe = _context.Ppes
+                .Include(p => p.PpeAttributeCategoryAttributeValues)
+                .ThenInclude(p => p.AttributeValueAttributeCategory)
+                .ThenInclude(p => p.AttributeValue)
+                .ThenInclude(p => p.Value)
+                .FirstOrDefault(p => p.Id == ppeId);
+
+           // return Json(ppe.PpeAttributeCategoryAttributeValues);
+            
+            var options = "<option value=\"\">Select Attribute Value</option>";
+            foreach (var ppeAttributeCategoryAttributeValue in ppe.PpeAttributeCategoryAttributeValues)
+            {
+                options += $"<option value=\"{ppeAttributeCategoryAttributeValue.Id}\">{ppeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text} | {ppeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Id}</option>";
+            }
+            
+            return Json(options);
+        }
+
+        
     }
 }

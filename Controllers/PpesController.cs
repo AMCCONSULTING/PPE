@@ -48,6 +48,26 @@ namespace PPE.Controllers
                 return NotFound();
             }
 
+            ViewBag.PpeAttributeCategoryAttributeValues = _context.PpeAttributeCategoryAttributeValues
+                .Where(pacav => pacav.PpeId == id)
+                .Include(pacav => pacav.AttributeValueAttributeCategory)
+                .ThenInclude(avac => avac.AttributeValue)
+                .ThenInclude(av => av.Value)
+                .Include(pacav => pacav.AttributeValueAttributeCategory)
+                .ThenInclude(avac => avac.AttributeValue)
+                .ThenInclude(ac => ac.Attribute)
+                .Select(pacav => new SelectListItem()
+                {
+                    Text = pacav.AttributeValueAttributeCategory.AttributeValue.Value.Text,
+                    Value = pacav.AttributeValueAttributeCategory.AttributeValue.Value.Id.ToString(),
+                    Group = new SelectListGroup()
+                    {
+                        Name = pacav.AttributeValueAttributeCategory.AttributeValue.Attribute.Title
+                    }
+                });
+
+            //return Json(ViewBag.PpeAttributeCategoryAttributeValues);
+            
             return View(ppe);
         }
 
@@ -65,21 +85,30 @@ namespace PPE.Controllers
         [Route("api/ppe")]
         public IActionResult Get([DataTablesRequest] DataTablesRequest dataRequest)
         {
-            IEnumerable<Ppe> ppe = _context.Ppes.Include(p => p.Category);
+            //IEnumerable<Ppe> ppe = _context.Ppes.Include(p => p.Category);
+            IQueryable<Ppe> ppe = _context.Ppes.Include(p => p.Category);
             
             int recordsTotal = ppe.Count();
             int recordsFilterd = recordsTotal;
 
-            /*if (filters.Category > 0)
+            var filters = new Dictionary<string, string>();
+            foreach(var key in Request.Query.Keys)
             {
-                ppe = ppe.Where(e => e.CategoryId == filters.Category);
-                recordsFilterd = ppe.Count();
-            }*/
-            
-            if (!string.IsNullOrEmpty(dataRequest.Search?.Value))
-            {
-                ppe = ppe.Where(e => e.Title.Contains(dataRequest.Search.Value, StringComparison.InvariantCultureIgnoreCase));
-                recordsFilterd = ppe.Count();
+                if (key.StartsWith("filters"))
+                {
+                    filters[key.Substring("filters".Length)] = Request.Query[key];
+                    
+                    if (key == "filters[category]" && !string.IsNullOrEmpty(Request.Query[key]))
+                    {
+                        ppe = ppe.Where(e => e.CategoryId == int.Parse(Request.Query[key]));
+                        recordsFilterd = ppe.Count();
+                    }
+                    if (key == "filters[title]" && !string.IsNullOrEmpty(Request.Query[key]))
+                    {
+                        ppe = ppe.Where(e => e.Title.Contains(Request.Query[key].ToString()));
+                        recordsFilterd = ppe.Count();
+                    }
+                }
             }
             
             ppe = ppe.Skip(dataRequest.Start).Take(dataRequest.Length);
@@ -115,6 +144,46 @@ namespace PPE.Controllers
         {
             if (ModelState.IsValid)
             {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    await _context.AddAsync(ppe);
+                    await _context.SaveChangesAsync();
+                    
+                    var category = _context.Categories.FirstOrDefault(c => c.Id == ppe.CategoryId);
+                    if (category == null)
+                    {
+                        return NotFound();
+                    }
+                    
+                   var attributeValueAttributeCategoryId = _context.AttrValueAttrCategories
+                          .Where(avac => avac.AttributeCategory.CategoryId == category.Id)
+                          .Select(avac => avac.Id)
+                          .ToList();
+                   
+                   var ppeAttributeCategoryAttributeValue = 
+                       attributeValueAttributeCategoryId.Select(avac => new PpeAttributeCategoryAttributeValue
+                   {
+                       AttributeValueAttributeCategoryId = avac,
+                          PpeId = ppe.Id
+                   } ).ToList();
+                   
+                   _context.PpeAttributeCategoryAttributeValues.AddRange(ppeAttributeCategoryAttributeValue);
+                   await _context.SaveChangesAsync();
+                   await transaction.CommitAsync();
+                   
+                   return RedirectToAction(nameof(Index));
+                   
+                }
+                catch (DbUpdateException e)
+                {
+                    await transaction.RollbackAsync();
+                    return Problem(e.Message);
+                }
+            }
+
+            /*if (ModelState.IsValid)
+            {
                 await _context.AddAsync(ppe);
                 await _context.SaveChangesAsync();
 
@@ -129,20 +198,18 @@ namespace PPE.Controllers
                                         PpeId = ppe.Id,
                                         CategoryId = ppe.CategoryId
                                     };
-                                    
+
                                      await _context.Variants.AddAsync(variant);
                                      await _context.SaveChangesAsync();
-                                     
-                    
                 }
-                
-                
+
+
                 /*
                  *    // add the ppe to the VariantValue table with variant id as variant id of the same category
                 var categoryVariantValues = _context.VariantValues
                     .Where(v => v.VariantId == categoryVariant.Id)
                     .ToList();
-                
+
                 var variantValues = categoryVariantValues.Select(v => new VariantValue
                 {
                     ValueId = v.ValueId,
@@ -150,15 +217,17 @@ namespace PPE.Controllers
                 }).ToList();
 
                 // return Json(variantValues);
-                
+
                 await _context.VariantValues.AddRangeAsync(variantValues);
-                 */
-                
+                 #1#
+
                 await _context.SaveChangesAsync();
-                
-               
+
+
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id",
+                "Title", ppe.CategoryId);*/
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", 
                 "Title", ppe.CategoryId);
             return View(ppe);

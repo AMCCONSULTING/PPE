@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PPE.Data;
+using PPE.Data.Enums;
 using PPE.Models;
 
 namespace PPE.Controllers;
@@ -20,6 +21,7 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         // get ppe that are threshold or below threshold and send them to the view
+        /*
         var ppe = _context.Stocks
             .Include(s => s.Project)
             .Include(s => s.VariantValue)
@@ -54,6 +56,17 @@ public class HomeController : Controller
         
         Console.WriteLine($"Labels: {string.Join(", ", labels)}");
         Console.WriteLine($"Data: {string.Join(", ", data)}");
+        */
+
+        var stocks = _context.Stocks
+            .Include(s => s.Ppe)
+            .Where(s => s.ProjectId == null && s.StockType == StockType.Normal)
+            .GroupBy(s => s.Ppe);
+        
+        var labels = stocks.Select(s => $"{s.Key.Title}").ToList();
+        var data = stocks.Select(s => s.Sum(s => s.StockIn - s.StockOut)).ToList();
+        ViewBag.Labels = labels;
+        ViewBag.Data = data;
         
         return View();
     }

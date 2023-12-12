@@ -10,6 +10,13 @@ $(document).ready(function () {
         width: '100%',
     });
     
+    $('.select2-tags').select2({
+        tags: true,
+        placeholder: "Select an option",
+        allowClear: true,
+        width: '100%',
+    });
+    
     // initialize datatable 
     $('table[data-column]').each(function () {
         let table = $(this);
@@ -21,10 +28,9 @@ $(document).ready(function () {
             responsive: true,
             ajax: {
                 url: url,
-                type: 'POST',
+                type: 'GET',
                 dataSrc: 'data.$values',
                 data: function (d) {
-                    
                     // Include filters in the AJAX request
                     d.filters = {};
                     // Iterate over columns and get filter values
@@ -37,7 +43,7 @@ $(document).ready(function () {
                     //console.log(d)
                     return d;
                     
-                }, // Pass filters as data to your server
+                },
             },
             columns: columns.map(function (col) {
                 return {

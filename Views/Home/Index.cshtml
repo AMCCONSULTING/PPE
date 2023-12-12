@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
 <canvas id="ppeChart" width="400" height="100"></canvas>
@@ -31,11 +31,11 @@
             let labels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Labels));
             let data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Data));
             
-            console.log('Labels type:', typeof labels);
+        /*    console.log('Labels type:', typeof labels);
             console.log('Data type:', typeof data);
             
             console.log('Labels:', labels);
-            console.log('Data:', data);
+            console.log('Data:', data);*/
                     
             let ctx = document.getElementById('ppeChart').getContext('2d');
             let myChart = new Chart(ctx, {

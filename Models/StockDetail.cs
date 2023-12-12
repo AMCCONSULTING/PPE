@@ -3,14 +3,12 @@
 public class StockDetail
 {
     public int Id { get; set; }
+   // public DateTime Date { get; set; }
     public int StockId { get; set; }
-    public virtual Stock Stock { get; set; }
-    public int Quantity { get; set; }
-    public int Price { get; set; }
-    public int Total { get; set; }
-    public DateTime Date { get; set; }
-    
-    // stock detail relationship
-    
+    public Stock? Stock { get; set; }
+    public int PpeAttributeCategoryAttributeValueId { get; set; }
+    public PpeAttributeCategoryAttributeValue? PpeAttributeCategoryAttributeValue { get; set; }
+    public int StockIn { get; set; }
+    public int StockOut { get; set; }
     
 }

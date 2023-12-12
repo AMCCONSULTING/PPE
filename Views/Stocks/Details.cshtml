@@ -1,53 +1,38 @@
 @model PPE.Models.Stock
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Details Stock";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "Stocks",
+            ButtonType = "dark"
+        }};
 }
 
-<h1>Details</h1>
+<dive>
+    <h4>
+        @ViewBag.Ppe.Title
+    </h4>
+    <table class="table bg-white">
+        <thead>
+        <th>Value</th>
+        <th>StockIn</th>
+        <th>StockOut</th>
+        <th>Current Stock</th>
+        </thead>
+        <tbody>
+        @foreach (var item in ViewBag.StockDetailed)
+        {
+            <tr>
+                <td>@item.Value</td>
+                <td>@item.StockIn.ToString()</td>
+                <td>@item.StockOut.ToString()</td>
+                <td>@item.CurrentStock.ToString()</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</dive>
 
-<div>
-    <h4>Stock</h4>
-    <hr />
-    <dl class="row">
-        @*<dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>*@
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Date)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Date)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Project)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Project.Prefix)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockIn)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockIn)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockOut)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockOut)
-        </dd>
-    </dl>
-    <dive>
-        @Html.DisplayFor(model => model.VariantValue.Variant.Ppe.Title) | 
-        @Html.DisplayFor(model => model.VariantValue.Variant.Title) |
-        @Html.DisplayFor(model => model.VariantValue.Value)
-    </dive>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>

@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PPE.Data;
+using PPE.Data.Enums;
 using PPE.Models;
 
 namespace PPE.Controllers
@@ -22,25 +19,40 @@ namespace PPE.Controllers
         // GET: Stocks
         public async Task<IActionResult> Index()
         {
-            // Define your filter values
-            var projectId = 1/* your project id */;
-            var ppeId = 1/* your ppe id */;
-            var variantValueId = 1/* your variant value id */;
-
-            /*var appDbContext = _context.Stocks
-                .Where(s =>
-                    (projectId == 0 || s.Project.Id == projectId) &&
-                    //(ppeId == 0 || s.VariantValue.Variant.Ppe.Id == ppeId) &&
-                    (variantValueId == 0 || s.VariantValue.Id == variantValueId))
-                .Include(s => s.Project)
-                .Include(s => s.VariantValue)
-                .ThenInclude(s => s.Variant)
-                .ThenInclude(s => s.Ppe);*/
+            
             var appDbContext = _context.Stocks
-                .Include(s => s.Project)
-                .Include(s => s.VariantValue)
-                .ThenInclude(s => s.Variant)
+                .Where(s => s.Project == null && s.StockType == StockType.Normal)
+                .Include(s => s.Ppe)
+                .ThenInclude(s => s.Category)
+                .Include(s => s.StockDetails)
+                .ThenInclude(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeValue)
+                .ThenInclude(s => s.Value)
+                .Include(s => s.StockDetails)
+                .ThenInclude(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeCategory)
+                .ThenInclude(s => s.Attribute)
+                .Include(s => s.StockDetails)
+                .ThenInclude(s => s.PpeAttributeCategoryAttributeValue)
                 .ThenInclude(s => s.Ppe);
+            
+            // stock of each ppe and sum of stock in and stock out
+            var stockOfPpe = appDbContext
+                .GroupBy(s => s.Ppe)
+                .Select(s => new 
+                { 
+                    Ppe = s.Key,
+                    StockIn = s.Sum(s => s.StockIn),
+                    StockOut = s.Sum(s => s.StockOut),
+                    CurrentStock = s.Sum(s => s.StockIn) - s.Sum(s => s.StockOut),
+                    Threshold = s.Key.Threshold,
+                });
+            
+            //return Json(stockOfPpe);
+            
+            ViewBag.StockOfPpe = stockOfPpe;
             
             return View(await appDbContext.ToListAsync());
         }
@@ -48,148 +60,227 @@ namespace PPE.Controllers
         // GET: Stocks/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Stocks == null)
+            if (id == null || _context.Ppes == null)
             {
                 return NotFound();
             }
+            
+            var ppe = await _context.Ppes
+                .Where(p => p.Id == id)
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync();
 
-            var stock = await _context.Stocks
-                .Include(s => s.Project)
-                .Include(s => s.VariantValue)
-                .ThenInclude(s => s.Variant)
+            var stockDetails = _context.StockDetails
+                .Where(s => s.Stock.PpeId == id && s.Stock.Project == null && s.Stock.StockType == StockType.Normal)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeValue)
+                .ThenInclude(s => s.Value)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeCategory)
+                .ThenInclude(s => s.Attribute)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
                 .ThenInclude(s => s.Ppe)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (stock == null)
-            {
-                return NotFound();
-            }
-
-            return View(stock);
+                .GroupBy(s => s.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text);
+            
+            ViewBag.Ppe = ppe;
+            
+            
+            // sum of ppes stock in and stock out of each attribute value of ppe
+            var stockOfPpe = stockDetails
+                .Select(s => new 
+                { 
+                    Value = s.Key,
+                    StockIn = s.Sum(s => s.StockIn),
+                    StockOut = s.Sum(s => s.StockOut),
+                    CurrentStock = s.Sum(s => s.StockIn) - s.Sum(s => s.StockOut),
+                });
+          
+            ViewBag.StockDetailed = stockOfPpe;
+           // return Json(ViewBag.StockDetailed);
+            return View();
         }
 
         // GET: Stocks/Create
         public IActionResult Create()
         {
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix");
-            ViewData["VariantValueId"] = _context.VariantValues
-                .Include(v => v.Variant)
-                .ThenInclude(v => v.Ppe)
-                .Select(v => new SelectListItem
-                {
-                    Text = $"{v.Variant.Ppe.Title} - {v.Value}",
-                    Value = v.Id.ToString(),
-                });
+            ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "Title");
+            
             return View();
         }
         
-        // POST: Stocks/SaveStocks
-        [HttpPost]
-        public IActionResult SaveStocks(List<Stock> stocks)
+        // GET: Stocks/GetPpeOfCategory/5
+        public async Task<IActionResult> GetPpeOfCategory(int? id)
         {
-            Console.WriteLine($"Stocks: {stocks}");
-            return Json(stocks);
-            try
-            {
-                foreach (var stock in stocks)
-                {
-                    // Save each stock entry to the database
-                    var newStock = new Stock
-                    {
-                        VariantValueId = stock.VariantValueId,
-                        StockIn = stock.StockIn,
-                        StockOut = stock.StockOut,
-                        ProjectId = stock.ProjectId,
-                        Date = stock.Date,
-                        // Add other properties as needed
-                    };
-
-                    _context.Stocks.Add(newStock);
-                }
-
-                _context.SaveChanges();
-
-                return RedirectToAction("Index"); // Redirect to another action or page
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions (log or display an error message)
-                return View("Error");
-            }
-        }
-
-        // POST: Stocks/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Quantity,Date,ProjectId,StockIn,StockOut,VariantValueId")] Stock stock)
-        {
-
-            return Json(stock);
-            
-            if (ModelState.IsValid)
-            {
-                // if project already has a stock for this variant value, update it instead of creating a new one
-                var existingStock = await _context.Stocks
-                    .FirstOrDefaultAsync(s => s.ProjectId == stock.ProjectId && s.VariantValueId == stock.VariantValueId);
-                if (existingStock != null)
-                {
-                    existingStock.StockIn += stock.StockIn;
-                    existingStock.StockOut += stock.StockOut;
-                    _context.Update(existingStock);
-                }
-                else
-                {
-                    _context.Add(stock); 
-                }
-               
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", stock.ProjectId);
-            ViewData["VariantValueId"] = _context.VariantValues
-                .Include(v => v.Variant)
-                .ThenInclude(v => v.Ppe)
-                .Select(v => new SelectListItem
-                {
-                    Text = $"{v.Variant.Ppe.Title} - {v.Value}",
-                    Value = v.Id.ToString(),
-                    Selected = v.Id == stock.VariantValueId,
-                });
-            return View(stock);
-        }
-        
-        // GET: Stocks/GetVariantValueNotInProjectStocks/5
-        public async Task<IActionResult> GetVariantValueNotInProjectStocks(int? id)
-        {
-            if (id == null || _context.Stocks == null)
+            if (id == null || _context.Ppes == null)
             {
                 return NotFound();
             }
 
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
-            {
-                return NotFound();
-            }
-
-            var variantValues = _context.VariantValues
-                .Include(v => v.Variant)
-                .ThenInclude(v => v.Ppe)
-                .Where(v => !_context.Stocks.Any(s => s.VariantValueId == v.Id && s.ProjectId == id))
-                .Select(v => new SelectListItem
+            var ppe = await _context.Ppes
+                .Where(p => p.CategoryId == id)
+                .Select(p => new SelectListItem
                 {
-                    Text = $"{v.Variant.Ppe.Title} - {v.Value}",
-                    Value = v.Id.ToString(),
-                });
+                    Text = p.Title,
+                    Value = p.Id.ToString(),
+                })
+                .ToListAsync();
             
+            // create select list for ppe with option to select html element
             var options = "<option value=''>-- Select an option --</option>";
-            foreach (var variantValue in variantValues)
+            foreach (var p in ppe)
             {
-                options += $"<option " + $"value='{variantValue.Value}'>{variantValue.Text}</option>";
+                options += $"<option " + $"value='{p.Value}'>{p.Text}</option>";
             }
             
             return Json(options);
         }
+        
+        // GET: Stocks/GetPpeAttributeCategoryAttributeValueOfPpe/5
+        public async Task<IActionResult> GetPpeAttributeCategoryAttributeValueOfPpe(int? id)
+        {
+            if (id == null || _context.PpeAttributeCategoryAttributeValues == null)
+            {
+                return NotFound();
+            }
 
+            var ppeAttributeCategoryAttributeValue = await _context.PpeAttributeCategoryAttributeValues
+                .Where(p => p.PpeId == id)
+                .Include(p => p.StockDetails)
+                
+                .Select(p => new SelectListItem
+                {
+                    Text = p.AttributeValueAttributeCategory.AttributeValue.Value.Text,
+                    Value = p.Id.ToString(),
+                })
+                .ToListAsync();
+            
+            // create select list for ppe with option to select html element
+            var options = "<option value=''>-- Select an option --</option>";
+            foreach (var p in ppeAttributeCategoryAttributeValue)
+            {
+                options += $"<option " + $"value='{p.Value}'>{p.Text}</option>";
+            }
+            
+            return Json(options);
+        }
+        
+        
+        public async Task<IActionResult> GetAttributeValueOfPpe(int? id)
+        {
+            if (id == null || _context.PpeAttributeCategoryAttributeValues == null)
+            {
+                return NotFound();
+            }
+            
+            var ppeAttributeValueInStockDetails = 
+                await _context.StockDetails
+                    .Where(s => s.Stock.PpeId == id &&
+                                s.Stock.Project == null && 
+                                s.Stock.StockType == StockType.Normal)
+                    .Include(s => s.PpeAttributeCategoryAttributeValue)
+                    .ThenInclude(s => s.AttributeValueAttributeCategory)
+                    .ThenInclude(s => s.AttributeValue)
+                    .ThenInclude(s => s.Value)
+                    .GroupBy(s => s.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text)
+                    .Select(s => s.FirstOrDefault())
+               
+                    .ToListAsync();
+
+            //return Json(ppeAttributeValueInStockDetails);
+            
+            var ppeAttributeCategoryAttributeValue = await _context.PpeAttributeCategoryAttributeValues
+                .Where(p => p.PpeId == id)
+                .Include(p => p.StockDetails)
+                
+                .Select(p => new SelectListItem
+                {
+                    Text = p.AttributeValueAttributeCategory.AttributeValue.Value.Text,
+                    Value = p.Id.ToString(),
+                })
+                .ToListAsync();
+            
+            // create select list for ppe with option to select html element
+            var options = "<option value=''>-- Select an option --</option>";
+            foreach (var p in ppeAttributeValueInStockDetails)
+            {
+                options += $"<option " + $"value='{p.Id}'>{p.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text}</option>";
+            }
+            
+            return Json(options);
+        }
+        
+        // POST: Stocks/SaveStocks
+        [HttpPost]
+        public async Task<IActionResult> Create([Bind("Id,Date,ProjectId,StockIn,StockOut,PpeId,NatureStock,StockType")] Stock stock, string attributeValueId)
+        {
+            //return Json(attributeValueId);
+            if (ModelState.IsValid)
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.Add(stock);
+                        await _context.SaveChangesAsync();
+
+                        if (stock.ProjectId != null)
+                        {
+                            // add new record with project id null and stock out value
+                            var stockOut = new Stock
+                            {
+                                Date = stock.Date,
+                                StockOut = stock.StockIn,
+                                StockIn = 0,
+                                PpeId = stock.PpeId,
+                                StockType = StockType.Normal,
+                                StockNature = StockNature.Administration,
+                            };
+                            _context.Add(stockOut);
+                            await _context.SaveChangesAsync();
+                            
+                            var stockDetails = new StockDetail
+                            {
+                                StockId = stockOut.Id,
+                                PpeAttributeCategoryAttributeValueId = int.Parse(attributeValueId),
+                                StockIn = 0,
+                                StockOut = stock.StockIn,
+                            };
+                            _context.Add(stockDetails);
+                            await _context.SaveChangesAsync();
+                        }
+                        
+                        var stockDetail = new StockDetail
+                        {
+                            StockId = stock.Id,
+                            PpeAttributeCategoryAttributeValueId = int.Parse(attributeValueId),
+                            StockIn = stock.StockIn,
+                            StockOut = stock.StockOut,
+                        };
+                        
+                        _context.Add(stockDetail);
+                        await _context.SaveChangesAsync();
+                        
+                        await transaction.CommitAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch (Exception e)
+                    {
+                        await transaction.RollbackAsync();
+                        return Json(e.Message);
+                    }
+                }
+            }
+            
+            //return Json(ModelState.Values.SelectMany(v => v.Errors));
+            
+            ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "Title");
+            ViewBag.ProjectId = new SelectList(_context.Projects, "Id", "Title");
+            return View(stock);
+        }
+        
+        
         // GET: Stocks/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -204,17 +295,7 @@ namespace PPE.Controllers
                 return NotFound();
             }
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", stock.ProjectId);
-            ViewData["VariantValueId"] = _context.VariantValues
-                .Include(v => v.Variant)
-                .ThenInclude(v => v.Ppe)
-                .Select(v => new SelectListItem
-                {
-                    Text = $"{v.Variant.Ppe.Title} - {v.Value}",
-                    Value = v.Id.ToString(),
-                    Selected = v.Id == stock.VariantValueId,
-                });
-            
-            //return Json(ViewData["VariantValueId"]);
+        
             return View(stock);
         }
 
@@ -251,25 +332,13 @@ namespace PPE.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            //return Json(ModelState.Values.SelectMany(v => v.Errors));
             
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Prefix", stock.ProjectId);
-            ViewData["VariantValueId"] = 
-                //new SelectList(_context.VariantValues, "Id", "Id", stock.VariantValueId);
-                _context.VariantValues
-                    .Include(v => v.Variant)
-                    .ThenInclude(v => v.Ppe)
-                    .Select(v => new SelectListItem
-                    {
-                        Text = $"{v.Variant.Ppe.Title} - {v.Value}",
-                        Value = v.Id.ToString(),
-                        Selected = v.Id == stock.VariantValueId,
-                    });
             return View(stock);
         }
 
         // GET: Stocks/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        /*public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Stocks == null)
             {
@@ -286,7 +355,7 @@ namespace PPE.Controllers
             }
 
             return View(stock);
-        }
+        }*/
 
         // POST: Stocks/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -315,6 +384,120 @@ namespace PPE.Controllers
         public IActionResult FilterStock()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IActionResult> StockReturn()
+        {
+            
+            var stockReturn = _context.EmployeeStocks
+                .Where(s => s.Status == StockEmployeeStatus.Returned || s.Status == StockEmployeeStatus.Damaged)
+                .Include(s => s.Employee)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeValue)
+                .ThenInclude(s => s.Value)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeCategory)
+                .ThenInclude(s => s.Attribute)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.Ppe);
+
+            //return Json(stockReturn);
+            // stock of each ppe and sum of stock in and stock out
+            var stockOfPpe = stockReturn
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.Ppe)
+                .ThenInclude(s => s.Category)
+                .GroupBy(s => s.PpeAttributeCategoryAttributeValue.Ppe)
+                .Select(s => new 
+                { 
+                    Ppe = s.Key.Title,
+                    Category = s.Key.Category.Title,
+                    Status = s.FirstOrDefault().Status,
+                    StockIn = s.Sum(s => s.StockIn),
+                    StockOut = s.Sum(s => s.StockOut),
+                    CurrentStock = s.Sum(s => s.StockIn) - s.Sum(s => s.StockOut),
+                });
+            //return Json(stockOfPpe);
+            /*var appDbContext = _context.Stocks
+                .Where(s => s.Project == null && s.StockType == StockType.Return)
+                .Include(s => s.Ppe)
+                .ThenInclude(s => s.Category)
+                .Include(s => s.StockDetails)
+                .ThenInclude(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeValue)
+                .ThenInclude(s => s.Value)
+                .Include(s => s.StockDetails)
+                .ThenInclude(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeCategory)
+                .ThenInclude(s => s.Attribute)
+                .Include(s => s.StockDetails)
+                .ThenInclude(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.Ppe);*/
+            
+            // stock of each ppe and sum of stock in and stock out
+            /*var stockOfPpe = appDbContext
+                .GroupBy(s => s.Ppe)
+                .Select(s => new 
+                { 
+                    Ppe = s.Key,
+                    StockIn = s.Sum(s => s.StockIn),
+                    StockOut = s.Sum(s => s.StockOut),
+                    CurrentStock = s.Sum(s => s.StockIn) - s.Sum(s => s.StockOut),
+                    Threshold = s.Key.Threshold,
+                });*/
+            
+            ViewBag.StockOfPpe = stockOfPpe;
+            
+            return View();
+        }
+
+        public async Task<IActionResult> StockLost()
+        {
+            var appDbContext = _context.EmployeeStocks
+                .Where(s => s.Status == StockEmployeeStatus.Lost)
+                .Include(s => s.Employee)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeValue)
+                .ThenInclude(s => s.Value)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.AttributeValueAttributeCategory)
+                .ThenInclude(s => s.AttributeCategory)
+                .ThenInclude(s => s.Attribute)
+                .Include(s => s.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(s => s.Ppe);
+            
+            
+            // stock of each ppe and sum of stock in and stock out
+            var stockOfPpe = appDbContext
+                .GroupBy(s => s.PpeAttributeCategoryAttributeValue.Ppe)
+                .Select(s => new 
+                { 
+                    Ppe = s.Key,
+                    Category = s.Key.Category.Title,
+                    StockIn = s.Sum(s => s.StockIn),
+                    StockOut = s.Sum(s => s.StockOut),
+                    CurrentStock = s.Sum(s => s.StockIn) - s.Sum(s => s.StockOut),
+                    Threshold = s.Key.Threshold,
+                });
+            
+            //return Json(stockOfPpe);
+            
+            ViewBag.StockOfPpe = stockOfPpe;
+            
+            return View();
+        }
+
+        // GET: Stocks/CreateMovement
+        public IActionResult CreateMovement()
+        {
+            ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "Title");
+            ViewBag.ProjectId = new SelectList(_context.Projects, "Id", "Title");
+            return View();
         }
     }
 }
