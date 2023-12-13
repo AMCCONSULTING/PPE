@@ -22,7 +22,7 @@
             </div>
             <div class="form-group col-12">
                 <label asp-for="AttributeCategories" class="control-label"></label>
-                <select name="attributes[]" class="form-control select2" multiple>
+                <select name="attributes[]" class="form-control select2">
                     <option></option>
                     @foreach (var value in ViewBag.Attributes )
                     {

@@ -111,7 +111,7 @@
                 $.ajax({
                     url: '/EmployeeStocks/GetAttributesValues',
                     type: 'GET',
-                    data: { ppeId: ppeId },
+                    data: { ppeId: ppeId, projectId: @ViewBag.ProjectId },
                     success: function (data) {
                         console.log(data)
                         valueSelect.html(data)

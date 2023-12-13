@@ -81,7 +81,7 @@ namespace PPE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AttributeCategory",
+                name: "AttributeCategories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -91,15 +91,15 @@ namespace PPE.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AttributeCategory", x => x.Id);
+                    table.PrimaryKey("PK_AttributeCategories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AttributeCategory_Attributes_AttributeId",
+                        name: "FK_AttributeCategories_Attributes_AttributeId",
                         column: x => x.AttributeId,
                         principalTable: "Attributes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AttributeCategory_Categories_CategoryId",
+                        name: "FK_AttributeCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "Id",
@@ -186,28 +186,6 @@ namespace PPE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Stocks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProjectId = table.Column<int>(type: "int", nullable: false),
-                    StockIn = table.Column<int>(type: "int", nullable: false),
-                    StockOut = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Stocks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Stocks_Projects_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "Projects",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AttributeValues",
                 columns: table => new
                 {
@@ -234,6 +212,88 @@ namespace PPE.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Stocks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: true),
+                    StockIn = table.Column<int>(type: "int", nullable: false),
+                    StockOut = table.Column<int>(type: "int", nullable: false),
+                    PpeId = table.Column<int>(type: "int", nullable: false),
+                    StockNature = table.Column<int>(type: "int", nullable: false),
+                    StockType = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stocks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Stocks_Ppes_PpeId",
+                        column: x => x.PpeId,
+                        principalTable: "Ppes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Stocks_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AttrValueAttrCategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AttributeValueId = table.Column<int>(type: "int", nullable: false),
+                    AttributeCategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AttrValueAttrCategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AttrValueAttrCategories_AttributeCategories_AttributeCategoryId",
+                        column: x => x.AttributeCategoryId,
+                        principalTable: "AttributeCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AttrValueAttrCategories_AttributeValues_AttributeValueId",
+                        column: x => x.AttributeValueId,
+                        principalTable: "AttributeValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PpeAttributeCategoryAttributeValues",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PpeId = table.Column<int>(type: "int", nullable: false),
+                    AttributeValueAttributeCategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PpeAttributeCategoryAttributeValues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PpeAttributeCategoryAttributeValues_AttrValueAttrCategories_AttributeValueAttributeCategoryId",
+                        column: x => x.AttributeValueAttributeCategoryId,
+                        principalTable: "AttrValueAttrCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PpeAttributeCategoryAttributeValues_Ppes_PpeId",
+                        column: x => x.PpeId,
+                        principalTable: "Ppes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EmployeeStocks",
                 columns: table => new
                 {
@@ -244,10 +304,16 @@ namespace PPE.Migrations
                     StockOut = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VariantValueId = table.Column<int>(type: "int", nullable: false),
+                    IsArchived = table.Column<bool>(type: "bit", nullable: false),
+                    StockType = table.Column<int>(type: "int", nullable: false),
+                    Designation = table.Column<int>(type: "int", nullable: false),
+                    PpeCondition = table.Column<int>(type: "int", nullable: false),
+                    PpeAttributeCategoryAttributeValueId = table.Column<int>(type: "int", nullable: true),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false),
-                    FunctionId = table.Column<int>(type: "int", nullable: false)
+                    FunctionId = table.Column<int>(type: "int", nullable: false),
+                    ResponsibleId = table.Column<int>(type: "int", nullable: false),
+                    HseId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -265,6 +331,11 @@ namespace PPE.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_EmployeeStocks_PpeAttributeCategoryAttributeValues_PpeAttributeCategoryAttributeValueId",
+                        column: x => x.PpeAttributeCategoryAttributeValueId,
+                        principalTable: "PpeAttributeCategoryAttributeValues",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_EmployeeStocks_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
@@ -273,39 +344,61 @@ namespace PPE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AttrValueAttrCategories",
+                name: "StockDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AttributeValueId = table.Column<int>(type: "int", nullable: false),
-                    AttributeCategoryId = table.Column<int>(type: "int", nullable: false)
+                    StockId = table.Column<int>(type: "int", nullable: false),
+                    PpeAttributeCategoryAttributeValueId = table.Column<int>(type: "int", nullable: false),
+                    StockIn = table.Column<int>(type: "int", nullable: false),
+                    StockOut = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AttrValueAttrCategories", x => x.Id);
+                    table.PrimaryKey("PK_StockDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AttrValueAttrCategories_AttributeCategory_AttributeCategoryId",
-                        column: x => x.AttributeCategoryId,
-                        principalTable: "AttributeCategory",
+                        name: "FK_StockDetails_PpeAttributeCategoryAttributeValues_PpeAttributeCategoryAttributeValueId",
+                        column: x => x.PpeAttributeCategoryAttributeValueId,
+                        principalTable: "PpeAttributeCategoryAttributeValues",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AttrValueAttrCategories_AttributeValues_AttributeValueId",
-                        column: x => x.AttributeValueId,
-                        principalTable: "AttributeValues",
+                        name: "FK_StockDetails_Stocks_StockId",
+                        column: x => x.StockId,
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "StocksToBePaid",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EmployeeStockId = table.Column<int>(type: "int", nullable: false),
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StocksToBePaid", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StocksToBePaid_EmployeeStocks_EmployeeStockId",
+                        column: x => x.EmployeeStockId,
+                        principalTable: "EmployeeStocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_AttributeCategory_AttributeId",
-                table: "AttributeCategory",
+                name: "IX_AttributeCategories_AttributeId",
+                table: "AttributeCategories",
                 column: "AttributeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AttributeCategory_CategoryId",
-                table: "AttributeCategory",
+                name: "IX_AttributeCategories_CategoryId",
+                table: "AttributeCategories",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
@@ -349,6 +442,11 @@ namespace PPE.Migrations
                 column: "FunctionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmployeeStocks_PpeAttributeCategoryAttributeValueId",
+                table: "EmployeeStocks",
+                column: "PpeAttributeCategoryAttributeValueId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EmployeeStocks_ProjectId",
                 table: "EmployeeStocks",
                 column: "ProjectId");
@@ -359,42 +457,87 @@ namespace PPE.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PpeAttributeCategoryAttributeValues_AttributeValueAttributeCategoryId",
+                table: "PpeAttributeCategoryAttributeValues",
+                column: "AttributeValueAttributeCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PpeAttributeCategoryAttributeValues_PpeId",
+                table: "PpeAttributeCategoryAttributeValues",
+                column: "PpeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Ppes_CategoryId",
                 table: "Ppes",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StockDetails_PpeAttributeCategoryAttributeValueId",
+                table: "StockDetails",
+                column: "PpeAttributeCategoryAttributeValueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockDetails_StockId",
+                table: "StockDetails",
+                column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stocks_PpeId",
+                table: "Stocks",
+                column: "PpeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stocks_ProjectId",
                 table: "Stocks",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StocksToBePaid_EmployeeStockId",
+                table: "StocksToBePaid",
+                column: "EmployeeStockId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AttrValueAttrCategories");
-
-            migrationBuilder.DropTable(
-                name: "EmployeeStocks");
-
-            migrationBuilder.DropTable(
                 name: "Managers");
 
             migrationBuilder.DropTable(
-                name: "Ppes");
+                name: "StockDetails");
+
+            migrationBuilder.DropTable(
+                name: "StocksToBePaid");
 
             migrationBuilder.DropTable(
                 name: "Stocks");
 
             migrationBuilder.DropTable(
-                name: "AttributeCategory");
-
-            migrationBuilder.DropTable(
-                name: "AttributeValues");
+                name: "EmployeeStocks");
 
             migrationBuilder.DropTable(
                 name: "Employees");
+
+            migrationBuilder.DropTable(
+                name: "PpeAttributeCategoryAttributeValues");
+
+            migrationBuilder.DropTable(
+                name: "Functions");
+
+            migrationBuilder.DropTable(
+                name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "AttrValueAttrCategories");
+
+            migrationBuilder.DropTable(
+                name: "Ppes");
+
+            migrationBuilder.DropTable(
+                name: "AttributeCategories");
+
+            migrationBuilder.DropTable(
+                name: "AttributeValues");
 
             migrationBuilder.DropTable(
                 name: "Categories");
@@ -404,12 +547,6 @@ namespace PPE.Migrations
 
             migrationBuilder.DropTable(
                 name: "Values");
-
-            migrationBuilder.DropTable(
-                name: "Functions");
-
-            migrationBuilder.DropTable(
-                name: "Projects");
         }
     }
 }

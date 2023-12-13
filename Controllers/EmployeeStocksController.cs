@@ -304,7 +304,7 @@ namespace PPE.Controllers
             var options = "<option value=\"\">Select PPE</option>";
             foreach (var ppe in ppes)
             {
-                options += $"<option value=\"{ppe.Id}\">{ppe.Title} | {ppe.Id}</option>";
+                options += $"<option value=\"{ppe.Id}\">{ppe.Title}</option>";
             }
             
             return Json(options);
@@ -318,19 +318,33 @@ namespace PPE.Controllers
                 return NotFound();
             }
 
-            var ppe = _context.Ppes
+            /*var ppe = _context.Ppes
                 .Include(p => p.PpeAttributeCategoryAttributeValues)
                 .ThenInclude(p => p.AttributeValueAttributeCategory)
                 .ThenInclude(p => p.AttributeValue)
                 .ThenInclude(p => p.Value)
-                .FirstOrDefault(p => p.Id == ppeId);
+                .FirstOrDefault(p => p.Id == ppeId);*/
+            
+            var ppeAttributeCategoryAttributeValues = _context.PpeAttributeCategoryAttributeValues
+                .Include(p => p.AttributeValueAttributeCategory)
+                .ThenInclude(p => p.AttributeValue)
+                .ThenInclude(p => p.Value)
+                .Where(p => p.PpeId == ppeId)
+                .Where(p => p.StockDetails.Any(s => s.Stock.ProjectId == projectId))
+                .ToList();
+            
 
            // return Json(ppe.PpeAttributeCategoryAttributeValues);
             
             var options = "<option value=\"\">Select Attribute Value</option>";
-            foreach (var ppeAttributeCategoryAttributeValue in ppe.PpeAttributeCategoryAttributeValues)
+            foreach (var ppeAttributeCategoryAttributeValue in ppeAttributeCategoryAttributeValues)
             {
-                options += $"<option value=\"{ppeAttributeCategoryAttributeValue.Id}\">{ppeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text} | {ppeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Id}</option>";
+                var valueCount = _context.StockDetails
+                    .Include(s => s.Stock)
+                    .Where(s => s.PpeAttributeCategoryAttributeValueId == ppeAttributeCategoryAttributeValue.Id)
+                    .Where(s => s.Stock.ProjectId == projectId)
+                    .Sum(s => s.Stock.StockIn - s.Stock.StockOut);
+                options += $"<option value=\"{ppeAttributeCategoryAttributeValue.Id}\">{ppeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text} ( {valueCount})</option>";
             }
             
             return Json(options);

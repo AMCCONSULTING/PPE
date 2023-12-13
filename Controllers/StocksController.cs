@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PPE.Data;
 using PPE.Data.Enums;
@@ -85,7 +86,6 @@ namespace PPE.Controllers
                 .GroupBy(s => s.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text);
             
             ViewBag.Ppe = ppe;
-            
             
             // sum of ppes stock in and stock out of each attribute value of ppe
             var stockOfPpe = stockDetails
@@ -205,7 +205,7 @@ namespace PPE.Controllers
             var options = "<option value=''>-- Select an option --</option>";
             foreach (var p in ppeAttributeValueInStockDetails)
             {
-                options += $"<option " + $"value='{p.Id}'>{p.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text}</option>";
+                options += $"<option " + $"value='{p.PpeAttributeCategoryAttributeValueId}'>{p.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text}</option>";
             }
             
             return Json(options);
@@ -213,62 +213,120 @@ namespace PPE.Controllers
         
         // POST: Stocks/SaveStocks
         [HttpPost]
-        public async Task<IActionResult> Create([Bind("Id,Date,ProjectId,StockIn,StockOut,PpeId,NatureStock,StockType")] Stock stock, string attributeValueId)
+        public async Task<IActionResult> Create([Bind("Id,Date,ProjectId,StockIn,StockOut,PpeId,NatureStock,StockType")] Stock stock,
+            string attributeValueId,
+            List<int> stockIn, List<int> ppeVariantId, List<int> ppeIds)
         {
-            //return Json(attributeValueId);
+            /*return Json(
+                new
+                {
+                    ppeIds,
+                    stockIn,
+                    ppeVariantId,
+                });*/
             if (ModelState.IsValid)
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {
-                        _context.Add(stock);
-                        await _context.SaveChangesAsync();
+                        /*_context.Add(stock);
+                        await _context.SaveChangesAsync();*/
 
-                        if (stock.ProjectId != null)
+                        if (stock.ProjectId == null)
                         {
-                            // add new record with project id null and stock out value
-                            var stockOut = new Stock
+                            for (int i = 0; i < ppeVariantId.Count; i++)
                             {
-                                Date = stock.Date,
-                                StockOut = stock.StockIn,
-                                StockIn = 0,
-                                PpeId = stock.PpeId,
-                                StockType = StockType.Normal,
-                                StockNature = StockNature.Administration,
-                            };
-                            _context.Add(stockOut);
+                                var newStockIn = new Stock
+                                {
+                                    Date = stock.Date,
+                                    StockIn = stockIn[i],
+                                    StockOut = 0,
+                                    PpeId = ppeIds[i],
+                                    StockType = StockType.Normal,
+                                    StockNature = StockNature.Administration,
+                                };
+                                _context.Add(newStockIn);
+                                await _context.SaveChangesAsync();
+                                
+                                var newStockDetails = new StockDetail
+                                {
+                                    StockId = newStockIn.Id,
+                                    PpeAttributeCategoryAttributeValueId = ppeVariantId[i],
+                                    StockIn = stockIn[i],
+                                    StockOut = 0,
+                                };
+                                _context.Add(newStockDetails);
+                               await _context.SaveChangesAsync();
+                            }
+                            await _context.SaveChangesAsync();
+                            await transaction.CommitAsync();
+                            return RedirectToAction(nameof(Index));
+                        }
+                        else
+                        {
+                            /*return Json(new
+                            {
+                                ppeIds,
+                                stockIn,
+                                ppeVariantId,
+                            });*/
+                            for (int i = 0; i < ppeVariantId.Count; i++)
+                            {
+                                var newStockOutP = new Stock
+                                {
+                                    Date = stock.Date,
+                                    StockIn = 0,
+                                    StockOut = stockIn[i],
+                                    PpeId = ppeIds[i],
+                                    StockType = StockType.Normal,
+                                    StockNature = StockNature.Administration,
+                                    //ProjectId = stock.ProjectId,
+                                };
+                                _context.Stocks.Add(newStockOutP);
+                                await _context.SaveChangesAsync();
+                                
+                                var newStockIn = new Stock
+                                {
+                                    Date = stock.Date,
+                                    StockIn = stockIn[i],
+                                    StockOut = 0,
+                                    PpeId = ppeIds[i],
+                                    StockType = StockType.Normal,
+                                    StockNature = StockNature.Project,
+                                    ProjectId = stock.ProjectId,
+                                };
+                                _context.Add(newStockIn);
+                                await _context.SaveChangesAsync();
+
+                                var newStockDetailsOut = new StockDetail
+                                {
+                                    StockId = newStockOutP.Id,
+                                    PpeAttributeCategoryAttributeValueId = ppeVariantId[i],
+                                    StockIn = 0,
+                                    StockOut = stockIn[i],
+                                };
+                                _context.Add(newStockDetailsOut);
+                                
+                                var newStockDetails = new StockDetail
+                                {
+                                    StockId = newStockIn.Id,
+                                    PpeAttributeCategoryAttributeValueId = ppeVariantId[i],
+                                    StockIn = stockIn[i],
+                                    StockOut = 0,
+                                };
+                                _context.Add(newStockDetails);
+                            }
+                            
                             await _context.SaveChangesAsync();
                             
-                            var stockDetails = new StockDetail
-                            {
-                                StockId = stockOut.Id,
-                                PpeAttributeCategoryAttributeValueId = int.Parse(attributeValueId),
-                                StockIn = 0,
-                                StockOut = stock.StockIn,
-                            };
-                            _context.Add(stockDetails);
-                            await _context.SaveChangesAsync();
+                            await transaction.CommitAsync();
+                            return RedirectToAction(nameof(Index));
                         }
-                        
-                        var stockDetail = new StockDetail
-                        {
-                            StockId = stock.Id,
-                            PpeAttributeCategoryAttributeValueId = int.Parse(attributeValueId),
-                            StockIn = stock.StockIn,
-                            StockOut = stock.StockOut,
-                        };
-                        
-                        _context.Add(stockDetail);
-                        await _context.SaveChangesAsync();
-                        
-                        await transaction.CommitAsync();
-                        return RedirectToAction(nameof(Index));
-                    }
-                    catch (Exception e)
+                    } catch (DbUpdateException ex)
                     {
                         await transaction.RollbackAsync();
-                        return Json(e.Message);
+                        return Json(GetFullErrorMessage(ex));
                     }
                 }
             }
@@ -499,5 +557,20 @@ namespace PPE.Controllers
             ViewBag.ProjectId = new SelectList(_context.Projects, "Id", "Title");
             return View();
         }
+        
+        private string GetFullErrorMessage(DbUpdateException ex)
+        {
+            var messages = new List<string>();
+            Exception currentException = ex;
+
+            while (currentException != null)
+            {
+                messages.Add(currentException.Message);
+                currentException = currentException.InnerException;
+            }
+
+            return string.Join(" ", messages);
+        }
+        
     }
 }

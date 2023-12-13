@@ -101,7 +101,7 @@
                                                             <label for="" class="col-form-label">HSE Check status:</label>
                                                             <select name="status"
                                                                     data-placeholder="-- Select Status --"
-                                                                    class="form-control select2">
+                                                                    class="form-control select2 hseCheckSelect">
                                                                 <option></option>
                                                                 <option value="0">@PpeStatus.Good</option>
                                                                 <option value="1">@PpeStatus.Damaged</option>
@@ -109,10 +109,60 @@
                                                             </select>
                                                         </div>
                                                         <div class="form-group col-12 col-md-6">
-                                                            <label for="" class="col-form-label">Date</label>
+                                                            <label asp-for="" class="col-form-label">Date</label>
                                                             <input type="date" name="date" class="form-control" placeholder="-- Date --"/>
                                                         </div>
+                                                        <div class="form-group col-12 col-md-6 hse-from-group">
+                                                            <label for="" class="col-form-label">HSE </label>
+                                                            <select name="status"
+                                                                    data-placeholder="-- Select HSE --"
+                                                                    class="form-control select2 hseCheckSelect">
+                                                                <option></option>
+                                                                @foreach(var hse in ViewBag.HSEs)
+                                                                {
+                                                                    <option value="@hse.Id">@hse.FullName</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group col-12 col-md-6">
+                                                            <label for="" class="col-form-label">Magazinier</label>
+                                                            <select name="magazinierId"
+                                                                    data-placeholder="-- Select Magazinier --"
+                                                                    class="form-control select2">
+                                                                <option></option>
+                                                                @foreach (var magazinier in ViewBag.Magaziniers)
+                                                                {
+                                                                    <option value="@magazinier.Id">@magazinier.FullName</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group col-12 col-md-6">
+                                                            <label for="" class="col-form-label">Responsable</label>
+                                                            <select name="responsableId"
+                                                                    data-placeholder="-- Select Responsable --"
+                                                                    class="form-control select2">
+                                                                <option></option>
+                                                                @foreach (var responsable in ViewBag.Responsables)
+                                                                {
+                                                                    <option value="@responsable.Id">@responsable.FullName</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        @*<div class="form-group col-12 col-md-6">
+                                                            <label for="" class="col-form-label">Responsable</label>
+                                                            <select name="responsableId"
+                                                                    data-placeholder="-- Select Responsable --"
+                                                                    class="form-control select2">
+                                                                <option></option>
+                                                                @foreach (var responsable in ViewBag.Responsables)
+                                                                {
+                                                                    <option value="@responsable.Id">@responsable.FullName</option>
+                                                                }
+                                                            </select>
+                                                        </div>*@
                                                     </div>
+                                                    
+                                                        
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -165,8 +215,8 @@
         </div>
         <div class="tab-pane" id="tab43" aria-labelledby="base-tab43">
             <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">History PPEs</h3>
-                    </div>
+                <h3 class="card-title">History PPEs</h3>
+            </div>
             <div class="bg-white">
                 <table class="table">
                     <thead>
@@ -194,7 +244,21 @@
             </div>
         </div>
     </div>
-    
 </div>
+
+@section Scripts
+{
+    <script>
+    $(document).ready(function () {
+        $('.hseCheckSelect').on('change', function () {
+            if ($(this).val() == 2) {
+                $('.hse-from-group').hide();
+            } else {
+                $('.hse-from-group').show();
+            }
+        });
+    });
+    </script>
+}
 
 

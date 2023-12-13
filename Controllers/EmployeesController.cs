@@ -172,6 +172,30 @@ namespace PPE.Controllers
                 return NotFound();
             }
             
+            ViewBag.Magaziniers = await _context.Managers
+                .Where(u => u.Fonction == Fonction.Magasinier)
+                .Where(u => u.ProjectId == employee.ProjectId)
+                .ToListAsync();
+            
+            ViewBag.Responsables = await _context.Managers
+                .Where(u => u.Fonction == Fonction.Responsable)
+                .ToListAsync();
+            
+            ViewBag.Transporters = await _context.Managers
+                .Where(u => u.Fonction == Fonction.Transporteur)
+                .Where(u => u.ProjectId == employee.ProjectId)
+                .ToListAsync();
+            
+            ViewBag.Hses = await _context.Managers
+                .Where(u => u.Fonction == Fonction.HSE)
+                .Where(u => u.ProjectId == employee.ProjectId)
+                .ToListAsync();
+            
+            ViewBag.Coordinators = await _context.Managers
+                .Where(u => u.Fonction == Fonction.Coordinateur)
+                .Where(u => u.ProjectId == employee.ProjectId)
+                .ToListAsync();
+            
             ViewBag.StockStatus = new SelectList(Enum.GetValues(typeof(StockType)));
 
             return View(employee);
@@ -196,12 +220,15 @@ namespace PPE.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
         {
+            //return Json(employee);
             if (ModelState.IsValid)
             {
+                //return Json(employee);
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            
             ViewData["Size"] = new SelectList(Enum.GetValues(typeof(Size)));
             ViewData["ShoeSize"] = new SelectList(Enum.GetValues(typeof(ShoeSize)));
             ViewData["FunctionId"] = new SelectList(_context.Functions, "Id", "Title", employee.FunctionId);

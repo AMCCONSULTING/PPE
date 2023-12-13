@@ -1,38 +1,41 @@
 @model PPE.Models.Attribute
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Attribute";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "Attributes",
+            ButtonType = "dark"
+        }
+    };
 }
 
-<h1>Create</h1>
 
-<h4>Attribute</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+    <div class="bg-white card-body">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="row">
+            <div class="form-group col-md-6 col-12">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-6 col-12">
                 <label asp-for="AttributeValues" class="control-label"></label>
                 <select asp-for="AttributeValues" name="values[]" class="form-control select2-tags" 
                         multiple data-placeholder="Create values for this attribute">
                     <option></option>
                 </select>
                 <span asp-validation-for="AttributeValues" class="text-danger"></span>
-                </div>
+            </div>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 

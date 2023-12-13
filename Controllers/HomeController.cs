@@ -20,53 +20,35 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        // get ppe that are threshold or below threshold and send them to the view
-        /*
-        var ppe = _context.Stocks
-            .Include(s => s.Project)
-            .Include(s => s.VariantValue)
-            .ThenInclude(v => v!.Variant)
-            .ThenInclude(v => v.Ppe)
-            //.Where(s => s.StockIn - s.StockOut <= s.VariantValue!.Variant.Ppe.Threshold)
-            .ToList();
-        
-        // add the ppe that are not in the stock table
-        var ppeNotInStock = _context.VariantValues
-            .Include(v => v.Variant)
-            .ThenInclude(v => v.Ppe)
-            .Where(v => !ppe.Select(s => s.VariantValueId).Contains(v.Id))
-            .Select(v => new Stock
-            {
-                StockIn = 0,
-                StockOut = 0,
-                ProjectId = 0,
-                VariantValueId = v.Id,
-                VariantValue = v
-            })
-            .ToList();
-        
-        ppe.AddRange(ppeNotInStock);
-        
-        ViewBag.Ppe = ppe;
-        var labels = ppe.Select(s => $"{s.VariantValue.Variant.Ppe.Title} - {s.VariantValue.Value.Text}").ToList();
-        var data = ppe.Select(s => s.StockIn - s.StockOut).ToList();
-
-        ViewBag.Labels = labels;
-        ViewBag.Data = data;
-        
-        Console.WriteLine($"Labels: {string.Join(", ", labels)}");
-        Console.WriteLine($"Data: {string.Join(", ", data)}");
-        */
-
         var stocks = _context.Stocks
             .Include(s => s.Ppe)
             .Where(s => s.ProjectId == null && s.StockType == StockType.Normal)
             .GroupBy(s => s.Ppe);
         
+        // get ppes that are below threshold
+        var ppeBelowThreshold = _context.Stocks
+            .Include(s => s.Project)
+            .Include(v => v!.Ppe)
+            .Where(s => s.StockIn - s.StockOut <= s!.Ppe!.Threshold)
+            .Where(s => s.ProjectId == null && s.StockType == StockType.Normal)
+            .GroupBy(s => s.Ppe.Title)
+            .Select(g => new
+            {
+                Ppe = g.Key,
+                StockIn = g.Sum(s => s.StockIn),
+                StockOut = g.Sum(s => s.StockOut),
+                CurrentStock = g.Sum(s => s.StockIn) - g.Sum(s => s.StockOut),
+            });
+        
+        
+        
         var labels = stocks.Select(s => $"{s.Key.Title}").ToList();
         var data = stocks.Select(s => s.Sum(s => s.StockIn - s.StockOut)).ToList();
         ViewBag.Labels = labels;
         ViewBag.Data = data;
+        
+        // get ppe that are threshold or below threshold
+        ViewBag.Ppe = ppeBelowThreshold;
         
         return View();
     }

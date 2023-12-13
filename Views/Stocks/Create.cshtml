@@ -17,14 +17,14 @@
         <div class="col-md-12">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row">
-                <div class="form-group col-md-6 col-12">
+                <div class="form-group col-md-3 col-12">
                     <label asp-for="Date" class="control-label"></label>
                     <input 
                         asp-for="Date"  
                         class="form-control"/>
                     <span asp-validation-for="Date" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-6 col-12">
+                <div class="form-group col-md-3 col-12">
                     <label asp-for="Ppe.CategoryId" class="control-label">Category</label>
                     <select 
                         asp-for="Ppe.CategoryId" 
@@ -34,9 +34,7 @@
                         <option></option>
                     </select>
                 </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-4 col-12">
+                <div class="form-group col-md-3 col-12">
                     <label  class="control-label">Ppe</label>
                     <select 
                         name="ppeId"
@@ -44,7 +42,7 @@
                         class="form-control select2 ppeSelect">
                     </select>
                 </div>
-                <div class="form-group col-md-4 col-12">
+                <div class="form-group col-md-3 col-12">
                     <label  class="control-label">Value</label>
                     <select 
                         name="attributeValueId"
@@ -52,23 +50,9 @@
                         class="form-control select2 attributeValueSelect">
                     </select>
                 </div>
-                <div class="col-md-4 col-12">
-                    <label asp-for="StockIn" class="control-label">Qte</label>
-                    <input asp-for="StockIn" class="form-control"/>
-                    <span asp-validation-for="StockIn" class="text-danger"></span>
-                </div>
+                
             </div>
-                @*<div class="form-group">
-                <label asp-for="StockIn" class="control-label"></label>
-                <input asp-for="StockIn" class="form-control"/>
-                <span asp-validation-for="StockIn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StockOut" class="control-label"></label>
-                <input asp-for="StockOut" class="form-control"/>
-                <span asp-validation-for="StockOut" class="text-danger"></span>
-            </div>*@
-                <div class="form-group mt-2">
+                <div class="form-group">
                     <input type="submit" value="Create" class="btn btn-primary"/>
                 </div>
 
@@ -79,7 +63,6 @@
                     <tr>
                         <th>PPE - Variant</th>
                         <th>Stock In</th>
-                        <th>Stock Out</th>
                         <th>Options</th>
                     </tr></thead>
                     <tbody id="stockTable">
@@ -109,9 +92,11 @@
                });
            });
            let counter = 0;
-           $('.selectVariantValue').on('change',function () {
+           $('.attributeValueSelect').on('change',function () {
                let id = $(this).val();
-               let variantValue = $('.selectVariantValue').find(':selected').text();
+               let variantValue = $('.attributeValueSelect').find(':selected').text();
+               let ppeText = $('.ppeSelect').find(':selected').text();
+               let ppeId = $('.ppeSelect').find(':selected').val();
                if ($('.stockTable').find(`input[value="${id}"]`).length > 0) {
                    alert('This PPE already exists');
                    return;
@@ -120,18 +105,14 @@
                $("#stockTable").append(
                    `<tr>
                        <td style="vertical-align: center">
-                           <input type="hidden" name="VariantValue[${counter}]" value="${id}" class="form-control" />
-                           ${variantValue} - ${counter}
+                           <input type="hidden" name="ppeIds[]" value="${ppeId}" class="form-control" />
+                           <input type="hidden" name="ppeVariantId[]" value="${id}" class="form-control" />
+                           ${ppeText} - ${variantValue}
                        </td>
                        <td>
-                           <input type="text" name="StockIn[${counter}]" value="0" class="form-control" />
+                           <input type="text" name="StockIn[]" value="0" class="form-control" />
                        </td>
                        <td>
-                           <input type="text" name="StockOut[${counter}]" value="0" class="form-control" />  
-                       </td>
-                       <td>
-                           <input type="hidden" name="Date" value="12/12/2022" />
-                           <input type="hidden" name="ProjectId" value="1" />
                            <a href="#" class="btn btn-danger btn-sm remove">Remove</a>
                        </td>   
                    </tr>`

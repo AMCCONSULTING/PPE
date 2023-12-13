@@ -46,9 +46,13 @@
             <td>@item.StockOut.ToString()</td>
             <td>@item.CurrentStock.ToString()</td>
             <td>
-                <a class="btn btn-sm btn-dark text-white">
-                    <i class="la la-eye"></i>
-                </a>
+                <form asp-action="ProjectStockDetails" asp-controller="Projects" method="get">
+                <input type="hidden" name="projectId" value="@Model.Id">
+                <input type="hidden" name="ppeId" value="@item.Ppe.Id">
+                <button type="submit" value="Details" class="btn btn-dark btn-sm">
+                <i class="la la-eye"></i>
+                </button>
+                </form>
             </td>
         </tr>
     }

@@ -12,8 +12,8 @@ using PPE.Data;
 namespace PPE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231212171709_addIsArchivedToEmployeeStocks")]
-    partial class addIsArchivedToEmployeeStocks
+    [Migration("20231212191513_initialMigrations")]
+    partial class initialMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -200,6 +200,9 @@ namespace PPE.Migrations
                     b.Property<int>("FunctionId")
                         .HasColumnType("int");
 
+                    b.Property<int>("HseId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsArchived")
                         .HasColumnType("bit");
 
@@ -214,6 +217,9 @@ namespace PPE.Migrations
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ResponsibleId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -661,7 +667,7 @@ namespace PPE.Migrations
             modelBuilder.Entity("PPE.Models.StockToBePaid", b =>
                 {
                     b.HasOne("PPE.Models.EmployeeStock", "EmployeeStock")
-                        .WithMany("StockToBePaids")
+                        .WithMany("StockToBePaid")
                         .HasForeignKey("EmployeeStockId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -698,7 +704,7 @@ namespace PPE.Migrations
 
             modelBuilder.Entity("PPE.Models.EmployeeStock", b =>
                 {
-                    b.Navigation("StockToBePaids");
+                    b.Navigation("StockToBePaid");
                 });
 
             modelBuilder.Entity("PPE.Models.Function", b =>

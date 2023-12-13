@@ -1,10 +1,8 @@
 ﻿namespace PPE.Data.Enums;
 
-public enum Designation
+public enum TypeDotation
 {
     Donation,
     Changement,
     Reafectation,
-    Return,
-    Lost,
 }

@@ -58,6 +58,7 @@ namespace PPE.Controllers
                 })
                 .ToList();
             ViewBag.GroupedStocks = groupedStocks;
+            
             return View(project);
         }
 
@@ -175,5 +176,57 @@ namespace PPE.Controllers
         {
           return (_context.Projects?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        [HttpGet]
+        public IActionResult ProjectStockDetails(int ppeId, int projectId)
+        {
+            
+            var detailedStock = _context.StockDetails
+                .Where(s => s.PpeAttributeCategoryAttributeValue.PpeId == ppeId && s.Stock.ProjectId == projectId)
+                .GroupBy(s => s.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text)
+                .Select(g => new
+                {
+                    Value = $"{g.Key}",
+                    // Value = $"{g.Key} - {g.FirstOrDefault().PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Attribute.Title}",
+                    StockIn = g.Sum(s => s.StockIn),
+                    StockOut = g.Sum(s => s.StockOut),
+                    CurrentStock = g.Sum(s => s.StockIn) - g.Sum(s => s.StockOut),
+                })
+                .ToList();
+            
+            ViewBag.Ppe = _context.Ppes.FirstOrDefault(p => p.Id == ppeId);
+            
+            //return Json(detailedStock);
+            
+            ViewBag.GroupedStocks = detailedStock;
+            
+            var currentStock = _context.Stocks
+                .Where(s => s.PpeId == ppeId && s.ProjectId == projectId)
+                .GroupBy(s => s.Ppe)
+                .Select(g => new
+                {
+                    Ppe = g.Key,
+                    StockIn = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockIn),
+                    StockOut = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockOut),
+                    CurrentStock = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockIn) - g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockOut),
+                })
+                .ToList();
+            
+            var labels = currentStock.Select(s => $"{s.Ppe.Title}").ToList();
+            var stockIn = currentStock.Select(s => s.StockIn).ToList();
+            var stockOut = currentStock.Select(s => s.StockOut).ToList();
+            var currentStocks = currentStock.Select(s => s.CurrentStock).ToList();
+            
+            ViewBag.Labels = labels;
+            ViewBag.StockIn = stockIn;
+            ViewBag.StockOut = stockOut;
+            ViewBag.CurrentStocks = currentStocks;
+            
+            ViewBag.ProjectId = projectId;
+            return View();
+            
+            //return View(stocks);
+        }
+       
     }
 }

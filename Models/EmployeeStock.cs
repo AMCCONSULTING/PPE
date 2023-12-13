@@ -23,6 +23,9 @@ public class EmployeeStock
     public int FunctionId { get; set; }
     public Function? Function { get; set; } = null!;
     public int Total => StockIn - StockOut;
-    public virtual ICollection<StockToBePaid> StockToBePaids { get; set; } = null!;
+   
+   // public 
+    public virtual ICollection<StockToBePaid> StockToBePaid { get; set; } = null!;
+    
     
 }
