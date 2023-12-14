@@ -1,3 +1,4 @@
+@using PPE.Data.Enums
 @model PPE.Models.EmployeeStock
 
 @{
@@ -12,6 +13,14 @@
             ButtonType = "dark",
         }
     };
+    var typeDotation = // enum TypeDotation
+        Enum.GetValues(typeof(TypeDotation))
+            .Cast<TypeDotation>()
+            .Select(v => new SelectListItem
+            {
+                Text = v.ToString(),
+                Value = ((int)v).ToString()
+            });
 }
 
 @*<div class="card-body bg-white">
@@ -43,13 +52,13 @@
         <input type="hidden" name="EmployeeId" value="@ViewData["EmployeeId"]">
         <input type="hidden" name="StockIn" value="1">
         <div class="row">
-            <div class="col-12 col-md-6 form-group">
-                <label for=""></label>
+            <div class="col-12 col-md-4 form-group">
+                <label asp-for="Date" for=""></label>
                 <input type="date" class="form-control" name="Date">
                 <span class="text-danger"></span>
             </div>
-            <div class="col-12 col-md-6 form-group">
-                <label for=""></label>
+            <div class="col-12 col-md-4 form-group">
+                <label for="">Category</label>
                 <select name="CategoryId" 
                         data-live-search="true" 
                         data-placeholder="-- Select Category --" 
@@ -62,21 +71,42 @@
                 </select>
                 <span class="text-danger"></span>
             </div>
-            <div class="col-12 col-md-6">
-                <select 
+            <div class="col-12 col-md-4 form-group">
+                <label>Ppe</label>
+                <select
                     name="PpeId"
-                    data-live-search="true" 
-                    data-placeholder="-- Select Ppe --" 
+                    data-live-search="true"
+                    data-placeholder="-- Select Ppe --"
                     class="form-control select2 ppeSelect">
                 </select>
             </div>
-            <div class="col-12 col-md-6">
-                <select 
+            <div class="col-12 col-md-4 form-group">
+                <label> Variant </label>
+                <select
                     name="ppeAttributeCategoryAttributeValueId"
-                    data-live-search="true" 
-                    data-placeholder="-- Select Variant --" 
+                    data-live-search="true"
+                    data-placeholder="-- Select Variant --"
                     class="form-control select2 valueSelect">
                 </select>
+            </div>
+            <div class="col-12 col-md-4 form-group">
+                <label>Type dotation</label>
+                <select
+                    name="typeDotation"
+                    data-live-search="true"
+                    data-placeholder="-- Select Type dotation --"
+                    class="form-control select2">
+                    <option></option>
+                    @foreach (var item in typeDotation)
+                    {
+                        <option value="@item.Value">@item.Text | @item.Value</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-md-4 form-group">
+                <label asp-for="StockIn"></label>
+                <input type="number" class="form-control" name="Quantity" asp-for="StockIn">
+                <span asp-validation-for="StockIn" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group mt-2">

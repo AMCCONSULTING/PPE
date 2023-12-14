@@ -109,7 +109,7 @@
                                                             </select>
                                                         </div>
                                                         <div class="form-group col-12 col-md-6">
-                                                            <label asp-for="" class="col-form-label">Date</label>
+                                                            <label class="col-form-label">Date</label>
                                                             <input type="date" name="date" class="form-control" placeholder="-- Date --"/>
                                                         </div>
                                                         <div class="form-group col-12 col-md-6 hse-from-group">
@@ -200,7 +200,9 @@
                         <tr>
                             <td>@item._Date.ToString("d")</td> 
                             <td>@item.Ppe</td>
-                            <td>@item.Designation</td>
+                            <td>
+                                <span class="badge bg-info"> @item.Designation </span>
+                            </td>
                             <td>@item.AttributeValue</td>
                             <td>
                                 <button class="btn btn-sm btn-danger">

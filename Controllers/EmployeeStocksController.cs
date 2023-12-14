@@ -87,18 +87,19 @@ namespace PPE.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Date,StockIn,StockOut,Status")] EmployeeStock employeeStock, int employeeId,
-            int ppeAttributeCategoryAttributeValueId, int PpeId)
+            int ppeAttributeCategoryAttributeValueId, int PpeId, int typeDotation)
         {
-            var employee = _context.Employees.Find(employeeId);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
+            
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
+                    var employee = await _context.Employees.FindAsync(employeeId);
+                    if (employee == null)
+                    {
+                        return NotFound();
+                    }
+                    
                     var newStock = new Stock
                     {
                         ProjectId = employee.ProjectId,
@@ -111,20 +112,16 @@ namespace PPE.Controllers
                     _context.Stocks.Add(newStock);
                     await _context.SaveChangesAsync();
 
-
                    // return Json(newStock);
                     
                     var newStockDetail = new StockDetail
                     {
                         StockId = newStock.Id,
                         PpeAttributeCategoryAttributeValueId = ppeAttributeCategoryAttributeValueId,
-                        //StockIn = employeeStock.StockIn,
                         StockOut = employeeStock.StockIn,
                     };
                     _context.StockDetails.Add(newStockDetail);
                     await _context.SaveChangesAsync();
-                    
-                    //return Json(newStockDetail);
                     
                     var newEmployeeStock = new EmployeeStock
                     {
@@ -136,10 +133,25 @@ namespace PPE.Controllers
                         StockIn = employeeStock.StockIn,
                         StockOut = employeeStock.StockOut,
                         Status = employeeStock.Status,
-                        Remarks = employeeStock.Remarks
+                        Remarks = employeeStock.Remarks,
+                        StockType = StockType.Normal,
+                        Designation = (Designation)typeDotation,
+                        TypeDotation = (TypeDotation)typeDotation,
                     };
                     _context.EmployeeStocks.Add(newEmployeeStock);
                     await _context.SaveChangesAsync();
+                    
+                    if(typeDotation == TypeDotation.Reafectation)
+                    {
+                        var stockToBePaid = new StockToBePaid
+                        {
+                            EmployeeStockId = newEmployeeStock.Id,
+                            StockOut = employeeStock.StockIn,
+                        };
+                        _context.StockToBePaids.Add(stockToBePaid);
+                        await _context.SaveChangesAsync();
+                        }
+                        
                     
                     await transaction.CommitAsync();
                     return RedirectToAction("Details", "Employees", new { id = employeeId});
@@ -153,35 +165,6 @@ namespace PPE.Controllers
                 }
             }
             
-            var newStockEmployee = new EmployeeStock
-            {
-                ProjectId = employee.ProjectId,
-                FunctionId = employee.FunctionId,
-                EmployeeId = employee.Id,
-                PpeAttributeCategoryAttributeValueId = ppeAttributeCategoryAttributeValueId,
-                Date = employeeStock.Date,
-                StockIn = employeeStock.StockIn,
-                StockOut = employeeStock.StockOut,
-                Status = employeeStock.Status,
-                Remarks = employeeStock.Remarks
-            };
-            
-            //return Json(employeeStock);
-            if (ModelState.IsValid)
-            {
-                _context.EmployeeStocks.Add(newStockEmployee);
-                await _context.SaveChangesAsync();
-                
-                return RedirectToAction("Details", "Employees", new { id = employeeStock.EmployeeId });
-                return RedirectToAction(nameof(Index));
-            }
-            
-            //return Json(ModelState.Values.SelectMany(v => v.Errors));
-            
-            ViewData["Status"] = new SelectList(Enum.GetValues(typeof(StockEmployeeStatus)));
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeStock.EmployeeId);
-            ;//ViewData["VariantValueId"] = new SelectList(_context.VariantValues, "Id", "Id", employeeStock.VariantValueId);
-            return View(employeeStock);
         }
 
         // GET: EmployeeStocks/Edit/5

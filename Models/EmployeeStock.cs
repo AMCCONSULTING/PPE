@@ -12,8 +12,9 @@ public class EmployeeStock
     public string? Remarks { get; set; }
     public bool IsArchived { get; set; } = false;
     public StockType StockType { get; set; } = StockType.Normal;
-    public Designation Designation { get; set; } = Designation.Donation;
-    public PpeCondition PpeCondition { get; set; } = PpeCondition.Good;
+    public Designation Designation { get; set; }
+    public TypeDotation TypeDotation { get; set; }
+    public PpeCondition PpeCondition { get; set; }
     public int? PpeAttributeCategoryAttributeValueId { get; set; }
     public PpeAttributeCategoryAttributeValue? PpeAttributeCategoryAttributeValue { get; set; }
     public int EmployeeId { get; set; }

@@ -1,4 +1,5 @@
-﻿@model Employee
+﻿@using PPE.Data.Enums
+@model Employee
 
 @{
 ViewBag.Title = "Add To Employee Stock";
@@ -12,6 +13,15 @@ ViewBag.Title = "Add To Employee Stock";
             ButtonType = "dark"
         }
     };
+
+    var typeDotation = // enum TypeDotation
+        Enum.GetValues(typeof(TypeDotation))
+            .Cast<TypeDotation>()
+            .Select(v => new SelectListItem
+            {
+                Text = v.ToString(),
+                Value = ((int)v).ToString()
+            });
 }
 
 <div class="card-body bg-white">
@@ -42,34 +52,40 @@ ViewBag.Title = "Add To Employee Stock";
         <input type="hidden" asp-for="FunctionId">
         <input type="hidden" name="EmployeeId" value="@Model.Id">
         <div class="row">
-            <div class="col-12 col-md-6 form-group">
+            <div class="col-12 col-md-4 form-group">
                 <label for=""></label>
                 <input type="date" class="form-control" name="Date">
                 <span class="text-danger"></span>
             </div>
-            <div class="col-12 col-md-6 form-group">
+            <div class="col-12 col-md-4 form-group">
                 <label for=""></label>
                 <select name="VariantValueId" 
                         data-live-search="true" 
                         data-placeholder="-- Select Category --" 
                         class="form-control select2 categorySelect">
                     <option></option>
-                    @*@foreach(var category in ViewBag.Category)
-                    {
-                        <option value="@category.Id">@category.Title</option>
-                    }*@
                 </select>
                 <span class="text-danger"></span>
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-4">
                 <select 
                     data-live-search="true" 
                     data-placeholder="-- Select Ppe --" 
                     class="form-control select2 ppeSelect">
                 </select>
             </div>
-            
-            
+            <div class="col-12 col-md-4">
+                <select
+                    data-live-search="true"
+                    data-placeholder="-- Select Type dotation --"
+                    class="form-control select2">
+                    <option></option>
+                    @foreach(var item in typeDotation)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
         </div>
         <div class="form-group">
             <button class="btn btn-info" type="submit">Save changes</button>

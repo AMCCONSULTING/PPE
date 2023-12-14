@@ -363,7 +363,7 @@ namespace PPE.Controllers
                     
                     if (status == (int)PpeStatus.Lost)
                     {
-                
+                /*
                         var stockToBePaid = new StockToBePaid
                         {
                             EmployeeStockId = id,
@@ -371,7 +371,7 @@ namespace PPE.Controllers
                         };
                         _context.Add(stockToBePaid);
                         _context.SaveChanges();
-                
+                //*/
                         var newEmployeeStock = new EmployeeStock
                         {
                             Date = date,
