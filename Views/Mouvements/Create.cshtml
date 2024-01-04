@@ -1,0 +1,99 @@
+﻿@model PPE.Models.Mouvement
+
+@{
+    ViewData["Title"] = "Nouveau mouvement";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Retour à la liste",
+            Action = "Index",
+            Controller = "Mouvements",
+            ButtonType = "dark"
+        }
+    };
+}
+
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="Document" class="control-label"></label>
+                <input asp-for="Document" class="form-control" />
+                <span asp-validation-for="Document" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select
+                    data-placeholder="--Select--"
+                    asp-for="ProjectId" class="form-control select2"
+                    asp-items="ViewBag.ProjectId">
+                    <option></option>
+                </select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="ResponsableId" class="control-label"></label>
+                <select
+                    data-placeholder="--Select--"
+                    asp-for="ResponsableId" class="form-control select2"
+                    asp-items="ViewBag.ResponsableId">
+                    <option></option>
+                </select>
+                <span asp-validation-for="ResponsableId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="MagazinierId" class="control-label"></label>
+                <select
+                    data-placeholder="--Select--"
+                    asp-for="MagazinierId" class="form-control select2"
+                    asp-items="ViewBag.MagazinierId">
+                    <option></option>
+                </select>
+                <span asp-validation-for="MagazinierId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="TransporteurId" class="control-label"></label>
+                <select
+                    data-placeholder="--Select--"
+                    asp-for="TransporteurId" name="TransporteurId" class="form-control select2">
+                    <option></option>
+                    @foreach(var item in ViewBag.TransporteurId)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="TransporteurId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="CoordinateurId" class="control-label"></label>
+                <select
+                    data-placeholder="--Select--"
+                    asp-for="CoordinateurId" class="form-control select2"
+                    asp-items="ViewBag.CoordinateurId">
+                    <option></option>
+                </select>
+                <span asp-validation-for="CoordinateurId" class="text-danger"></span>
+                
+            </div>
+            <div class="form-group col-12 col-md-6 d-flex align-self-end justify-content-end">
+                <input type="button" onclick="submitBtn()" value="Save changes" class="btn btn-primary"/> 
+            </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

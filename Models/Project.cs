@@ -19,6 +19,8 @@ namespace PPE.Models
         
         // list of stocks
         public ICollection<Stock>? Stocks { get; set; }
+        public ICollection<ProjectStock> ProjectStocks { get; set; }
+        
         
     }
 }

@@ -1,0 +1,43 @@
+﻿@model PPE.Models.MainStock
+
+@{
+    ViewData["Title"] = "Alimentation du stock";
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="PpeAttributeCategoryAttributeValueId" class="control-label"></label>
+                <select asp-for="PpeAttributeCategoryAttributeValueId" class ="form-control" asp-items="ViewBag.PpeAttributeCategoryAttributeValueId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="QuantityIn" class="control-label"></label>
+                <input asp-for="QuantityIn" class="form-control" />
+                <span asp-validation-for="QuantityIn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="QuantityOut" class="control-label"></label>
+                <input asp-for="QuantityOut" class="form-control" />
+                <span asp-validation-for="QuantityOut" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="QuantityStock" class="control-label"></label>
+                <input asp-for="QuantityStock" class="form-control" />
+                <span asp-validation-for="QuantityStock" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="button" onclick="submitBtn()" value="Save changes" class="btn btn-primary"/> 
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

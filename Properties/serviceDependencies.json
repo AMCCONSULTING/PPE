@@ -6,6 +6,9 @@
     },
     "identityapp1": {
       "type": "identityapp"
+    },
+    "identityapp2": {
+      "type": "identityapp"
     }
   }
 }

@@ -14,6 +14,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+
+builder.Services.AddAuthorization(options => { options.FallbackPolicy = options.DefaultPolicy; });
+
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
+builder.Services.AddRazorPages()
+    .AddMicrosoftIdentityUI();
+
 // Database configuration
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -25,6 +40,13 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     });
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestLineSize = 20000; // Set as needed
+    options.Limits.MaxRequestBufferSize = 20000; // Set as needed
+    options.Limits.MaxRequestHeadersTotalSize = 20000; // Set as needed
+});
+
 // Create the database and apply migrations
 /*using (var serviceScope = builder.Services.BuildServiceProvider().CreateScope())
 {
@@ -35,7 +57,7 @@ builder.Services.AddControllersWithViews()
     DataSeeder.SeedData(dbContext);
 }*/
 
-//builder.Services.AddScoped<IExcelService, ExcelService>();
+builder.Services.AddScoped<IStokeService, StokeService>();
 
 var app = builder.Build();
 

@@ -82,8 +82,6 @@ public class AppDbContext : DbContext
     public DbSet<Stock> Stocks { get; set; }
     public DbSet<StockDetail> StockDetails { get; set; }
     public DbSet<Project> Projects { get; set; }
-    /*public DbSet<Variant> Variants { get; set; }
-    public DbSet<VariantValue> VariantValues { get; set; }*/
     public DbSet<Function> Functions { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Manager> Managers { get; set; }
@@ -96,7 +94,24 @@ public class AppDbContext : DbContext
     public DbSet<PpeAttributeCategoryAttributeValue> PpeAttributeCategoryAttributeValues { get; set; }
     public DbSet<StockToBePaid> StocksToBePaid { get; set; }
     
-    
+    public DbSet<Responsable> Responsables { get; set; }
+    public DbSet<Coordinateur> Coordinateurs { get; set; }
+    public DbSet<Magazinier> Magaziniers { get; set; }
+    public DbSet<Hse> Hses { get; set; }
+    public DbSet<Transporteur> Transporteurs { get; set; }
+    public DbSet<Mouvement> Mouvements { get; set; }
+    public DbSet<MouvementDetail> MouvementDetails { get; set; }
+    public DbSet<Stoke> Stokes { get; set; }
+    public DbSet<StokeDetail> StokeDetails { get; set; }
+    public DbSet<MainStock> MainStocks { get; set; }
+    public DbSet<ProjectStock> ProjectStocks { get; set; }
+    public DbSet<Dotation> Dotations { get; set; } 
+    public DbSet<DotationDetail> DotationDetails { get; set; }
+    public DbSet<PayableStock> PayableStocks { get; set; }
+    public DbSet<Return> Returns { get; set; }
+   // public DbSet<ReturnDetail> ReturnDetails { get; set; }
+    public DbSet<StockEmployee> StockEmployees { get; set; }
     
     
 }
+

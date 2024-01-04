@@ -1,10 +1,32 @@
-    <nav class="header-navbar navbar-expand-md navbar navbar-with-menu navbar-without-dd-arrow fixed-top navbar-semi-light bg-info navbar-shadow">
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Principal
+@inject PPE.Data.AppDbContext _context
+@{
+    var ppeBelowThresholdCount = _context.MainStocks
+        .Include(ms => ms.PpeAttributeCategoryAttributeValue)
+        .ThenInclude(pacav => pacav.Ppe)
+        .Count(ms => ms.QuantityIn - ms.QuantityOut < ms.PpeAttributeCategoryAttributeValue.Ppe.Threshold);
+
+    var ppeBelowThreshold = _context.MainStocks
+        .Include(ms => ms.PpeAttributeCategoryAttributeValue)
+        .ThenInclude(pacav => pacav.Ppe)
+        .GroupBy(ms => ms.PpeAttributeCategoryAttributeValue.Ppe)
+        .Where(ms => ms.Sum(x => x.QuantityIn - x.QuantityOut) < ms.Key.Threshold)
+        .Select(ms => new { 
+            Ppe = ms.Key, 
+            QuantityIn = ms.Sum(x => x.QuantityIn), 
+            QuantityOut = ms.Sum(x => x.QuantityOut) ,
+            Quantity = ms.Sum(x => x.QuantityIn - x.QuantityOut)
+        });
+}
+
+<nav class="header-navbar navbar-expand-md navbar navbar-with-menu navbar-without-dd-arrow fixed-top navbar-semi-light bg-info navbar-shadow">
         <div class="navbar-wrapper">
             <div class="navbar-header">
                 <ul class="nav navbar-nav flex-row">
                     <li class="nav-item mobile-menu d-md-none mr-auto"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ft-menu font-large-1"></i></a></li>
                     <li class="nav-item"><a class="navbar-brand" asp-controller="Home" asp-action="Index"><img class="brand-logo" alt="modern admin logo" src="~/img/logo.png">
-                            <h3 class="brand-text">PPE</h3>
+                        <h3 class="brand-text">PPE</h3>
                         </a></li>
                     <li class="nav-item d-md-none"><a class="nav-link open-navbar-container" data-toggle="collapse" data-target="#navbar-mobile"><i class="la la-ellipsis-v"></i></a></li>
                 </ul>
@@ -18,48 +40,51 @@
                         </a></li>
                     </ul>
                     <ul class="nav navbar-nav float-right">
-                        
                         <li class="dropdown dropdown-notification nav-item">
-                            <a class="nav-link nav-link-label" href="#" data-toggle="dropdown"><i class="ficon ft-bell"></i>
-                                <span class="badge badge-pill badge-danger badge-up badge-glow">@ViewBag.PpeCount</span></a>
+                            <a class="nav-link nav-link-label" href="#" data-toggle="@(ppeBelowThreshold.Any() ? "dropdown": string.Empty)"><i class="ficon ft-bell"></i>
+                                <span class="badge badge-pill badge-danger badge-up badge-glow">@ppeBelowThreshold.Count()</span></a>
                             <ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
                                 <li class="dropdown-menu-header">
                                     <h6 class="dropdown-header m-0"><span class="grey darken-2">Notifications</span>
-                                    </h6><span class="notification-tag badge badge-danger float-right m-0">@ViewBag.PpeCount New</span>
+                                    </h6><span class="notification-tag badge badge-danger float-right m-0">@ppeBelowThreshold.Count() New</span>
                                 </li>
                                 <li class="scrollable-container media-list w-100">
-                                    @*@foreach (var ppe in ViewBag.Ppe)
+                                    @foreach (var ppe in ppeBelowThreshold)
                                     {
                                         <a href="javascript:void(0)">
                                             <div class="media">
                                                 <div class="media-left align-self-center"><i class="ft-plus-square icon-bg-circle bg-cyan mr-0"></i></div>
                                                 <div class="media-body">
-                                                    <h6 class="media-heading">@ppe.Ppe</h6>
-                                                    <p class="notification-text font-small-3 text-muted">@ppe.CurrentStock</p>
-                                                    $1$<p class="notification-text font-small-3 text-muted">Lorem ipsum dolor sit amet, consectetuer elit.</p>
-                                                    <small>
-                                                        <time class="media-meta text-muted" datetime="2015-06-11T18:29:20+08:00">30 minutes ago</time></small>#1#
+                                                    <h6 class="media-heading">@ppe.Ppe.Title</h6>
+                                                    <p class="notification-text font-small-3 text-muted">@ppe.Quantity</p>
                                                 </div>
                                             </div>
                                         </a>
-                                    }*@
-                                </li>
-                                <li class="dropdown-menu-footer">
-                                    <a class="dropdown-item text-muted text-center" href="javascript:void(0)">Read all notifications</a>
+                                    }
                                 </li>
                             </ul>
                         </li>
                         
-                        <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown"><span class="mr-1 user-name text-bold-700">John Doe</span><span class="avatar avatar-online"><img src="~/img/logo.png" alt="avatar"><i></i></span></a>
-                            <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" href="">
+                        <li class="dropdown dropdown-user nav-item">
+                            <a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
+                                <span class="mr-1 user-name text-bold-700">@User.Identity?.Name</span>
+                                <span class="avatar avatar-online">
+                                    <img src="~/img/logo.png" alt="avatar"><i></i>
+                                </span>
+
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                @*<a class="dropdown-item" href="">
                                     <i class="ft-user"></i> Edit Profile
                                 </a>
                                 <a class="dropdown-item" href=""><i class="ft-clipboard"></i> Todo</a>
                                 <a class="dropdown-item" href="">
                                     <i class="ft-check-square"></i> Task
                                 </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href=""><i class="ft-power"></i> Logout</a>
+                                <div class="dropdown-divider"></div>*@
+                                <a class="dropdown-item" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">
+                                    <i class="ft-power"></i> Logout
+                                </a>
                             </div>
                         </li>
                     </ul>

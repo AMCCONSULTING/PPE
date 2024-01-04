@@ -1,0 +1,84 @@
+﻿@model PPE.Models.Dotation
+
+@{
+    ViewData["Title"] = "Details Dotation: " + Model.Employee.FullName;
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Retour à la liste",
+            Action = "Index",
+            Controller = "Dotations",
+            ButtonType = "dark"
+        }
+    };
+}
+
+<h4>@Model.Date.ToString("d") | @Model.Reference</h4>
+
+
+<div class="card">
+<div class="card-header">
+    <div class="row">
+        @*<div class="col-12 col-md-3">
+            <h4 class="card-title">
+                <strong>Responsable: </strong> 
+                <p>@Model.Responsible.Employee.FullName</p>
+            </h4>
+        </div>*@
+        <div class="col-12 col-md-3">
+            <h4 class="card-title">
+                <strong>Coordinateur: </strong> 
+                <p>@Model.Coordinator.Employee.FullName</p>
+            </h4>
+        </div>
+        @*<div class="col-12 col-md-3">
+            <h4 class="card-title">
+                <strong>Transporteur: </strong> 
+                <p>@Model.Transporter.Employee.FullName</p>
+            </h4>
+        </div>*@
+        <div class="col-12 col-md-3">
+            <h4 class="card-title">
+                <strong>Magazinier: </strong> 
+                <p>@Model.Magasinier.Employee.FullName</p>
+            </h4>
+        </div>
+            
+    </div>
+    <hr/>
+    <div class="card-body">
+        @if (Model.DotationDetails.Count > 0)
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Ppe</th>
+                        <th>Value</th>
+                        <th>Quantite</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var group in Model.DotationDetails.GroupBy(x => x.Article.Ppe))
+                    {
+                        <tr>
+                            <td rowspan="@(group.Count() + 1)">@group.Key.Title</td>
+                        </tr>
+                        foreach (var item in group)
+                        {
+                            <tr>
+                                <td>@item.Article.AttributeValueAttributeCategory.AttributeValue.Value.Text</td>
+                                <td>@item.Quantity</td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        } else {
+            <div class="text-center">
+                <h4>Aucun article n'a été ajouté!</h4>
+            </div>
+        }
+    </div>
+</div>
+</div>

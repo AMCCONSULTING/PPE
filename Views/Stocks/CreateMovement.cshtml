@@ -64,7 +64,7 @@
                 </div>
             </div>
                 <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary"/>
+                    <input type="button" onclick="submitBtn()" value="Save changes" class="btn btn-primary"/>
                 </div>
 
             </div>
@@ -109,7 +109,7 @@
                           let variantValue = $('.attributeValueSelect').find(':selected').text();
                           let ppeText = $('.ppeSelect').find(':selected').text();
                           let ppeId = $('.ppeSelect').find(':selected').val();
-                          if ($('.stockTable').find(`input[value="${id}"]`).length > 0) {
+                          if ($('.stockTable').find(`input[value="${variantValue}"]`).length > 0) {
                               alert('This PPE already exists');
                               return;
                           }
@@ -119,7 +119,7 @@
                                   <td style="vertical-align: center">
                                       <input type="hidden" name="ppeIds[]" value="${ppeId}" class="form-control" />
                                       <input type="hidden" name="ppeVariantId[]" value="${id}" class="form-control" />
-                                      ${ppeText} - ${variantValue} - ${id}
+                                      ${ppeText} - ${variantValue}
                                   </td>
                                   <td>
                                       <input type="text" name="StockIn[]" value="0" class="form-control" />

@@ -1,0 +1,57 @@
+﻿@model IEnumerable<PPE.Models.MainStock>
+
+@{
+    ViewData["Title"] = "Stock principal";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Alimentation du stock",
+            Action = "Create",
+            Controller = "Stokes",
+            ButtonType = "primary"
+        }
+    };
+}
+
+<table class="table bg-white">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PpeAttributeCategoryAttributeValue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantityIn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantityOut)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantityStock)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @* @Html.DisplayFor(modelItem => item.PpeAttributeCategoryAttributeValue.Ppe.Title) *@
+            @Html.DisplayFor(modelItem => item.PpeAttributeCategoryAttributeValue.Ppe.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.QuantityIn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.QuantityOut)
+        </td>
+        <td>
+            @(item.QuantityIn - @item.QuantityOut)
+        </td>
+        <td>
+            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.PpeAttributeCategoryAttributeValue.Ppe.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+        </td>
+    </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,79 @@
+﻿@model Mouvement;
+@{
+    ViewData["Title"] = "Mouvement du stock: " + Model.Reference;
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Retour à la liste",
+            Action = "Index",
+            Controller = "Mouvements",
+            ButtonType = "dark"
+        }
+    };
+}
+
+<div class="card">
+    <form asp-action="AddMouvementDetails">
+        <div class="card-body">
+            <div readonly asp-validation-summary="ModelOnly"></div>
+            <input type="hidden" asp-for="Id"/>
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <label>Categories</label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2 category-select-in-stock"
+                        id="category" name="category">
+                        <option></option>
+                        @foreach (var item in ViewBag.Categories)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label>Ppes</label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2 ppe-select-in-stock" id="ppe" name="ppe">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label>Variants</label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2 value-select-in-stock" id="value" name="value">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row justify-content-end mt-2">
+                <div class="col-md-2 submit-btn @( Model.MouvementDetails.Count > 0 ? "" : "d-none" ) text-right">
+                    <input type="button" onclick="submitBtn()" value="Save changes" class="btn btn-primary"/> 
+                </div>
+            </div>
+    
+            <hr/>
+            <div class="row">
+                <div class="col-md-8 col-12">
+                    <ul class="list-group value-list-container list-group-flush">
+                        @if (Model.MouvementDetails!.Count > 0)
+                        {
+                            foreach (var stokeDetail in Model.MouvementDetails)
+                            {
+                                <li data-id="@stokeDetail.ArticleId" class="list-group-item">
+                                    <div class="row align-items-center">
+                                        <span class="col">@stokeDetail.Article!.Ppe.Title - @stokeDetail.Article!.AttributeValueAttributeCategory!.AttributeValue!.Value!.Text</span> 
+                                        <input type="number" class="form-control col" value="@stokeDetail.Quantity" name="quantities[]">
+                                        <input type="hidden" value="@stokeDetail.ArticleId" name="articles[]">
+                                        <button type="button" class="btn btn-danger col-1 mx-1" onclick="removeItem(this)">X</button>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -15,7 +15,16 @@
     };
 }
 
-<div class="bg-white mb-2">
+@if (TempData["success"] != null)
+    {
+        <div class="alert alert-success">@TempData["success"]</div>
+    }
+    @if (TempData["error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["error"]</div>
+    }
+
+<div class="card">
     <div class="card-body">
         <div class="row justify-content-between align-items-center">
             <div class="col-12 col-sm-6 col-md-4">
@@ -37,7 +46,7 @@
 <div class="card-body bg-white">
     <ul class="nav nav-tabs nav-linetriangle no-hover-bg">
         <li class="nav-item">
-            <a class="nav-link active" id="base-tab41" data-toggle="tab" aria-controls="tab41" href="#tab41" aria-expanded="true">
+            <a class="nav-link active" id="base-tab41" data-toggle="tab" aria-controls="tab41" href="#currentTab" aria-expanded="true">
                 Current PPEs
             </a>
         </li>
@@ -45,8 +54,8 @@
             <a class="nav-link" id="base-tab42" data-toggle="tab" aria-controls="tab42" href="#tab42" aria-expanded="false">
                 <span class="d-flex justify-content-center align-items-center">
                     <span> To be payed</span> &nbsp; &nbsp;
-                    @if (ViewBag.StockToPayCount > 0){
-                        <div class="badge badge-warning">@ViewBag.StockToPayCount</div>
+                    @if (Model.PayableStocks.Any()){
+                        <div class="badge badge-warning">@Model.PayableStocks.Count(e => e.Quantity > 0 && e.IsPaid == false)</div>
                     }
                 </span>
             </a>
@@ -59,30 +68,30 @@
     </ul>
     
     <div class="tab-content px-1 pt-1">
-        <div role="tabpanel" class="tab-pane active" id="tab41" aria-expanded="true" aria-labelledby="base-tab41">
+        <div role="tabpanel" class="tab-pane active" id="currentTab" aria-expanded="true" aria-labelledby="base-tab41">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="card-title">Current PPEs</h3>
-                <a asp-action="Create" asp-controller="EmployeeStocks" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Add new PPE</a>
+                <a asp-action="Create" asp-controller="Dotations" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Add new PPE</a>
             </div>
             <div class="bg-white">
                 <table class="table">
                     <thead>
                     <tr class="bg-primary text-white">
-                        <th>Date</th>
                         <th>PPE</th>
                         <th>Variant</th>
+                        <th>Quantity</th>
                         <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var item in ViewBag.CurrentStock)
+                    @foreach (var item in Model.StockEmployees.Where(e=> e.Quantity > 0))
                     {
                         <tr>
-                            <td>@item._Date.ToString("d")</td>
-                            <td>@item.Ppe</td>
-                            <td>@item.AttributeValue</td>
+                            <td>@item.Article.Ppe.Title</td>
+                            <td>@item.Article.AttributeValueAttributeCategory.AttributeValue.Value.Text</td>
+                            <td>@item.Quantity</td>
                             <td>
-                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">Return</button>
+                                @*<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">Return</button>
                                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <form asp-action="ReturnPpe">
@@ -110,7 +119,7 @@
                                                         </div>
                                                         <div class="form-group col-12 col-md-6">
                                                             <label class="col-form-label">Date</label>
-                                                            <input type="date" name="date" class="form-control" placeholder="-- Date --"/>
+                                                            <input type="datetime-local" name="date" class="form-control" placeholder="-- Date --"/>
                                                         </div>
                                                         <div class="form-group col-12 col-md-6 hse-from-group">
                                                             <label for="" class="col-form-label">HSE </label>
@@ -148,21 +157,7 @@
                                                                 }
                                                             </select>
                                                         </div>
-                                                        @*<div class="form-group col-12 col-md-6">
-                                                            <label for="" class="col-form-label">Responsable</label>
-                                                            <select name="responsableId"
-                                                                    data-placeholder="-- Select Responsable --"
-                                                                    class="form-control select2">
-                                                                <option></option>
-                                                                @foreach (var responsable in ViewBag.Responsables)
-                                                                {
-                                                                    <option value="@responsable.Id">@responsable.FullName</option>
-                                                                }
-                                                            </select>
-                                                        </div>*@
                                                     </div>
-                                                    
-                                                        
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -172,6 +167,17 @@
                                         </form>
                                     </div>
                                 </div>
+                            *@
+                                @*<a asp-action="Create" asp-controller="Returns"  
+                                   asp-route-id="@item.ArticleId"
+                                   class="btn btn-sm btn-danger">
+                                    Return
+                                </a>*@
+                                <form asp-action="Create" method="get" asp-controller="Returns">
+                                    <input type="hidden" name="articleId" value="@item.ArticleId" />
+                                    <input type="hidden" name="employeeId" value="@Model.Id"/>
+                                    <button type="submit" class="btn btn-sm btn-danger">Return</button>
+                                </form>
                             </td>
                         </tr>
                     }
@@ -187,28 +193,20 @@
                 <table class="table">
                     <thead>
                     <tr class="bg-dark text-white">
-                        <th>Date</th>
                         <th>PPE</th>
-                        <th>Designation</th>
                         <th>Variant</th>
+                        <th>Qte</th>
                         <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var item in ViewBag.StockToPay)
+                    @foreach (var item in Model.PayableStocks.Where(e => e.Quantity > 0 && e.IsPaid == false))
                     {
                         <tr>
-                            <td>@item._Date.ToString("d")</td> 
-                            <td>@item.Ppe</td>
-                            <td>
-                                <span class="badge bg-info"> @item.Designation </span>
-                            </td>
-                            <td>@item.AttributeValue</td>
-                            <td>
-                                <button class="btn btn-sm btn-danger">
-                                    Remboursé
-                                </button>
-                            </td>
+                            <td>@item.Article.Ppe.Title</td> 
+                            <td>@item.Article.AttributeValueAttributeCategory.AttributeValue.Value.Text</td>
+                            <td>@item.Quantity</td>
+                            <td><a class="btn btn-sm btn-danger">Remboursé</a></td>
                         </tr>
                     }
                     </tbody>
@@ -219,30 +217,99 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="card-title">History PPEs</h3>
             </div>
-            <div class="bg-white">
-                <table class="table">
-                    <thead>
-                    <tr class="bg-dark text-white">
-                        <th>Date</th>
-                        <th>PPE</th>
-                        <th>Designation</th>
-                        <th>Variant</th>
-                        <th>Quantity</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var item in ViewBag.StockReturned)
-                    {
+            <div class="row">
+                <div class="col-md-6">
+                    @*<div id="accordionWrap" role="tablist" aria-multiselectable="true">
+                            @foreach (var item in Model.Dotations!.OrderByDescending(r => r.Date))
+                            {
+                                <div class="card accordion collapse-icon accordion-icon-rotate p-0 m-1 shadow-sm">
+                                    <a id="heading-@item.Id" class="card-header info" data-toggle="collapse" href="#accordion-@item.Id" aria-expanded="true" aria-controls="accordion-@item.Id">
+                                        <div class="card-title lead">
+                                            <strong>@item.Date.ToString("d")</strong> | @item.Reference $1$| $2$Sum qte#2# <span class="badge bg-info">@item.DotationDetails.Count</span> Article(s#1#)
+                                        </div>
+                                    </a>
+                                    <div id="accordion-@item.Id" role="tabpanel" data-parent="#accordionWrap" aria-labelledby="heading-@item.Id" class="collapse">
+                                        <div class="card-content">
+                                            <div class="card-body">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item">   
+                                                        <div class="row align-items-center">
+                                                            <strong class="col">Ppe | Variant</strong>
+                                                            <strong class="col">Quantity</strong>
+                                                            <strong class="col">Dsignation</strong>
+                                                        </div>
+                                                    </li>
+                                                    @if (item.DotationDetails != null)
+                                                    {
+                                                        foreach (var dotationDetail in item.DotationDetails)
+                                                        {
+                                                            <li class="list-group-item">
+                                                                <div class="row align-items-center">
+                                                                    <span class="col">@dotationDetail.Article!.Ppe.Title - @dotationDetail.Article!.AttributeValueAttributeCategory!.AttributeValue!.Value!.Text</span>
+                                                                    <span class="col">@dotationDetail.Quantity</span>
+                                                                    <span class="col">@item.Type</span>
+                                                                </div>
+                                                            </li>
+                                                        }
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>*@
+                    <table class="table table-bordered">
+                        <thead>
                         <tr>
-                            <td>@item._Date.ToString("d")</td> 
-                            <td>@item.Ppe</td>
-                            <td>@item.Designation</td>
-                            <td>@item.AttributeValue</td>
-                            <td>@item.StockIn</td>
+                            <th>Date</th>
+                            <th>Ppe</th>
+                            <th>Designation</th>
+                            <th>Qte</th>
                         </tr>
-                    }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model.Dotations!.OrderByDescending(r => r.Date))
+                        {
+                            <tr>
+                                <td rowspan="@(item.DotationDetails.Count() + 1)">@item.Date.ToString("d")</td>
+                            </tr>
+                            foreach (var itemDotation in item.DotationDetails)
+                            {
+                                <tr>
+                                    <td>@itemDotation.Article!.Ppe.Title - @itemDotation.Article!.AttributeValueAttributeCategory!.AttributeValue!.Value!.Text</td>
+                                    <td>@item.Type</td>
+                                    <td>@itemDotation.Quantity</td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <thead>   
+                        <tr>
+                            <th class="col">Date</th>
+                            <th class="col">Ppe</th>
+                            <th class="col">Status ppe</th>
+                            <th class="col">Quantity</th>
+                        </tr>
+                        </thead>
+                        @if (Model.Returns != null)
+                        {
+                            foreach (var item in Model.Returns.OrderByDescending(r => r.Date))
+                            {
+                                <tr>
+                                    <td>@item.Date.ToString("d")</td>
+                                    <td>@item.Article!.Ppe.Title - @item.Article!.AttributeValueAttributeCategory!.AttributeValue!.Value!.Text</td>
+                                     <td>@item.Status.ToString()</td>
+                                    <td>@item.Quantity</td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -253,7 +320,7 @@
     <script>
     $(document).ready(function () {
         $('.hseCheckSelect').on('change', function () {
-            if ($(this).val() == 2) {
+            if ($(this).val() === 2) {
                 $('.hse-from-group').hide();
             } else {
                 $('.hse-from-group').show();
@@ -261,6 +328,4 @@
         });
     });
     </script>
-}
-
-
+} 

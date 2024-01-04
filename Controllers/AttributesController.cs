@@ -224,7 +224,9 @@ namespace PPE.Controllers
             }
 
             var attribute = await _context.Attributes.FindAsync(id);
-            if (attribute == null)
+            
+            
+            /*if (attribute == null)
             {
                 return NotFound();
             }
@@ -236,7 +238,7 @@ namespace PPE.Controllers
                     Text = value.Value.Text,
                     Value = value.Value.Id.ToString()
                 })
-                .ToList();
+                .ToList();*/
             
             return View(attribute);
         }

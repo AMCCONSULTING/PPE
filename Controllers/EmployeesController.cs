@@ -71,6 +71,37 @@ namespace PPE.Controllers
             var employee = await _context.Employees
                 .Include(e => e.Function)
                 .Include(e => e.Project)
+                .Include(e => e.StockEmployees)!
+                .ThenInclude(e => e.Article)
+                .ThenInclude(e => e.Ppe)
+                .Include(e => e.StockEmployees)
+                .ThenInclude(e => e.Article)
+                .ThenInclude(e => e.AttributeValueAttributeCategory)
+                .ThenInclude(e => e.AttributeValue)
+                .ThenInclude(e => e.Value)
+                .Include(e => e.Dotations)
+                .ThenInclude(e => e.DotationDetails)
+                .ThenInclude(e => e.Article)
+                .ThenInclude(e => e.Ppe)
+                .Include(e => e.Dotations)
+                .ThenInclude(e => e.DotationDetails)
+                .ThenInclude(e => e.Article)
+                .ThenInclude(e => e.AttributeValueAttributeCategory)
+                .ThenInclude(e => e.AttributeValue)
+                .ThenInclude(e => e.Value)
+                .Include(e => e.PayableStocks)
+                .ThenInclude(e => e.Article)
+                .ThenInclude(e => e.Ppe)
+                .Include(e => e.PayableStocks)
+                .ThenInclude(e => e.Article)
+                .ThenInclude(e => e.AttributeValueAttributeCategory)
+                .ThenInclude(e => e.AttributeValue)
+                .ThenInclude(e => e.Value)
+                .Include(e => e.Returns)
+                .ThenInclude(e => e.Article)
+                .ThenInclude(e => e.AttributeValueAttributeCategory)
+                .ThenInclude(e => e.AttributeValue)
+                .ThenInclude(e => e.Value)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             var employeeStocks = await _context.EmployeeStocks
@@ -85,9 +116,11 @@ namespace PPE.Controllers
                 .ThenInclude(e => e.AttributeValue)
                 .ThenInclude(e => e.Value)
                 .Where(e => e.EmployeeId == id)
+                .OrderByDescending(e => e.Date)
                 .ToListAsync();
 
             ViewBag.CurrentStock = employeeStocks
+                .OrderByDescending(e => e.Date)
                 .Where(e => e is { Status: StockEmployeeStatus.Current, IsArchived: false })
                 .Select(e => new
                 {
@@ -114,9 +147,11 @@ namespace PPE.Controllers
                     Designation = e.Designation,
                     StockIn = e.StockIn,
                     StockOut = e.StockOut,
+                    PpeCondition = e.PpeCondition,
                     CurrentStock = e.StockIn - e.StockOut,
                     AttributeValue = e.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text,
-                    Status = e.Status
+                    Status = e.Status,
+                    
                 });
             
             var stockToPay = _context.StocksToBePaid
@@ -134,6 +169,7 @@ namespace PPE.Controllers
                 .ThenInclude(e => e.AttributeValue)
                 .ThenInclude(e => e.Value)
                 .Where(e => e.EmployeeStock.EmployeeId == id && e.IsPaid == false)
+                .OrderByDescending(e => e.EmployeeStock.Date)
                 .Select(e => new
                 {
                     _Date = e.EmployeeStock.Date,
@@ -144,7 +180,8 @@ namespace PPE.Controllers
                     StockOut = e.EmployeeStock.StockOut,
                     CurrentStock = e.EmployeeStock.StockIn - e.EmployeeStock.StockOut,
                     AttributeValue = e.EmployeeStock.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text,
-                    Status = e.EmployeeStock.Status
+                    Status = e.EmployeeStock.Status,
+                    
                 });
             
             ViewBag.StockToPay = stockToPay;
@@ -155,6 +192,7 @@ namespace PPE.Controllers
             
             ViewBag.StockLost = employeeStocks
                 .Where(e => e.Status == StockEmployeeStatus.Lost)
+                .OrderByDescending(e => e.Date)
                 .Select(e => new
                 {
                     _Date = e.Date,
@@ -218,7 +256,7 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Matricule,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
         {
             //return Json(employee);
             if (ModelState.IsValid)
@@ -228,6 +266,13 @@ namespace PPE.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            /*return Json(new
+            {
+                errors = ModelState.Values.SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+            });
+            */
             
             ViewData["Size"] = new SelectList(Enum.GetValues(typeof(Size)));
             ViewData["ShoeSize"] = new SelectList(Enum.GetValues(typeof(ShoeSize)));
@@ -263,7 +308,7 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,NNI,Matricule,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
         {
             if (id != employee.Id)
             {
@@ -363,15 +408,6 @@ namespace PPE.Controllers
                     
                     if (status == (int)PpeStatus.Lost)
                     {
-                /*
-                        var stockToBePaid = new StockToBePaid
-                        {
-                            EmployeeStockId = id,
-                            IsPaid = false
-                        };
-                        _context.Add(stockToBePaid);
-                        _context.SaveChanges();
-                //*/
                         var newEmployeeStock = new EmployeeStock
                         {
                             Date = date,
@@ -459,14 +495,25 @@ namespace PPE.Controllers
             var filters = new Dictionary<string, string>();
             foreach(var key in Request.Query.Keys)
             {
+                if (key.StartsWith("search"))
+                {
+                    filters[key.Substring("search".Length)] = Request.Query[key];
+                    if (key == "search[value]" && !string.IsNullOrEmpty(Request.Query[key]))
+                    {
+                        employees = employees.Where(e => e.FirstName.Contains(Request.Query[key].ToString()) 
+                                                         || e.LastName.Contains(Request.Query[key].ToString()) 
+                                                         || e.NNI.Contains(Request.Query[key].ToString()) 
+                                                         || e.Phone.Contains(Request.Query[key].ToString()) 
+                                                         || e.Matricule.Contains(Request.Query[key].ToString())
+                        );
+                        recordsFilterd = employees.Count();
+                    }
+                }
+                
                 if (key.StartsWith("filters"))
                 {
                     filters[key.Substring("filters".Length)] = Request.Query[key];
-                    /*if (!string.IsNullOrEmpty(dataRequest.Search?.Value))
-                    {
-                        employees = employees.Where(e => e.FirstName.Contains(dataRequest.Search.Value, StringComparison.InvariantCultureIgnoreCase));
-                        recordsFilterd = employees.Count();
-                    }*/
+                    
                     if (key == "filters[project]" && !string.IsNullOrEmpty(Request.Query[key]))
                     {
                         employees = employees.Where(e => e.ProjectId == int.Parse(Request.Query[key]));
@@ -497,8 +544,8 @@ namespace PPE.Controllers
                 .Select(e => new
                 {
                     Id = e.Id,
-                    FirstName = e.FirstName,
-                    LastName = e.LastName,
+                    Matricule = e.Matricule,
+                    FullName = e.FullName,
                     NNI = e.NNI,
                     Phone = e.Phone,
                     Project = e.Project.Title,
@@ -518,6 +565,148 @@ namespace PPE.Controllers
                 .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
         }
 
-       
+        public IActionResult EditReturnPpe(int id, int status, DateTime date)
+        {
+            
+            var employeeStock = _context.EmployeeStocks.Find(id);
+            if (employeeStock == null)
+            {
+                return NotFound();
+            }
+
+            employeeStock.IsArchived = true;
+            _context.Update(employeeStock);
+            _context.SaveChanges();
+
+            if (status == (int)PpeStatus.Lost)
+            {
+                employeeStock.Date = date;
+                employeeStock.StockIn = employeeStock.StockIn;
+                employeeStock.StockOut = employeeStock.StockOut;
+                employeeStock.Status = StockEmployeeStatus.Lost;
+                employeeStock.Remarks = employeeStock.Remarks;
+                employeeStock.Designation = Designation.Lost;
+                employeeStock.PpeCondition = PpeCondition.Lost;
+                employeeStock.PpeAttributeCategoryAttributeValueId = employeeStock.PpeAttributeCategoryAttributeValueId;
+                employeeStock.EmployeeId = employeeStock.EmployeeId;
+                employeeStock.ProjectId = employeeStock.ProjectId;
+                employeeStock.FunctionId = employeeStock.FunctionId;
+                employeeStock.StockType = StockType.Lost;
+                employeeStock.PpeCondition = PpeCondition.Lost;
+
+                _context.Update(employeeStock);
+                _context.SaveChanges();
+            }
+            else if (status == (int)PpeStatus.Damaged)
+            {
+                employeeStock.Date = date;
+                employeeStock.StockIn = employeeStock.StockIn;
+                employeeStock.StockOut = employeeStock.StockOut;
+                employeeStock.Status = StockEmployeeStatus.Damaged;
+                employeeStock.Remarks = employeeStock.Remarks;
+                employeeStock.Designation = Designation.Return;
+                employeeStock.PpeCondition = PpeCondition.Damaged;
+                employeeStock.PpeAttributeCategoryAttributeValueId = employeeStock.PpeAttributeCategoryAttributeValueId;
+                employeeStock.EmployeeId = employeeStock.EmployeeId;
+                employeeStock.ProjectId = employeeStock.ProjectId;
+                employeeStock.FunctionId = employeeStock.FunctionId;
+                employeeStock.StockType = StockType.Return;
+                employeeStock.PpeCondition = PpeCondition.Damaged;
+                _context.Update(employeeStock);
+                _context.SaveChanges();
+            }
+            else
+            {
+                employeeStock.Date = date;
+                employeeStock.StockIn = employeeStock.StockIn;
+                employeeStock.StockOut = employeeStock.StockOut;
+                employeeStock.Status = StockEmployeeStatus.Returned;
+                employeeStock.Remarks = employeeStock.Remarks;
+                employeeStock.Designation = Designation.Return;
+                employeeStock.PpeCondition = PpeCondition.Good;
+                employeeStock.PpeAttributeCategoryAttributeValueId = employeeStock.PpeAttributeCategoryAttributeValueId;
+                employeeStock.EmployeeId = employeeStock.EmployeeId;
+                employeeStock.ProjectId = employeeStock.ProjectId;
+                employeeStock.FunctionId = employeeStock.FunctionId;
+                employeeStock.StockType = StockType.Return;
+                employeeStock.PpeCondition = PpeCondition.Good;
+                
+                _context.Update(employeeStock);
+                _context.SaveChanges();
+                //return Json(new {id, status, date, employeeStock});
+                // returned to the stock of this employee project
+                
+                var ppeId = _context.PpeAttributeCategoryAttributeValues
+                    .Find(employeeStock.PpeAttributeCategoryAttributeValueId).PpeId;
+                
+                var newStockReturned = new Stock
+                {
+                    ProjectId = employeeStock.ProjectId,
+                    Date = employeeStock.Date,
+                    StockIn = employeeStock.StockIn,
+                    StockType = StockType.Normal,
+                    PpeId = ppeId,
+                    StockNature = StockNature.Project,
+                };
+                _context.Add(newStockReturned);
+                _context.SaveChanges();
+                
+                //return Json(newStockReturned);
+
+                var newStockDetailedReturned = new StockDetail
+                {
+                    StockId = newStockReturned.Id,
+                    PpeAttributeCategoryAttributeValueId = (int)employeeStock.PpeAttributeCategoryAttributeValueId,
+                    StockIn = employeeStock.StockIn,
+                };
+
+                _context.Add(newStockDetailedReturned);
+                _context.SaveChanges();
+
+            }
+
+            return RedirectToAction("Details", new { id = employeeStock.EmployeeId });
+        }
+        
+        // GET: api/Employees/5
+        [HttpGet()]
+        [Route("api/employees/{id}")]
+        public async Task<ActionResult<Employee>> Get(int id)
+        {
+            if (_context.Employees == null)
+            {
+                return Problem("Entity set 'ApplicationDbContext.Employees'  is null.");
+            }
+            var employee = await _context.Employees
+                .Include(e => e.Function)
+                .Include(e => e.Project)
+                .FirstOrDefaultAsync(e => e.Id == id);
+            
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            
+            return employee;
+        }
+        
+        // GET: Employees/DeleteEmployee/5
+        [HttpGet()]
+        [Route("Employees/DeleteEmployee/{id}")]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            if (_context.Employees == null)
+            {
+                return Problem("Entity set 'ApplicationDbContext.Employees'  is null.");
+            }
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee != null)
+            {
+                _context.Employees.Remove(employee);
+            }
+            
+            await _context.SaveChangesAsync();
+            return Json(new {success = true, message = "Employee deleted successfully"});
+        }
     }
 }

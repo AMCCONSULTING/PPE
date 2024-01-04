@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DataTables.AspNetCore.Mvc.Binder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -181,53 +177,7 @@ namespace PPE.Controllers
                     return Problem(e.Message);
                 }
             }
-
-            /*if (ModelState.IsValid)
-            {
-                await _context.AddAsync(ppe);
-                await _context.SaveChangesAsync();
-
-                var categoryVariant = _context.Variants.FirstOrDefault(v => v.CategoryId == ppe.CategoryId);
-                // add the ppe to the Variant table with category id as variant id of the same category
-
-                if (categoryVariant == null)
-                {
-                    var variant = new Variant
-                                    {
-                                        Title = categoryVariant!.Title,
-                                        PpeId = ppe.Id,
-                                        CategoryId = ppe.CategoryId
-                                    };
-
-                                     await _context.Variants.AddAsync(variant);
-                                     await _context.SaveChangesAsync();
-                }
-
-
-                /*
-                 *    // add the ppe to the VariantValue table with variant id as variant id of the same category
-                var categoryVariantValues = _context.VariantValues
-                    .Where(v => v.VariantId == categoryVariant.Id)
-                    .ToList();
-
-                var variantValues = categoryVariantValues.Select(v => new VariantValue
-                {
-                    ValueId = v.ValueId,
-                    VariantId = variant.Id
-                }).ToList();
-
-                // return Json(variantValues);
-
-                await _context.VariantValues.AddRangeAsync(variantValues);
-                 #1#
-
-                await _context.SaveChangesAsync();
-
-
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id",
-                "Title", ppe.CategoryId);*/
+            
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", 
                 "Title", ppe.CategoryId);
             return View(ppe);
@@ -286,48 +236,9 @@ namespace PPE.Controllers
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Id", ppe.CategoryId);
             return View(ppe);
         }
-
-        // GET: Ppes/Delete/5
-        /*public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Ppes == null)
-            {
-                return NotFound();
-            }
-
-            var ppe = await _context.Ppes
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (ppe == null)
-            {
-                return NotFound();
-            }
-
-            return View(ppe);
-        }
-
+        
         // POST: Ppes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Ppes == null)
-            {
-                return Problem("Entity set 'AppDbContext.Ppes'  is null.");
-            }
-            var ppe = await _context.Ppes.FindAsync(id);
-            if (ppe != null)
-            {
-                _context.Ppes.Remove(ppe);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-        */
-
-        // POST: Ppes/Delete/5
-        [HttpPost]
+        [HttpGet]
         public IActionResult DeletePpe(int id)
         {
             if (_context.Ppes == null)
@@ -335,6 +246,16 @@ namespace PPE.Controllers
                 return Problem("Entity set 'AppDbContext.Ppes'  is null.");
             }
             var ppe = _context.Ppes.Find(id);
+            
+            var ppeAttributeCategoryAttributeValues = _context.PpeAttributeCategoryAttributeValues
+                .Where(pacav => pacav.PpeId == id)
+                .ToList();
+            
+            if (ppeAttributeCategoryAttributeValues != null)
+            {
+                _context.PpeAttributeCategoryAttributeValues.RemoveRange(ppeAttributeCategoryAttributeValues);
+            }
+            
             if (ppe != null)
             {
                 _context.Ppes.Remove(ppe);

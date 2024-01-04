@@ -1,0 +1,66 @@
+﻿@model IEnumerable<PPE.Models.Hse>
+
+@{
+    ViewData["Title"] = "List HSE";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Create New",
+            Action = "Create",
+            Controller = "Hses",
+            ButtonType = "primary"
+        }
+    };
+}
+
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Employee!.FullName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Employee!.Tel)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Employee!.ShoeSize)
+                    <th>
+                        @Html.DisplayNameFor(model => model.Employee!.Size)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+        @foreach (var item in Model) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee!.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee!.Tel)
+                    
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee!.ShoeSize)
+                    
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee!.Size)
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                <i class="la la-eye"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                                <i class="la la-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+        }
+            </tbody>
+        </table>
+    </div>
+</div>

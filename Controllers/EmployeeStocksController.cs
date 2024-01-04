@@ -141,18 +141,17 @@ namespace PPE.Controllers
                     _context.EmployeeStocks.Add(newEmployeeStock);
                     await _context.SaveChangesAsync();
                     
-                    if(typeDotation == TypeDotation.Reafectation)
+                    if(typeDotation == (int)TypeDotation.Reafectation)
                     {
                         var stockToBePaid = new StockToBePaid
                         {
                             EmployeeStockId = newEmployeeStock.Id,
-                            StockOut = employeeStock.StockIn,
+                            IsPaid = false,
                         };
-                        _context.StockToBePaids.Add(stockToBePaid);
+                        _context.Add(stockToBePaid);
                         await _context.SaveChangesAsync();
-                        }
+                    }
                         
-                    
                     await transaction.CommitAsync();
                     return RedirectToAction("Details", "Employees", new { id = employeeId});
                     

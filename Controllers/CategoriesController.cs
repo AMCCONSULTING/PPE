@@ -66,6 +66,132 @@ namespace PPE.Controllers
                 .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
         }
         
+        // api/ppe-categories/1
+        [HttpGet()]
+        [Route("api/getPpes/{categoryId}")]
+        public IActionResult Get(int categoryId)
+        {
+            var ppes = _context.Ppes
+                .Include(cp => cp.Category)
+                .Where(cp => cp.CategoryId == categoryId);
+                
+            if (ppes == null)
+            {
+                return Json(new {success = false, message = "Ppe not found"});
+            }
+            
+            return Json(ppes);
+        }
+        
+        // api/getPees/InStock/1
+        [HttpGet()]
+        [Route("api/getPpes/InStock/{categoryId}")]
+        public IActionResult GetPpeInStock(int categoryId)
+        {
+            var ppes = _context.MainStocks
+                .Include(cp => cp.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(p => p.Ppe)
+                .ThenInclude(p => p.Category)
+                .Where(cp => cp.PpeAttributeCategoryAttributeValue.Ppe.CategoryId == categoryId)
+                .GroupBy(cp => cp.PpeAttributeCategoryAttributeValue.Ppe)
+                .Select(cp => new
+                {
+                   Id = cp.Key.Id,
+                   Title = cp.Key.Title,
+                });
+                
+            if (ppes == null)
+            {
+                return Json(new {success = false, message = "Ppe not found"});
+            }
+            
+            return Json(ppes);
+        }
+        
+        // api/categoryAttributeValue/1
+        [HttpGet()]
+        [Route("api/categoryAttributeValue/{ppeId}")]
+        public IActionResult GetCategoryAttributeValue(int ppeId)
+        {
+            var ppeAttributeValues = _context.PpeAttributeCategoryAttributeValues
+                .Include(pacav => pacav.AttributeValueAttributeCategory)
+                .ThenInclude(avac => avac.AttributeValue)
+                .ThenInclude(av => av.Value)
+                .Where(pacav => pacav.PpeId == ppeId);
+            
+            return Json(ppeAttributeValues);
+        }
+        
+        // api/categoryAttributeValue/inStock/1
+        [HttpGet()]
+        [Route("api/categoryAttributeValue/inStock/{ppeId}")]
+        public IActionResult GetCategoryAttributeValueInStock(int ppeId)
+        {
+            var ppeAttributeValues = _context.MainStocks
+                .Include(pacav => pacav.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(avac => avac.AttributeValueAttributeCategory)
+                .ThenInclude(av => av.AttributeValue)
+                .ThenInclude(av => av.Value)
+                .Where(pacav => pacav.PpeAttributeCategoryAttributeValue.PpeId == ppeId && pacav.QuantityIn > pacav.QuantityOut)
+                .Select(pacav => new
+                {
+                    Id = pacav.PpeAttributeCategoryAttributeValueId,
+                    Title = pacav.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text,
+                    CurrentStock = pacav.QuantityIn - pacav.QuantityOut,
+                });
+            
+            return Json(ppeAttributeValues);
+        }
+        
+        // api/getPpes/inStock/project/1/2
+        [HttpGet()]
+        [Route("api/getPpes/inStock/project/{id}/{projectId}")]
+        public IActionResult GetPpeInStock(int id, int projectId)
+        {
+            var ppes = _context.ProjectStocks
+                .Include(cp => cp.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(p => p.Ppe)
+                .ThenInclude(p => p.Category)
+                .Where(cp => cp.PpeAttributeCategoryAttributeValue.Ppe.CategoryId == id && cp.ProjectId == projectId)
+                .GroupBy(cp => cp.PpeAttributeCategoryAttributeValue.Ppe)
+                .Select(cp => new
+                {
+                    Id = cp.Key.Id,
+                    Title = cp.Key.Title,
+                    CurrentStock = cp.Sum(p => p.QuantityIn) - cp.Sum(p => p.QuantityOut),
+                });
+            
+            // get all ppes in the category that are not in stockEmployee or stockIn - stockOut > 0
+                
+            if (ppes == null)
+            {
+                return Json(new {success = false, message = "Ppe not found"});
+            }
+            
+            return Json(ppes);
+        }
+        
+        // api/categoryAttributeValue/inStock/project/1/2
+        [HttpGet()]
+        [Route("api/categoryAttributeValue/inStock/project/{ppeId}/{projectId}")]
+        public IActionResult GetCategoryAttributeValueInStock(int ppeId, int projectId)
+        {
+            var ppeAttributeValues = _context.ProjectStocks
+                .Include(pacav => pacav.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(avac => avac.AttributeValueAttributeCategory)
+                .ThenInclude(av => av.AttributeValue)
+                .ThenInclude(av => av.Value)
+                .Where(pacav => pacav.PpeAttributeCategoryAttributeValue.PpeId == ppeId && pacav.ProjectId == projectId && pacav.QuantityIn > pacav.QuantityOut)
+                .Select(pacav => new
+                {
+                    Id = pacav.PpeAttributeCategoryAttributeValueId,
+                    Title = pacav.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text,
+                    CurrentStock = pacav.QuantityIn - pacav.QuantityOut,
+                });
+            
+            return Json(ppeAttributeValues);
+        }
+        
         // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -272,45 +398,6 @@ namespace PPE.Controllers
             return View(category);
         }
 
-        /*// Delete: Categories/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (_context.Categories == null)
-            {
-                return Problem("Entity set 'AppDbContext.Categories'  is null.");
-            }
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
-            {
-                _context.Categories.Remove(category);
-            }
-            
-            await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Delete successful" });
-        }
-        
-        // DELETE: api
-
-        // POST: Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Categories == null)
-            {
-                return Problem("Entity set 'AppDbContext.Categories'  is null.");
-            }
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
-            {
-                _context.Categories.Remove(category);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }*/
         
         // delete using ajax
         [HttpPost]

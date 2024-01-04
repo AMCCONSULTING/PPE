@@ -1,3 +1,4 @@
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @model PPE.Models.Project
 
 @{
@@ -11,51 +12,104 @@
         }};
 }
 
-<div>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Prefix)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Prefix)
-        </dd>
-    </dl>
+
+<div class="card">
+    <div class="card-body">
+        <div>
+            <canvas id="projectPpeChart" height="100"></canvas>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card-body">
+                    <table class="table bg-white">
+                        <thead>
+                        <tr class="bg-light">
+                            <th>Ppe</th>
+                            <th>Stock In</th>
+                            <th>Stock Out</th>
+                            <th>Current Stock</th>
+                            <th>Details</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model.ProjectStocks
+                            .GroupBy(ps => ps.PpeAttributeCategoryAttributeValue.Ppe))
+                        {
+                            <tr>
+                                <td>@item.Key.Title</td>
+                                <td>@item.Sum(s => s.QuantityIn)</td>
+                                <td>@item.Sum(s => s.QuantityOut)</td>
+                                <td>@item.Sum(s => s.QuantityIn - s.QuantityOut)</td>
+                                <td>
+                                    <a class="btn btn-dark btn-sm"
+                                        href="/Projects/ProjectStockDetails/@(item.Key.Id)/@(Model.Id)">
+                                         <i class="la la-eye"></i>
+                                    </a>
+                                    @*<form asp-action="ProjectStockDetails" asp-controller="Projects" method="get">
+                                        <input type="hidden" name="projectId" value="@Model.Id">
+                                        <input type="hidden" name="ppeId" value="@item.Key.Id">
+                                        <button type="submit" value="Details" class="btn btn-dark btn-sm">
+                                            <i class="la la-eye"></i>
+                                        </button>
+                                    </form>*@
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<h5> Stock of PPEs</h5>
-<table class="table bg-white">
-    <thead>
-    <th>Ppe</th>
-    <th>StockIn</th>
-    <th>StockOut</th>
-    <th>Current Stock</th>
-    <th>Details</th>
-    </thead>
-    <tbody>
-    @foreach (var item in ViewBag.GroupedStocks)
-    {
-        <tr>
-            <td>@item.Ppe.Title</td>
-            <td>@item.StockIn.ToString()</td>
-            <td>@item.StockOut.ToString()</td>
-            <td>@item.CurrentStock.ToString()</td>
-            <td>
-                <form asp-action="ProjectStockDetails" asp-controller="Projects" method="get">
-                <input type="hidden" name="projectId" value="@Model.Id">
-                <input type="hidden" name="ppeId" value="@item.Ppe.Id">
-                <button type="submit" value="Details" class="btn btn-dark btn-sm">
-                <i class="la la-eye"></i>
-                </button>
-                </form>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let labels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Labels));
+            let stockIn = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.StockIn));
+            let stockOut = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.StockOut));
+            let CurrentStocks = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.CurrentStocks)); 
+            let ctx = document.getElementById('projectPpeChart').getContext('2d');
+            let myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Current Stock',
+                        data: CurrentStocks,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Stock Out',
+                        data: stockOut,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Stock In',
+                        data: stockIn,
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
 

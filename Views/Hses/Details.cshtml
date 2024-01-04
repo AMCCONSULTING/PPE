@@ -1,0 +1,87 @@
+﻿@using PPE.Data.Enums
+@model PPE.Models.Hse
+@inject PPE.Data.AppDbContext _context
+
+@{
+    ViewData["Title"] = "Details HSE: " + Model.Employee.FullName;
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to List",
+            Action = "Index",
+            Controller = "Hses",
+            ButtonType = "dark"
+        }
+    };
+    
+    var emeployees = new SelectList(_context.Employees, "Id", "FullName");
+    var ppe = new SelectList(_context.Ppes, "Id", "Title");
+    var returnStatus = new SelectList(Enum.GetValues(typeof(RetunStatus)));
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-3 form-group">
+                <label class="control-label">
+                    <i class="la la-filter"></i>
+                    Start date
+                </label>
+                <input class="form-control" type="date" data-filter="startDate" />
+            </div>
+            <div class="col-md-3 form-group">
+                <label class="control-label">
+                    <i class="la la-filter"></i>
+                    End date
+                </label>
+                <input class="form-control" type="date" data-filter="endDate" />
+            </div>
+            <div class="col-md-3 form-group">
+                <label class="control-label">
+                    <i class="la la-filter"></i>
+                    Employee
+                </label>
+                <select class="select2" asp-items="emeployees"
+                        data-filter="employee"
+                        data-placeholder="--select--">
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-md-3 form-group">
+                <label class="control-label">
+                    <i class="la la-filter"></i>
+                    PPE
+                </label>
+                <select class="select2" asp-items="ppe"
+                        data-filter="ppe"
+                        data-placeholder="--select--">
+                    <option></option>
+                </select>
+            </div>
+            <div class="col-md-3 form-group">
+                <label class="control-label">
+                    <i class="la la-filter"></i>
+                    Return status
+                </label>
+                <select class="select2" asp-items="returnStatus"
+                        data-filter="status"
+                        data-placeholder="--select--">
+                    <option></option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table responsive w-100" data-column="date,ppe,quantity,employee,status" data-url="/api/get/hse/returs/@Model.Id">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>PPE</th>
+                <th>Quantity</th>
+                <th>Employee</th>
+                <th>Return status</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+

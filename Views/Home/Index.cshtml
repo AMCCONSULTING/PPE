@@ -4,25 +4,31 @@
 
 <canvas id="ppeChart" width="400" height="100"></canvas>
 
-@*<section class="out-of-stock">
+<section class="out-of-stock">
     <div class="container">
-        <canvas id="ppeChart" width="400" height="200"></canvas>
-        <div class="row">
-            <div class="col-md-6">
-                @foreach (var item in ViewBag.Ppe)
-                {
-                    <div class="alert alert-danger">
-                        <span> @item.Project.Title </span> |
-                        $1$ <span> @item.VariantValue.Ppe </span> |  #1#
-                        <span> @item.VariantValue.Variant.Ppe.Title </span> |
-                        <span> @item.VariantValue.Value </span> |
-                        <span> @item.CurrentStock </span>
-                    </div>
-                }
-            </div>
-        </div>
+        <table class="table table-bordered bg-white">
+            <thead>
+            <tr>
+                <th>Ppe</th>
+                <th>Stock in</th>
+                <th>Stock out</th>
+                <th>Current Stock</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in ViewBag.Stock)
+            {
+                <tr>
+                    <td>@item.Ppe</td>
+                    <td>@item.StockIn</td>
+                    <td>@item.StockOut</td>
+                    <td>@item.CurrentStock</td>
+                </tr>
+            }
+            </tbody>
+        </table>
     </div>
-</section>*@
+</section>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -30,12 +36,8 @@
         document.addEventListener("DOMContentLoaded", function () {
             let labels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Labels));
             let data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Data));
-            
-        /*    console.log('Labels type:', typeof labels);
-            console.log('Data type:', typeof data);
-            
-            console.log('Labels:', labels);
-            console.log('Data:', data);*/
+            let stockIn = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.StockIns));
+            let stockOut = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.StockOuts));
                     
             let ctx = document.getElementById('ppeChart').getContext('2d');
             let myChart = new Chart(ctx, {
@@ -43,10 +45,24 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Stock Levels',
+                        label: 'Current Stock',
                         data: data,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Stock Out',
+                        data: stockOut,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Stock In',
+                        data: stockIn,
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
                         borderWidth: 1
                     }]
                 },

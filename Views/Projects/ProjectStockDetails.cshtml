@@ -1,4 +1,5 @@
-﻿@{
+﻿@model PPE.Models.Project
+@{
     ViewData["title"] = "Details Project Stock";
     ViewBag.Buttons = new List<ButtonModel> {
         new ButtonModel {
@@ -10,45 +11,53 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-2">
-    <h5>Stock of: @ViewBag.Ppe.Title</h5>
+    <h5>Stock of: @ViewBag.PpeTitle</h5>
     <div>
-        <a asp-action="Details" asp-controller="Projects" asp-route-id="@ViewBag.ProjectId" class="btn btn-primary">
+        <a asp-action="Details" asp-controller="Projects" asp-route-id="@Model.Id" class="btn btn-primary">
             Back to project details
         </a>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 col-12">
-        <div class="bg-white">
-            <canvas id="stockChart" width="100%" height="50"></canvas>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <canvas id="stockChart" width="100%" height="60"></canvas>
+            </div>
+            <div class="col-md-6 col-12">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Variant</th>
+                            <th>StockIn</th>
+                            <th>StockOut</th>
+                            <th>Current Stock</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in ViewBag.ProjectStocks)
+                        {
+                            <tr>
+                                <td>@item.Value</td>
+                                <td>@item.StockIn</td>
+                                <td>@item.StockOut</td>
+                                <td>@item.CurrentStock</td>
+                            </tr>
+                        }
+                        @*{
+                            <tr>
+                                <td>@item.Value</td>
+                                <td>@item.StockIn.ToString()</td>
+                                <td>@item.StockOut.ToString()</td>
+                                <td>@item.CurrentStock.ToString()</td>
+                            </tr>
+                        }*@
+                    </table>
+            </div>
         </div>
     </div>
-    <div class="col-md-6 col-12">
-        <div class="bg-white">
-            <table class="table responsive">
-                <thead>
-                <tr>
-                    <th>PPE variant</th>
-                    <th>StockIn</th>
-                    <th>StockOut</th>
-                    <th>Current Stock</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var item in ViewBag.GroupedStocks)
-                {
-                    <tr>
-                        <td>@item.Value</td>
-                        <td>@item.StockIn.ToString()</td>
-                        <td>@item.StockOut.ToString()</td>
-                        <td>@item.CurrentStock.ToString()</td>
-                    </tr>
-                }
-            </table>
-        </div>
     </div>
-</div>
 
 @section Scripts {
     <script src="~/app-assets/vendors/js/charts/chart.min.js"></script>
@@ -59,9 +68,10 @@
                     let currentQuantities = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.currentStocks));
                     let stockOutQuantities = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.stockOut));
                     let stockInQuantities = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.stockIn));
+                    
+                    //myChart.destroy();
                     let myChart = new Chart(ctx, {
                         type: 'bar',
-                       
                         data: {
                             labels: labels,
                             datasets: [{
@@ -90,18 +100,17 @@
                                     beginAtZero: true
                                 }
                             },
-                            animation: {
-                                  onComplete: () => {
-                                    delayed = true;
-                                  },
-                                  delay: (context) => {
-                                    let delay = 0;
-                                    if (context.type === 'data' && context.mode === 'default' && !delayed) {
-                                      delay = context.dataIndex * 300 + context.datasetIndex * 100;
-                                    }
-                                    return delay;
-                                  },
-                            }                                  
+                            responsive: true,
+                            //maintainAspectRatio: false,
+                            /*plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Stocks'
+                                }
+                            }  */                           
                         }
                     });
         });

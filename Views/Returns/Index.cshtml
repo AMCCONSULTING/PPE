@@ -1,0 +1,167 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using PPE.Data.Enums
+@model IEnumerable<PPE.Models.Return>
+@inject PPE.Data.AppDbContext _context
+
+@{
+    ViewData["Title"] = "Liste des retours";
+    
+    var employees = _context.Employees.ToList();
+    var magaziniers = _context.Magaziniers
+        .Include(m => m.Employee)
+        .ToList();
+    var responsables = _context.Responsables
+        .Include(m => m.Employee)
+        .ToList();
+    var hses = _context.Hses
+        .Include(m => m.Employee)
+        .ToList();
+    var ppes = _context.Ppes.ToList();
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="filters">
+            <div class="row">
+                <div class="col-md-3 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        From
+                    </label>
+                    <input type="date" class="form-control" data-filter="startDate" />
+                    <span class="text-danger"></span>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        To
+                    </label>
+                    <input type="date" class="form-control" data-filter="endDate"/>
+                    <span class="text-danger"></span>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        Employé
+                    </label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2" data-filter="employee">
+                        <option></option>
+                        @foreach (var item in employees)
+                        {
+                            <option value="@item.Id">@item.FullName</option>
+                        }
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        Responsable Hse
+                    </label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2" data-filter="hse">
+                        <option></option>
+                        @foreach (var item in hses)
+                        {
+                            <option value="@item.Id">@item.Employee?.FullName</option>
+                        }
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        Magasinier
+                    </label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2" data-filter="magasinier">
+                        <option></option>
+                        @foreach (var item in magaziniers)
+                        {
+                            <option value="@item.Id">@item.Employee?.FullName</option>
+                        }
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        Status
+                    </label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2" data-filter="sataus">
+                        <option></option>
+                        @foreach (var item in new SelectList(Enum.GetValues<RetunStatus>()))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        PPE
+                    </label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2" data-filter="ppe">
+                        <option></option>
+                        @foreach (var item in ppes)
+                        {
+                            <option value="@item.Id">@item.Title</option>
+                        }
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="card-body">
+        <table class="table responsive w-100"
+               data-column="date,article,employee,magasinier,hse,status,document"
+               data-url="/api/returns/getdotations">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Date)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Article)
+                    </th>
+                    @*<th>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </th>*@
+                    <th>
+                        @Html.DisplayNameFor(model => model.Employee)
+                    </th>
+                    @*<th>
+                        @Html.DisplayNameFor(model => model.Responsable)
+                    </th>*@
+                    <th>
+                        @Html.DisplayNameFor(model => model.Magazinier)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Hse)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Document)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+

@@ -1,0 +1,105 @@
+﻿@model Stoke;
+@{
+    ViewData["Title"] = "Alimentation du stock: " + Model.Reference;
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Retour",
+            Action = "Index",
+            Controller = "Stokes",
+            ButtonType = "dark"
+        }
+    };
+}
+
+@if(ViewData["success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success! 👏👏 </strong> @ViewData["success"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="card">
+    <form asp-action="AddStokeDetails">
+        <div class="card-body">
+
+            <div readonly asp-validation-summary="ModelOnly"></div>
+            <input type="hidden" asp-for="Id"/>
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <label>Categories</label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2 category-select" id="category" name="category">
+                        <option>--Select--</option>
+                        @foreach (var item in ViewBag.Categories)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label>Ppes</label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2 ppe-select" id="ppe" name="ppe">
+                        <option></option>
+                        @*@foreach (var item in ViewBag.Categories)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }*@
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label>Variants</label>
+                    <select
+                        data-placeholder="--Select--"
+                        class="form-control select2 value-select" id="value" name="value">
+                        <option></option>
+                        @*@foreach (var item in ViewBag.Categories)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }*@
+                    </select>
+                </div>
+            </div>
+            <div class="row justify-content-end mt-2">
+                <div class="col-md-2 submit-btn @( Model.StokeDetails != null ? "" : "d-none" ) text-right">
+                    <input type="button" onclick="submitBtn()" value="Save changes" class="btn btn-primary"/>
+                </div>
+            </div>
+    
+            <hr/>
+            <div class="row">
+                <div class="col-md-8 col-12">
+                    <ul class="list-group value-list-container list-group-flush">
+                        @if (Model.StokeDetails != null)
+                        {
+                            foreach (var stokeDetail in Model.StokeDetails)
+                            {
+                                @*<li data-id="@stokeDetail.ArticleId" class="list-group-item">
+                                    <div class="row align-items-center">
+                                        <span class="col">@stokeDetail.Article!.Ppe.Title - @stokeDetail.Article!.AttributeValueAttributeCategory!.AttributeValue!.Value!.Text</span> 
+                                        <input type="number" class="form-control col" value="@stokeDetail.Quantity">
+                                        <input type="hidden" value="@stokeDetail.Article.AttributeValueAttributeCategoryId">
+                                        <button type="button" class="btn btn-danger col-1 mx-1" onclick="removeItem(this)">X</button>
+                                    </div>
+                                </li>*@
+                                <li data-id="@stokeDetail.ArticleId" class="list-group-item">
+                                    <div class="row align-items-center">
+                                        <span class="col">@stokeDetail.Article!.Ppe.Title - @stokeDetail.Article!.AttributeValueAttributeCategory!.AttributeValue!.Value!.Text</span> 
+                                        <input type="number" class="form-control col" value="@stokeDetail.Quantity" name="quantities[]">
+                                        <input type="hidden" value="@stokeDetail.ArticleId" name="articles[]">
+                                        <button type="button" class="btn btn-danger col-1 mx-1" onclick="removeItem(this)">X</button>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

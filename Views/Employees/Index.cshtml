@@ -17,7 +17,7 @@
         <div class="row">
             <div class="col-12 col-md-4 form-group">
                 <label> <i class="la la-filter"></i>Project</label>
-                <select class="form-control select2" id="filter-project">
+                <select class="form-control select2" data-filter="project">
                     <option></option>
                     @foreach (var project in ViewBag.Projects)
                     {
@@ -27,7 +27,7 @@
             </div>
             <div class="col-12 col-md-4 form-group">
                 <label><i class="la la-filter"></i>Function</label>
-                <select class="form-control select2" id="filter-function">
+                <select class="form-control select2" data-filter="function">
                     <option></option>
                     @foreach (var function in ViewBag.Functions)
                     {
@@ -35,35 +35,26 @@
                     }
                 </select>
             </div>
-            <div class="col-12 col-md-4 form-group">
+            @*<div class="col-12 col-md-4 form-group">
                 <label><i class="la la-filter"></i>Search by (name, phone, nni)</label>
                 <input type="text" class="form-control" placeholder="-- Search --" id="filter-name">
-            </div>
+            </div>*@
         </div>
     </div>
     <table class="table responsive w-100"
-           data-column="firstName,lastName,nni,project,function,actions"
+           data-column="matricule,fullName,nni,project,function,actions"
            data-url="/api/employees">
         <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.Matricule)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.FullName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.NNI)
             </th>
-            @*<th>
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Tel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Gender)
-            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Project)
             </th>
@@ -73,45 +64,6 @@
             <th></th>
         </tr>
         </thead>
-        @*<tbody>
-            @foreach (var item in Model) {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.FullName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.NNI)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Phone)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Tel)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Gender)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Project.Title)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Function.Title)
-                    </td>
-                    <td>
-                        <div class="btn-group">
-                            <a class="btn btn-sm btn-dark" asp-action="Details" asp-route-id="@item.Id">
-                                <i class="la la-eye"></i>
-                            </a>
-                            <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">
-                                <i class="la la-edit"></i>
-                            </a>
-                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">
-                                <i class="la la-trash"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            }
-            </tbody>*@
+        <tbody></tbody>
     </table>
 </div>

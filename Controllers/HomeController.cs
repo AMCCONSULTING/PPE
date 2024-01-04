@@ -20,7 +20,7 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        var stocks = _context.Stocks
+        /*var stocks = _context.Stocks
             .Include(s => s.Ppe)
             .Where(s => s.ProjectId == null && s.StockType == StockType.Normal)
             .GroupBy(s => s.Ppe);
@@ -38,17 +38,31 @@ public class HomeController : Controller
                 StockIn = g.Sum(s => s.StockIn),
                 StockOut = g.Sum(s => s.StockOut),
                 CurrentStock = g.Sum(s => s.StockIn) - g.Sum(s => s.StockOut),
-            });
+            });*/
         
+        var mainStocks = _context.MainStocks
+            .Include(s => s.PpeAttributeCategoryAttributeValue)
+            .ThenInclude(p => p!.Ppe)
+            .GroupBy(s => s.PpeAttributeCategoryAttributeValue!.Ppe.Category);
         
+        var stockOuts = mainStocks.Select(s => s.Sum(s => s.QuantityOut)).ToList();
+        var stockIns = mainStocks.Select(s => s.Sum(s => s.QuantityIn)).ToList();
+        var currentStocks = mainStocks.Select(s => s.Sum(s => s.QuantityIn - s.QuantityOut)).ToList();
+        /*var labels = stocks.Select(s => $"{s.Key.Title}").ToList();
+        var data = stocks.Select(s => s.Sum(s => s.StockIn - s.StockOut)).ToList();*/
+        ViewBag.Labels = mainStocks.Select(s => $"{s.Key.Title}").ToList();
+        ViewBag.Data = currentStocks;
+        ViewBag.StockIns = stockIns;
+        ViewBag.StockOuts = stockOuts;
         
-        var labels = stocks.Select(s => $"{s.Key.Title}").ToList();
-        var data = stocks.Select(s => s.Sum(s => s.StockIn - s.StockOut)).ToList();
-        ViewBag.Labels = labels;
-        ViewBag.Data = data;
-        
-        // get ppe that are threshold or below threshold
-        ViewBag.Ppe = ppeBelowThreshold;
+       // group in save array of objects
+       ViewBag.Stock = mainStocks.Select(s => new
+       {
+              Ppe = s.Key.Title,
+              StockIn = s.Sum(s => s.QuantityIn),
+              StockOut = s.Sum(s => s.QuantityOut),
+              CurrentStock = s.Sum(s => s.QuantityIn - s.QuantityOut),
+       });
         
         return View();
     }

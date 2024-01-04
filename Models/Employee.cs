@@ -8,6 +8,11 @@ public class Employee
 {
     [Key]
     public int Id { get; set; }
+    
+    [Required]
+    [DisplayName("Matricule")]
+    public string Matricule { get; set; }
+    
     [Required]
     [DisplayName("First name")]
     public string FirstName { get; set; } 
@@ -35,6 +40,19 @@ public class Employee
     
     // Relationship with EmployeeStock
     public ICollection<EmployeeStock>? EmployeeStocks { get; set; }
+    
+    // navigation properties
+    public ICollection<Magazinier>? Magaziniers { get; set; }
+    public ICollection<Coordinateur>? Coordinateurs { get; set; }
+    public ICollection<Transporteur>? Transporteurs { get; set; }
+    public ICollection<Responsable>? Responsables { get; set; }
+    public ICollection<Hse>? Hses { get; set; }
+    public ICollection<StockEmployee>? StockEmployees { get; set; }
+    public ICollection<PayableStock>? PayableStocks { get; set; }
+    public ICollection<Return>? Returns { get; set; }
+    public ICollection<Dotation>? Dotations { get; set; }
+    public ICollection<StockToBePaid>? StocksToBePaid { get; set; }
+    //public ICollection<DotationDetail> DotationDetails { get; set; }
     
     
 }

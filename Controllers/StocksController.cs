@@ -148,7 +148,6 @@ namespace PPE.Controllers
             var ppeAttributeCategoryAttributeValue = await _context.PpeAttributeCategoryAttributeValues
                 .Where(p => p.PpeId == id)
                 .Include(p => p.StockDetails)
-                
                 .Select(p => new SelectListItem
                 {
                     Text = p.AttributeValueAttributeCategory.AttributeValue.Value.Text,

@@ -1,0 +1,93 @@
+﻿@model PPE.Models.Stoke
+
+@{
+    ViewData["Title"] = "Details Alimentation du stock: " + Model.Reference;
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Retour à la liste",
+            Action = "Index",
+            Controller = "Stokes",
+            ButtonType = "dark"
+        },
+    };
+}
+
+<div class="card">
+    <div class="card-header">
+        <a asp-action="AddStokeDetails" asp-route-id="@Model.Id" 
+           class="btn btn-sm btn-primary top-0" 
+           style="top: 10px; right: 10px; position: absolute; z-index: 1000;"
+        >
+            <i class="la la-edit"></i>
+        </a>
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-3">
+                <h4>Date </h4>
+                <strong>@Model.Date.ToString("d")</strong>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <h4>Document </h4>
+                <strong>
+                    <a href="@Model.Document" target="_blank">Document</a>
+                </strong>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <h4>Respnsable </h4>
+                <strong>@Model.Responsable!.Employee!.FullName</strong>
+            </div>
+            @*<div class="col-12 col-md-6 col-lg-3">
+                <h4>Magazinier </h4>
+                <strong>@Model.Magazinier!.Employee!.FullName</strong>
+            </div>*@
+        </div>
+    </div>
+    <hr>
+    <div class="card-body">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr class="bg-light">
+                @*<th>Id</th>*@
+                <th>Ppe</th>
+                <th>Value</th>
+                <th>Quantity</th>
+                @*<th>Actions</th>*@
+            </tr>
+            </thead>
+            <tbody>
+            @if (Model.StokeDetails != null)
+            {
+                @*foreach (var item in Model.StokeDetails)
+                {
+                    <tr>
+                        $1$<td>@item.Id</td>#1#
+                        <td col="Count(@item.Article!.Ppe!.Title)">@item.Article!.Ppe!.Title</td>
+                        <td>@item.Article.AttributeValueAttributeCategory.AttributeValue!.Value!.Text</td>
+                        <td>@item.Quantity.ToString()</td>
+                        $1$<td>
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        </td>#1#
+                    </tr>
+                }*@
+                @foreach (var group in Model.StokeDetails.GroupBy(item => item.Article?.Ppe?.Title))
+                {
+                    <tr>
+                        <td style="vertical-align: center" rowspan="@(group.Count() + 1)">
+                            <strong class="mb-auto mt-auto">@group.Key</strong>
+                        </td>
+                    </tr>
+
+                    foreach (var item in group)
+                    {
+                        <tr>
+                            <td>@item.Article?.AttributeValueAttributeCategory.AttributeValue?.Value?.Text</td>
+                            <td>@item.Quantity.ToString()</td>
+                        </tr>
+                    }
+                }
+            }
+        </table>
+    </div>
+</div>
+

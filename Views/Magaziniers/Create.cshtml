@@ -1,0 +1,46 @@
+﻿@model PPE.Models.Magazinier
+
+@{
+    ViewData["Title"] = "New magazinier";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to List",
+            Action = "Index",
+            Controller = "Magaziniers",
+            ButtonType = "primary"
+        }
+    };
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="form-group col-12 col-md-6">
+                    <label asp-for="EmployeeId" class="control-label"></label>
+                    <select asp-for="EmployeeId" 
+                            class="form-control select2 select2-hidden-accessible employee-select" 
+                            data-val="true" 
+                            data-val-required="The EmployeeId field is required." 
+                            id="EmployeeId" 
+                            name="EmployeeId" 
+                            tabindex="-1" 
+                            aria-hidden="true"
+                            asp-items="ViewBag.EmployeeId">
+                    </select>
+                </div>
+                <div class="col-md-6 placeholder"></div>
+            </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <input type="button" onclick="submitBtn()" value="Save changes" class="btn btn-primary"/> 
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

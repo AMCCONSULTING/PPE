@@ -1,0 +1,109 @@
+﻿@model IEnumerable<PPE.Models.StokeDetail>
+
+@{
+    ViewData["Title"] = "Details MainStock";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Back to list",
+            Action = "Index",
+            Controller = "MainStocks",
+            ButtonType = "dark"
+        },
+    };
+    
+    var mouvementDetails = ViewBag.StokeDetails as IEnumerable<MouvementDetail>;
+    
+}
+
+<div class="card">
+    <div class="card-body">
+        <ul class="nav nav-tabs nav-linetriangle no-hover-bg">
+                <li class="nav-item">
+                    <a class="nav-link active" id="base-tab41" data-toggle="tab" aria-controls="tab41"
+                       href="#stockIn" aria-expanded="true">
+                        Stocks in
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="base-tab43" data-toggle="tab" aria-controls="tab43" href="#stockOut" aria-expanded="false">
+                        Stocks out
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="tab-content px-1 pt-1">
+                <div role="tabpanel" class="tab-pane active" id="stockIn" aria-expanded="true" 
+                     aria-labelledby="base-tab41">
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Date alimentation</th>
+                                <th>PPE</th>
+                                <th>Variant</th>
+                                <th>Qte</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach(var group in Model.GroupBy(x => x.Stoke!.Date))
+                            {
+                                <tr>
+                                    <td rowspan="@(group.Count() + 2)">@group.Key.ToString("d")</td>
+                                </tr>
+                                @foreach(var itemGroup in group.GroupBy(x => x.Article!.Ppe.Title))
+                                {
+                                    <tr>
+                                        <td rowspan="@(itemGroup.Count() + 1)">@itemGroup.Key</td>
+                                    </tr>
+                                    @foreach(var item in itemGroup)
+                                    {
+                                        <tr>
+                                            <td>@item.Article.AttributeValueAttributeCategory.AttributeValue.Value.Text</td>
+                                            <td>@item.Quantity</td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="stockOut" aria-labelledby="base-tab42">
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Date mouvements</th>
+                                <th>PPE</th>
+                                <th>Variant</th>
+                                <th>Qte</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach(var group in mouvementDetails!.GroupBy(x => x.Mouvement.Date))
+                            {
+                                <tr>
+                                    <td rowspan="@(group.Count() + 2)">@group.Key.ToString("d")</td>
+                                </tr>
+                                @foreach(var itemGroup in group.GroupBy(x => x.Article!.Ppe.Title))
+                                {
+                                    <tr>
+                                        <td rowspan="@(itemGroup.Count() + 1)">@itemGroup.Key</td>
+                                    </tr>
+                                    @foreach(var item in itemGroup)
+                                    {
+                                        <tr>
+                                            <td>@item.Article.AttributeValueAttributeCategory.AttributeValue.Value.Text</td>
+                                            <td>@item.Quantity</td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        
+    </div>
+</div>

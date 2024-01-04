@@ -1,0 +1,91 @@
+﻿@using PPE.Data.Enums
+@model PPE.Models.Dotation
+
+@{
+    ViewData["Title"] = "Create dotation";
+    ViewBag.Buttons = new List<ButtonModel>
+    {
+        new ButtonModel
+        {
+            Text = "Retour à la liste",
+            Action = "Index",
+            Controller = "Dotations",
+            ButtonType = "dark"
+        }
+    };
+    
+   
+    
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="EmployeeId" value="@ViewBag.EmployeeId" />
+            <div class="row">
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="Document" class="control-label"></label>
+                <input asp-for="Document" class="form-control" />
+                <span asp-validation-for="Document" class="text-danger"></span>
+            </div>
+            @*<div class="form-group col-12 col-md-6">
+                <label asp-for="ResponsibleId" class="control-label"></label>
+                <select 
+                 data-placeholder="--Select--"
+                 asp-for="ResponsibleId" class ="form-control select2" asp-items="ViewBag.ResponsibleId">
+                <option></option>
+            </select>
+            </div>*@
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="CoordinatorId" class="control-label"></label>
+                <select 
+                    data-placeholder="--Select--"
+                    asp-for="CoordinatorId" class ="form-control select2" asp-items="ViewBag.CoordinatorId">
+                    <option></option>
+                </select>
+            </div>
+            
+            @*<div class="form-group col-12 col-md-6">
+                <label asp-for="TransporterId" class="control-label"></label>
+                <select 
+                    data-placeholder="--Select--"
+                    asp-for="TransporterId" class ="form-control select2" asp-items="ViewBag.TransporterId">
+                    <option></option>
+                </select>
+            </div>*@
+            
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="MagasinierId" class="control-label"></label>
+                <select 
+                    data-placeholder="--Select--"
+                    asp-for="MagasinierId" class ="form-control select2" asp-items="ViewBag.MagasinierId">
+                    <option></option>
+                </select>
+            </div>
+            
+            <div class="form-group col-12 col-md-6">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class="form-control select2"
+                        data-placeholder="--Select--"
+                        asp-items="new SelectList(Enum.GetValues(typeof(TypeDotation)))"
+                ><option></option></select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            </div>
+            <div class="form-group">
+                <input type="button" onclick="submitBtn()" value="Create dotation" class="btn btn-primary"/> 
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

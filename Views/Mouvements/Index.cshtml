@@ -1,0 +1,124 @@
+﻿@model IEnumerable<PPE.Models.Mouvement>
+@inject PPE.Data.AppDbContext _context
+
+@{
+    ViewData["Title"] = "Liste des mouvements stock";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Nouveau mouvement",
+            Action = "Create",
+            Controller = "Mouvements",
+            ButtonType = "primary"
+        }
+    };
+    var projects = _context.Projects.ToList();
+}
+<div class="card">
+    <div class="card-header">
+        <div class="filters">
+            <div class="row">
+                <div class="col-md-4 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        Date de l'alimentation
+                    </label>
+                    <input type="date" class="form-control" id="filter-date" />
+                    <span class="text-danger"></span>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        Projet de l'alimentation
+                    </label>
+                    <select 
+                        data-placeholder="--Select--"
+                        class="form-control select2" id="filter-project">
+                        <option></option>
+                        @foreach (var item in projects)
+                        {
+                            <option value="@item.Id">@item.Title</option>
+                        }
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label">
+                        <i class="la la-filter"></i>
+                        Référence de l'alimentation
+                    </label>
+                    <input class="form-control" id="filter-reference" />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="card-body">
+        <table class="table"
+               data-column="date,reference,project,document,responsable,coordinateur,magazinier,actions"
+               data-url="/api/mouvements/getmouvements">
+            <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Reference)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Project)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Document)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Responsable)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Coordinateur)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Magazinier)
+                </th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @*@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Reference)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Prefix)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Document)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Responsable.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Magazinier.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hse.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Coordinateur.Id)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}*@
+            </tbody>
+        </table>
+    </div>
+</div>
+

@@ -8,9 +8,10 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i%7CQuicksand:300,400,500,700" rel="stylesheet">
     
     <!-- BEGIN: Vendor CSS-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-        <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/vendors.min.css">
-    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/ui/prism.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/vendors.min.css">
+    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/extensions/sweetalert2.min.css">
+    @* <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/ui/prism.min.css"> *@
     <link rel="stylesheet" href="~/app-assets/vendors/css/tables/datatable/jquery.dataTables.min.css">
     <link rel="stylesheet" href="~/app-assets/vendors/css/tables/extensions/responsive.dataTables.min.css">
     <link rel="stylesheet" href="~/app-assets/vendors/css/jquery-confirm/dist/jquery-confirm.min.css">
@@ -63,7 +64,7 @@
         }
         @Html.Partial("_ContentHeader", new ContentHeaderModel
         {
-            Title = ViewData["Title"].ToString(),
+            Title = ViewData["Title"]!.ToString(),
             Buttons = ViewBag.Buttons
         })
         <div class="content-body">
@@ -87,21 +88,22 @@
 
 
 <!-- BEGIN: Vendor JS-->
-    <script src="~/app-assets/vendors/js/vendors.min.js"></script>
+<script src="~/app-assets/vendors/js/vendors.min.js"></script>
+<script src="~/app-assets/vendors/js/extensions/sweetalert2.all.min.js"></script>
+<script src="~/app-assets/vendors/js/extensions/toastr.min.js"></script>
     <!-- BEGIN Vendor JS-->
 
     <!-- BEGIN: Page Vendor JS-->
-<script type="text/ecmascript" src="~/app-assets/vendors/js/ui/prism.min.js"></script>
-<script type="text/ecmascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+@*<script type="text/ecmascript" src="~/app-assets/vendors/js/ui/prism.min.js"></script>*@
 <!-- END: Page Vendor JS-->
 
     <!-- Begin: Select2 JS-->
 <script src="~/app-assets/vendors/js/forms/select/select2.full.min.js"></script>
 <!-- Begin: Select2 JS-->
-
 <script src="~/app-assets/vendors/js/tables/datatable/datatables.min.js"></script>
 <script src="~/app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js"></script>
 <script src="~/app-assets/vendors/js/jquery-confirm/dist/jquery-confirm.min.js"></script>
+
 
 <!-- BEGIN: Theme JS-->
 <script src="~/app-assets/js/core/app-menu.js"></script>

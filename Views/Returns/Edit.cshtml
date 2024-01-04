@@ -1,0 +1,89 @@
+﻿@using PPE.Data.Enums
+@model PPE.Models.Return
+@inject PPE.Data.AppDbContext _context
+
+@{
+    ViewData["Title"] = "Edit Return";
+    ViewBag.Buttons = new List<ButtonModel>
+    {
+        new ButtonModel
+        {
+            Text = "Liste des retours",
+            Action = "Index",
+            Controller = "Returns",
+            ButtonType = "dark"
+        }
+    };
+    
+    var status = new SelectList(Enum.GetValues(typeof(RetunStatus)));
+    var hses = new SelectList(_context.Hses.Select(r => new { Id = r.Id, FullName = r.Employee!.FullName }), "Id", "FullName");
+    var responsables = new SelectList(_context.Responsables.Select(r => new { Id = r.Id, FullName = r.Employee!.FullName }), "Id", "FullName");
+    var magaziniers = new SelectList(_context.Magaziniers.Select(r => new { Id = r.Id, FullName = r.Employee!.FullName }), "Id", "FullName");
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="EmployeeId" value="@ViewBag.EmployeeId">
+                        <input type="hidden" asp-for="ArticleId" value="@ViewBag.ArticleId">
+            <div class="row">
+                <div class="form-group col-12 col-md-6">
+                    <label asp-for="Status" class="control-label"></label>
+                    <select asp-for="Status" class="form-control select2 status-select"
+                            data-placeholder="-- Select Status --"
+                            asp-items="status">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+                <div class="form-group col-12 col-md-6 hse-select-container">
+                    <label asp-for="HseId" class="control-label"></label>
+                    <select asp-for="HseId" class="form-control select2 hse-select" 
+                            id="hse-select"
+                            data-placeholder="-- Select Responsable Hse --"
+                            asp-items="hses">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label asp-for="ResponsableId" class="control-label"></label>
+                    <select asp-for="ResponsableId" class="form-control select2" 
+                            data-placeholder="-- Select Responsable --"
+                            asp-items="responsables">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="ResponsableId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label asp-for="MagazinierId" class="control-label"></label>
+                    <select asp-for="MagazinierId" class="form-control select2" 
+                            data-placeholder="-- Select Magazinier --"
+                            asp-items="magaziniers">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="MagazinierId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label asp-for="Quantity" class="control-label"></label>
+                    <input asp-for="Quantity" class="form-control" value="1"/>
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

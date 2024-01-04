@@ -1,0 +1,41 @@
+﻿@model IEnumerable<PPE.Models.Return>
+@{
+    ViewData["Title"] = "Stock Return";
+    ViewBag.Buttons = new List<ButtonModel> {
+        new ButtonModel {
+            Text = "Stock de return",
+            Action = "Index",
+            Controller = "Returns",
+            ButtonType = "primary"
+        },
+    };
+}
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>PPE</th>
+                <th>Variant</th>
+                <th>Qte</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach(var group in Model.GroupBy(x => x.Article!.Ppe!.Title))
+            {
+                <tr>
+                    <td rowspan="@(Model.Count() + 1)">@group.Key</td>
+                </tr>
+                @foreach(var item in group.GroupBy(x => x.Article?.AttributeValueAttributeCategory?.AttributeValue?.Value?.Text))
+                {
+                    <tr>
+                        <td>@item.Key</td>
+                        <td>@item.Sum(x => x.Quantity)</td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

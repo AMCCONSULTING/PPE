@@ -39,7 +39,23 @@ namespace PPE.Controllers
             }
             
             var project = await _context.Projects
+                .Include(e => e.ProjectStocks)
+                .ThenInclude(ps => ps.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(paca => paca.AttributeValueAttributeCategory)
+                .ThenInclude(avac => avac.AttributeValue)
+                .ThenInclude(av => av.Value)
+                .Include(e => e.ProjectStocks)
+                .ThenInclude(ps => ps.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(paca => paca.Ppe)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            
+            // group by ppe and sum stock in and stock out for each ppe 
+           var projectStoks = project.ProjectStocks
+               .GroupBy(s => s.PpeAttributeCategoryAttributeValue.Ppe).ToList();
+           ViewBag.Labels = projectStoks.Select(s => $"{s.Key.Title}").ToList();
+           ViewBag.StockIn = projectStoks.Select(s => s.Sum(s => s.QuantityIn)).ToList();
+           ViewBag.StockOut = projectStoks.Select(s => s.Sum(s => s.QuantityOut)).ToList();
+           ViewBag.CurrentStocks = projectStoks.Select(s => s.Sum(s => s.QuantityIn) - s.Sum(s => s.QuantityOut)).ToList();
             
             if (project == null)
             {
@@ -178,54 +194,41 @@ namespace PPE.Controllers
         }
 
         [HttpGet]
+        [Route("Projects/ProjectStockDetails/{ppeId}/{projectId}")]
         public IActionResult ProjectStockDetails(int ppeId, int projectId)
         {
+            var project = _context.Projects
+                .Include(p => p.ProjectStocks)
+                .ThenInclude(ps => ps.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(paca => paca.AttributeValueAttributeCategory)
+                .ThenInclude(avac => avac.AttributeValue)
+                .ThenInclude(av => av.Value)
+                .Include(p => p.ProjectStocks)
+                .ThenInclude(ps => ps.PpeAttributeCategoryAttributeValue)
+                .ThenInclude(paca => paca.Ppe)
+                .FirstOrDefault(p => p.Id == projectId);
             
-            var detailedStock = _context.StockDetails
-                .Where(s => s.PpeAttributeCategoryAttributeValue.PpeId == ppeId && s.Stock.ProjectId == projectId)
-                .GroupBy(s => s.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text)
+            var projectStocks = _context.ProjectStocks
+                .Where(ps => ps.PpeAttributeCategoryAttributeValue.PpeId == ppeId && ps.ProjectId == projectId)
+                .GroupBy(ps => ps.PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Value.Text)
                 .Select(g => new
                 {
                     Value = $"{g.Key}",
-                    // Value = $"{g.Key} - {g.FirstOrDefault().PpeAttributeCategoryAttributeValue.AttributeValueAttributeCategory.AttributeValue.Attribute.Title}",
-                    StockIn = g.Sum(s => s.StockIn),
-                    StockOut = g.Sum(s => s.StockOut),
-                    CurrentStock = g.Sum(s => s.StockIn) - g.Sum(s => s.StockOut),
+                    StockIn = g.Sum(s => s.QuantityIn),
+                    StockOut = g.Sum(s => s.QuantityOut),
+                    CurrentStock = g.Sum(s => s.QuantityIn) - g.Sum(s => s.QuantityOut),
                 })
                 .ToList();
             
-            ViewBag.Ppe = _context.Ppes.FirstOrDefault(p => p.Id == ppeId);
-            
-            //return Json(detailedStock);
-            
-            ViewBag.GroupedStocks = detailedStock;
-            
-            var currentStock = _context.Stocks
-                .Where(s => s.PpeId == ppeId && s.ProjectId == projectId)
-                .GroupBy(s => s.Ppe)
-                .Select(g => new
-                {
-                    Ppe = g.Key,
-                    StockIn = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockIn),
-                    StockOut = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockOut),
-                    CurrentStock = g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockIn) - g.Where(s => s.StockType == StockType.Normal).Sum(s => s.StockOut),
-                })
-                .ToList();
-            
-            var labels = currentStock.Select(s => $"{s.Ppe.Title}").ToList();
-            var stockIn = currentStock.Select(s => s.StockIn).ToList();
-            var stockOut = currentStock.Select(s => s.StockOut).ToList();
-            var currentStocks = currentStock.Select(s => s.CurrentStock).ToList();
-            
-            ViewBag.Labels = labels;
-            ViewBag.StockIn = stockIn;
-            ViewBag.StockOut = stockOut;
-            ViewBag.CurrentStocks = currentStocks;
-            
-            ViewBag.ProjectId = projectId;
-            return View();
-            
-            //return View(stocks);
+            ViewBag.Labels = projectStocks.Select(s => s.Value).ToList();
+            ViewBag.StockIn = projectStocks.Select(s => s.StockIn).ToList();
+            ViewBag.StockOut = projectStocks.Select(s => s.StockOut).ToList();
+            ViewBag.CurrentStocks = projectStocks.Select(s => s.CurrentStock).ToList();
+            ViewBag.PpeTitle = project.ProjectStocks.FirstOrDefault(ps => ps.PpeAttributeCategoryAttributeValue.PpeId == ppeId)?.PpeAttributeCategoryAttributeValue.Ppe.Title;
+            ViewBag.PeId = ppeId;
+            ViewBag.ProjectStocks = projectStocks;
+            return View(project);
+
         }
        
     }

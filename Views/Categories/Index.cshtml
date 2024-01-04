@@ -29,78 +29,13 @@
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>Actions</th>
-            @*<th></th>*@
         </tr>
         </thead>
-        @*<tbody>
-        @foreach (var item in Model) {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.PpeCount)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">
-                            <i class="la la-edit"></i>
-                        </a> 
-                        <a class="btn btn-sm btn-dark" asp-action="Details" asp-route-id="@item.Id">
-                            <i class="la la-eye"></i>
-                        </a> 
-                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">
-                            <i class="la la-trash"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-        }
-        </tbody>*@
+
     </table>
 </div>
 
 @section Scripts {
-    <script>
-    $(document).ready(function () {
-      /*  $('table[data-column]').each(function () {
-                    var table = $(this);
-                    var columns = table.data('column').split(',');
-                    var url = table.data('url');
-       
-                    var dataTable = table.DataTable({
-                        processing: true,
-                        serverSide: true,
-                        ajax: {
-                            url: url,
-                            type: 'GET',
-                            dataSrc: 'data'
-                        },
-                        columns: columns.map(function (col) {
-                            //console.log(col)
-                            return {
-                                data: col,
-                                name: col
-                            };
-                        }),
-                        order: [[0, 'desc']]
-                    });
-        
-                    // Event listener for filter inputs
-                    columns.forEach(function (col) {
-                        $('#filter-' + col).on('change', function () {
-                            // Redraw DataTable when filter value changes
-                            dataTable.draw();
-                        });
-                    });
-                });
-        */
-    });
-    
-    </script>
     
 }
 

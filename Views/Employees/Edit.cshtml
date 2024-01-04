@@ -17,72 +17,91 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="row">
-                <div class="col-12 col-md-6 mt-2">
-                    <label asp-for="FirstName" class="form-label"></label>
-                    <input asp-for="FirstName" class="form-control" />
+                <div class="col-12 col-md-6 form-group">
+                    <label asp-for="FirstName" class="label-control"></label>
+                    <input asp-for="FirstName" class="form-control"/>
                     <span asp-validation-for="FirstName" class="text-danger"></span>
                 </div>
-                <div class="col-12 col-md-6 mt-2">
-                    <label asp-for="LastName" class="form-label"></label>
-                    <input asp-for="LastName" class="form-control" />
+                <div class="col-12 col-md-6 form-group">
+                    <label asp-for="LastName" class="label-control"></label>
+                    <input asp-for="LastName" class="form-control"/>
                     <span asp-validation-for="LastName" class="text-danger"></span>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12 col-md-6 mt-2">
-                    <label asp-for="NNI" class="form-label"></label>
-                    <input asp-for="NNI" class="form-control" />
+                <div class="col-12 col-md-6 form-group">
+                    <label asp-for="Matricule" class="form-label"></label>
+                    <input asp-for="Matricule" class="form-control"/>
+                    <span asp-validation-for="Matricule" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-6 form-group">
+                    <label asp-for="NNI" class="label-control"></label>
+                    <input asp-for="NNI" class="form-control"/>
                     <span asp-validation-for="NNI" class="text-danger"></span>
                 </div>
-                <div class="col-12 col-md-6 mt-2">
-                    <label asp-for="Phone" class="form-label"></label>
-                    <input asp-for="Phone" class="form-control" />
+                <div class="col-12 col-md-6 form-group">
+                    <label asp-for="Phone" class="label-control"></label>
+                    <input asp-for="Phone" class="form-control"/>
                     <span asp-validation-for="Phone" class="text-danger"></span>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12 col-md-6 mt-2">
+                <div class="col-12 col-md-6 form-group">
                     <label asp-for="Tel" class="form-label"></label>
-                    <input asp-for="Tel" class="form-control" />
+                    <input asp-for="Tel" class="form-control"/>
                     <span asp-validation-for="Tel" class="text-danger"></span>
                 </div>
-                <div class="col-12 col-md-6 mt-2">
+                <div class="col-12 col-md-6 form-group">
                     <label asp-for="Gender" class="form-label"></label>
-                    <select asp-for="Gender" class="form-control" asp-items="ViewBag.Gender">
-                        <option value="">Select Gender</option>
+                    <select asp-for="Gender"
+                            data-live-search="true" data-placeholder="-- Select Gender --"
+                            class="form-control select2" asp-items="ViewBag.Gender">
+                        <option></option>
                     </select>
                     <span asp-validation-for="Gender" class="text-danger"></span>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12 col-md-6 mt-2">
+                <div class="col-12 col-md-6 form-group">
+                    <label asp-for="Size" class="form-label"></label>
+                    <select asp-for="Size"
+                            data-live-search="true" data-placeholder=" -- Select size --"
+                            class="form-control select2" asp-items="ViewBag.Size">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="Size" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-6 form-group">
+                    <label asp-for="ShoeSize" class="form-label"></label>
+                    <select asp-for="ShoeSize"
+                            data-live-search="true"
+                            data-placeholder="-- Select shoe size --"
+                            class="form-control select2" asp-items="ViewBag.ShoeSize">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="ShoeSize" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-6 form-group">
                     <label asp-for="ProjectId" class="form-label"></label>
-                    <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                    <select asp-for="ProjectId"
+                            data-live-search="true" data-placeholder=" -- Select size --"
+                            class="form-control select2" asp-items="ViewBag.ProjectId">
+                        <option></option>
+                    </select>
                     <span asp-validation-for="ProjectId" class="text-danger"></span>
                 </div>
-                <div class="col-12 col-md-6 mt-2">
+                             
+                <div class="col-12 col-md-6 form-group">
                     <label asp-for="FunctionId" class="form-label"></label>
-                    <select asp-for="FunctionId" class="form-control" asp-items="ViewBag.FunctionId"></select>
+                    <select asp-for="FunctionId"
+                            data-live-search="true"
+                            data-placeholder="-- Select shoe size --"
+                            class="form-control select2" asp-items="ViewBag.FunctionId">
+                        <option></option>
+                    </select>
                     <span asp-validation-for="FunctionId" class="text-danger"></span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-6 mt-2">
-                    <label asp-for="FunctionId" class="form-label"></label>
-                    <select asp-for="FunctionId" class="form-control" asp-items="ViewBag.FunctionId"></select>
-                    <span asp-validation-for="FunctionId" class="text-danger"></span>
+                <div class="col">
+                    <input type="button" onclick="submitBtn()" value="Save changes" class="btn btn-primary"/>
                 </div>
-                <div class="col-12 col-md-6 mt-2">
-                    <label asp-for="FunctionId" class="form-label"></label>
-                    <select asp-for="FunctionId" class="form-control" asp-items="ViewBag.FunctionId"></select>
-                    <span asp-validation-for="FunctionId" class="text-danger"></span>
-                </div>
-                
             </div>
             
-            <div class="mt-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
         </form>
         
     </div>
