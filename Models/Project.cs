@@ -16,11 +16,11 @@ namespace PPE.Models
         // number of employees
         public int? EmployeeCount => Employees?.Count ?? 0;
         
-        
         // list of stocks
         public ICollection<Stock>? Stocks { get; set; }
-        public ICollection<ProjectStock> ProjectStocks { get; set; }
+        public ICollection<ProjectStock>? ProjectStocks { get; set; }
         
+       // public ICollection<ApplicationUser>? Users { get; set; }
         
     }
 }

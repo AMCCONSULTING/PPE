@@ -42,7 +42,7 @@
         </div>
     </div>
     <table class="table responsive w-100"
-           data-column="matricule,fullName,nni,project,function,actions"
+           data-column="matricule,fullName,nni,project,isActive,function,actions"
            data-url="/api/employees">
         <thead>
         <tr>
@@ -57,6 +57,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsActive)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Function)

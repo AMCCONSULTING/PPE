@@ -22,6 +22,15 @@ public class Dotation
     public TypeDotation Type { get; set; }
     public string Document { get; set; }
     
+    [DisplayName("Created at")]
+    public DateTime? CreatedAt { get; set; }
+    [DisplayName("Updated at")]
+    public DateTime? UpdatedAt { get; set; }
+    [DisplayName("Updated by")]
+    public string? UpdatedBy { get; set; }
+    [DisplayName("Created by")]
+    public string? CreatedBy { get; set; }
+    
     public Employee? Employee { get; set; }
     //public Responsable? Responsible { get; set; }
     public Coordinateur? Coordinator { get; set; }

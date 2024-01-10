@@ -256,12 +256,14 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Matricule,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,IsActive,LastName,Matricule,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId,CreatedAt,UpdatedAt,CreatedBy")] Employee employee)
         {
             //return Json(employee);
             if (ModelState.IsValid)
             {
                 //return Json(employee);
+                employee.CreatedAt = DateTime.Now;
+                employee.CreatedBy = User.Identity?.Name;
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -308,7 +310,7 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,NNI,Matricule,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,IsActive,NNI,Matricule,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId,CreatedAt,UpdatedAt,CreatedBy,UpdatedBy")] Employee employee)
         {
             if (id != employee.Id)
             {
@@ -319,6 +321,8 @@ namespace PPE.Controllers
             {
                 try
                 {
+                    employee.UpdatedAt = DateTime.Now;
+                    employee.UpdatedBy = User.Identity?.Name;
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
@@ -487,8 +491,8 @@ namespace PPE.Controllers
             //IEnumerable<Ppe> ppe = _context.Ppes.Include(p => p.Category);
             IQueryable<Employee> employees = _context.Employees
                 .Include(p => p.Project)
-                .Include(p => p.Function);
-            
+                .Include(p => p.Function)
+                .OrderByDescending(e => e.CreatedAt);
             int recordsTotal = employees.Count();
             int recordsFilterd = recordsTotal;
 
@@ -509,6 +513,8 @@ namespace PPE.Controllers
                         recordsFilterd = employees.Count();
                     }
                 }
+                
+                // if Employees?filters[function]=4
                 
                 if (key.StartsWith("filters"))
                 {
@@ -544,12 +550,16 @@ namespace PPE.Controllers
                 .Select(e => new
                 {
                     Id = e.Id,
-                    Matricule = e.Matricule,
+                    Matricule = $"{e.Project.Prefix}-{e.Matricule}",
                     FullName = e.FullName,
                     NNI = e.NNI,
                     Phone = e.Phone,
                     Project = e.Project.Title,
                     Function = e.Function.Title,
+                    IsActive = IsActive(e.IsActive),
+                    CreatedAt = e.CreatedAt,
+                    UpdatedAt = e.UpdatedAt,
+                    CreatedBy = e.CreatedBy,
                     Actions = $"<div class='btn-group'>" +
                               $"<a class='btn btn-primary btn-sm' href='/Employees/Edit/{e.Id}'>" +
                               $"<i class='la la-edit'></i>"+
@@ -563,6 +573,13 @@ namespace PPE.Controllers
                               $"</div>"
                 })
                 .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
+        }
+        
+        public static string IsActive(bool isActive)
+        {
+            return isActive ?
+                "<span class='badge badge-success'>Active</span>" : 
+                "<span class='badge badge-danger'>Sortie</span>";
         }
 
         public IActionResult EditReturnPpe(int id, int status, DateTime date)

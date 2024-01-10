@@ -1,4 +1,6 @@
 @using PPE.Data.Enums
+@using NuGet.Protocol
+@using System.Security.Claims
 @model PPE.Models.Employee
 
 @{
@@ -43,6 +45,26 @@
     </div>
 </div>
 
+@*<h1>
+    @User.IsInRole("Ppe.Create")
+    @{
+        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+    }
+</h1>*@
+
+@*<div>
+    @foreach (var item in roles)
+    {
+        <span>
+            @item
+        </span>
+    }
+</div>*@
+@*<div>
+    @Model.CreatedAt
+    @Model.UpdatedAt
+    @Model.CreatedBy
+</div>*@
 <div class="card-body bg-white">
     <ul class="nav nav-tabs nav-linetriangle no-hover-bg">
         <li class="nav-item">
@@ -91,93 +113,26 @@
                             <td>@item.Article.AttributeValueAttributeCategory.AttributeValue.Value.Text</td>
                             <td>@item.Quantity</td>
                             <td>
-                                @*<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">Return</button>
-                                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <form asp-action="ReturnPpe">
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Confirm return ppe</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="row">
-                                                        <div class="form-group col-12 col-md-6">
-                                                            <label for="" class="col-form-label">HSE Check status:</label>
-                                                            <select name="status"
-                                                                    data-placeholder="-- Select Status --"
-                                                                    class="form-control select2 hseCheckSelect">
-                                                                <option></option>
-                                                                <option value="0">@PpeStatus.Good</option>
-                                                                <option value="1">@PpeStatus.Damaged</option>
-                                                                <option value="2">@PpeStatus.Lost</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group col-12 col-md-6">
-                                                            <label class="col-form-label">Date</label>
-                                                            <input type="datetime-local" name="date" class="form-control" placeholder="-- Date --"/>
-                                                        </div>
-                                                        <div class="form-group col-12 col-md-6 hse-from-group">
-                                                            <label for="" class="col-form-label">HSE </label>
-                                                            <select name="status"
-                                                                    data-placeholder="-- Select HSE --"
-                                                                    class="form-control select2 hseCheckSelect">
-                                                                <option></option>
-                                                                @foreach(var hse in ViewBag.HSEs)
-                                                                {
-                                                                    <option value="@hse.Id">@hse.FullName</option>
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group col-12 col-md-6">
-                                                            <label for="" class="col-form-label">Magazinier</label>
-                                                            <select name="magazinierId"
-                                                                    data-placeholder="-- Select Magazinier --"
-                                                                    class="form-control select2">
-                                                                <option></option>
-                                                                @foreach (var magazinier in ViewBag.Magaziniers)
-                                                                {
-                                                                    <option value="@magazinier.Id">@magazinier.FullName</option>
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group col-12 col-md-6">
-                                                            <label for="" class="col-form-label">Responsable</label>
-                                                            <select name="responsableId"
-                                                                    data-placeholder="-- Select Responsable --"
-                                                                    class="form-control select2">
-                                                                <option></option>
-                                                                @foreach (var responsable in ViewBag.Responsables)
-                                                                {
-                                                                    <option value="@responsable.Id">@responsable.FullName</option>
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary">Return</button>
-                                                </div>
-                                            </div>
-                                        </form>
+                                @* <form asp-action="Create" method="get" asp-controller="Returns"> *@
+                                @*<input type="hidden" name="articleId" value="@item.ArticleId" />
+                                    <input type="hidden" name="employeeId" value="@Model.Id"/>*@
+                                @*<form asp-action="Create" method="get" asp-controller="Returns" id="returnPpeForm"> 
+                                    <div class="btn-group">
+                                        <button type="button" onclick="returnPpe({type: 1,articleId: @item.ArticleId,employeeId: @Model.Id})" 
+                                                class="btn btn-sm btn-dark">Return</button>
+                                        <button type="button" onclick="returnPpe({type: 2,articleId: @item.ArticleId ,employeeId: @Model.Id})" 
+                                                class="btn btn-sm btn-info">Change</button>
+                                        <button type="button" onclick="returnPpe({type: 3,articleId: @item.ArticleId,employeeId: @Model.Id})" 
+                                                class="btn btn-sm btn-danger">Reassign</button>
                                     </div>
-                                </div>
-                            *@
-                                @*<a asp-action="Create" asp-controller="Returns"  
-                                   asp-route-id="@item.ArticleId"
-                                   class="btn btn-sm btn-danger">
-                                    Return
-                                </a>*@
+                                </form>*@
+                                
+                                @* </form> *@
                                 <form asp-action="Create" method="get" asp-controller="Returns">
-                                    <input type="hidden" name="articleId" value="@item.ArticleId" />
-                                    <input type="hidden" name="employeeId" value="@Model.Id"/>
-                                    <button type="submit" class="btn btn-sm btn-danger">Return</button>
-                                </form>
+                                        <input type="hidden" name="articleId" value="@item.ArticleId" />
+                                        <input type="hidden" name="employeeId" value="@Model.Id"/>
+                                        <button type="submit" class="btn btn-sm btn-danger">Return</button>
+                                    </form>
                             </td>
                         </tr>
                     }
@@ -219,46 +174,6 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    @*<div id="accordionWrap" role="tablist" aria-multiselectable="true">
-                            @foreach (var item in Model.Dotations!.OrderByDescending(r => r.Date))
-                            {
-                                <div class="card accordion collapse-icon accordion-icon-rotate p-0 m-1 shadow-sm">
-                                    <a id="heading-@item.Id" class="card-header info" data-toggle="collapse" href="#accordion-@item.Id" aria-expanded="true" aria-controls="accordion-@item.Id">
-                                        <div class="card-title lead">
-                                            <strong>@item.Date.ToString("d")</strong> | @item.Reference $1$| $2$Sum qte#2# <span class="badge bg-info">@item.DotationDetails.Count</span> Article(s#1#)
-                                        </div>
-                                    </a>
-                                    <div id="accordion-@item.Id" role="tabpanel" data-parent="#accordionWrap" aria-labelledby="heading-@item.Id" class="collapse">
-                                        <div class="card-content">
-                                            <div class="card-body">
-                                                <ul class="list-group">
-                                                    <li class="list-group-item">   
-                                                        <div class="row align-items-center">
-                                                            <strong class="col">Ppe | Variant</strong>
-                                                            <strong class="col">Quantity</strong>
-                                                            <strong class="col">Dsignation</strong>
-                                                        </div>
-                                                    </li>
-                                                    @if (item.DotationDetails != null)
-                                                    {
-                                                        foreach (var dotationDetail in item.DotationDetails)
-                                                        {
-                                                            <li class="list-group-item">
-                                                                <div class="row align-items-center">
-                                                                    <span class="col">@dotationDetail.Article!.Ppe.Title - @dotationDetail.Article!.AttributeValueAttributeCategory!.AttributeValue!.Value!.Text</span>
-                                                                    <span class="col">@dotationDetail.Quantity</span>
-                                                                    <span class="col">@item.Type</span>
-                                                                </div>
-                                                            </li>
-                                                        }
-                                                    }
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>*@
                     <table class="table table-bordered">
                         <thead>
                         <tr>
@@ -327,5 +242,6 @@
             }
         });
     });
+   
     </script>
 } 

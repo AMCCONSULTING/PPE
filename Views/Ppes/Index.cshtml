@@ -12,6 +12,11 @@
     };
 }
 
+@if (User.IsInRole("Administrator"))
+{
+  <h1>Hello</h1>  
+}
+
 
 <div class="bg-white card-body">
     <div class="p-2 row">
@@ -29,7 +34,7 @@
             <label><i class="la la-filter"></i>Title</label>
             <input type="text" class="form-control" placeholder="-- Search --" id="filter-title">
         </div>
-        
+
     </div>
     <table class="table responsive w-100"
            data-column="title,category,threshold,description,actions"

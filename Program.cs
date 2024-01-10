@@ -5,9 +5,11 @@ using PPE.Data.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using PPE.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +33,9 @@ builder.Services.AddRazorPages()
 
 // Database configuration
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlServer(builder.Configuration
+            //.GetConnectionString("DevelopmentConnection"))
+            .GetConnectionString("DefaultConnection"))
         .LogTo(Console.WriteLine, LogLevel.Information));
 
 builder.Services.AddControllersWithViews()

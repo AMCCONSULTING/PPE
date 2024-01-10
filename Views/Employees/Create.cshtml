@@ -1,3 +1,4 @@
+@using PPE.Data.Enums
 @model PPE.Models.Employee
 
 @{
@@ -92,6 +93,18 @@
                     <option></option>
                 </select>
                 <span asp-validation-for="FunctionId" class="text-danger"></span>
+            </div>
+            <div class="col-12 col-md-6 form-group">
+                <label asp-for="IsActive" class="form-label"></label>
+                <select asp-for="IsActive"
+                        data-live-search="true"
+                        data-placeholder="-- Select shoe size --"
+                        class="form-control select2">
+                    @*asp-items="new SelectList(Enum.GetValues(typeof(IsActive)))"*@
+                    <option value="true">Active</option>
+                    <option value="false">Sortie</option>
+                </select>
+                <span asp-validation-for="IsActive" class="text-danger"></span>
             </div>
         </div>
         <div class="row">

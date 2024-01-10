@@ -26,136 +26,158 @@
     <div class="main-menu-content">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
             <li class="nav-item @(IsLinkActive("Home", "Index") ? "active" : "")"><a asp-action="Index" asp-controller="Home">
-                <i class="la la-dashboard"></i>
-                <span class="menu-title">Dashboard</span>
-            </a>
-            <li class="nav-item">
-                <a href="#"><i class="la la-industry"></i>
-                    <span class="menu-title">PPE</span></a>
-                <ul class="menu-content">
-                    <li class="@(IsLinkActive("Attributes", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Attributes" asp-action="Index"><i></i>
-                            <span>Custom attributes</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Categories", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Categories" asp-action="Index"><i></i>
-                            <span>PPE Categories</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Ppes", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Ppes" asp-action="Index"><i></i>
-                            <span>PPEs</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item @(IsLinkActive("Projects", "Index") ? "active" : "")">
-                <a asp-action="Index" asp-controller="Projects">
-                    <i class="la la-list"></i>
-                    <span class="menu-title">Projects</span>
+                    <i class="la la-dashboard"></i>
+                    <span class="menu-title">Dashboard</span>
                 </a>
             </li>
             
-            <li class=" nav-item">
-                <a href="#"><i class="la la-users"></i>
-                    <span class="menu-title">Employees</span></a>
-                <ul class="menu-content">
-                    <li class="@(IsLinkActive("Employees", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Employees" asp-action="Index">
-                            <i></i>
-                            <span>List employees</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Responsables", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Responsables" asp-action="Index"><i></i>
-                            <span>Responsables</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Coordinateurs", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Coordinateurs" asp-action="Index"><i></i>
-                            <span>Coordinateurs</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Transporteurs", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Transporteurs" asp-action="Index"><i></i>
-                            <span>Transporteurs</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Magaziniers", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Magaziniers" asp-action="Index"><i></i>
-                            <span>Magaziniers</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Hses", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Hses" asp-action="Index"><i></i>
-                            <span>Hses</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            
-            <li class=" nav-item">
-                <a href="#"><i class="la la-list"></i>
-                    <span class="menu-title">Gestion Stock</span></a>
-                <ul class="menu-content">
-                    <li class="@(IsLinkActive("MainStocks", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="MainStocks" asp-action="Index"><i></i>
-                            <span>Stock normal</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Returns", "StockReturn") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Returns" asp-action="StockReturn"><i></i>
-                            <span>Stock return</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Stocks", "StockLost") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Stocks" asp-action="StockLost"><i></i>
-                            <span>Stock lost</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Stokes", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Stokes" asp-action="Index">
-                            <i></i>
-                            <span>Alimentation stock</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Mouvements", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Mouvements" asp-action="Index"><i></i>
-                            <span>Acquisition stock</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            
-            <li class=" nav-item">
-                <a href="#"><i class="la la-list"></i>
-                    <span class="menu-title">Dotations & Retour</span></a>
-                <ul class="menu-content">
-                    <li class="@(IsLinkActive("Dotations", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Dotations" asp-action="Index"><i></i>
-                            <span>History dotations</span>
-                        </a>
-                    </li>
-                    <li class="@(IsLinkActive("Returns", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Returns" asp-action="Index"><i></i>
-                            <span>History retour</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            
-            <li class=" nav-item">
-                <a href="#"><i class="la la-cog"></i>
-                    <span class="menu-title">References</span></a>
-                <ul class="menu-content">
-                    <li class="@(IsLinkActive("Functions", "Index") ? "active" : "")">
-                        <a class="menu-item" asp-controller="Functions" asp-action="Index"><i></i>
-                            <span>List functions</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+            @if (User.IsInRole("Ppe.Manage"))
+            {
+                <li class="nav-item">
+                    <a href="#"><i class="la la-industry"></i>
+                        <span class="menu-title">PPE</span></a>
+                    <ul class="menu-content">
+                        <li class="@(IsLinkActive("Attributes", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Attributes" asp-action="Index"><i></i>
+                                <span>Custom attributes</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Categories", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Categories" asp-action="Index"><i></i>
+                                <span>PPE Categories</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Ppes", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Ppes" asp-action="Index"><i></i>
+                                <span>PPEs</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            @if (User.IsInRole("Project.Manage"))
+            {
+                <li class="nav-item @(IsLinkActive("Projects", "Index") ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Projects">
+                        <i class="la la-list"></i>
+                        <span class="menu-title">Projects</span>
+                    </a>
+                </li>
+            }
+            @if (User.IsInRole("Employee.Create"))
+            {
+                <li class=" nav-item">
+                    <a href="#"><i class="la la-users"></i>
+                        <span class="menu-title">Employees</span></a>
+                    <ul class="menu-content">
+                        <li class="@(IsLinkActive("Employees", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Employees" asp-action="Index">
+                                <i></i>
+                                <span>List employees</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Responsables", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Responsables" asp-action="Index"><i></i>
+                                <span>Responsables</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Coordinateurs", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Coordinateurs" asp-action="Index"><i></i>
+                                <span>Coordinateurs</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Transporteurs", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Transporteurs" asp-action="Index"><i></i>
+                                <span>Transporteurs</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Magaziniers", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Magaziniers" asp-action="Index"><i></i>
+                                <span>Magaziniers</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Hses", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Hses" asp-action="Index"><i></i>
+                                <span>Hses</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            @if (User.IsInRole("Ppe.Manage"))
+            {
+                <li class=" nav-item">
+                    <a href="#"><i class="la la-list"></i>
+                        <span class="menu-title">Gestion Stock</span></a>
+                    <ul class="menu-content">
+                        <li class="@(IsLinkActive("MainStocks", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="MainStocks" asp-action="Index"><i></i>
+                                <span>Stock normal</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Returns", "StockReturn") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Returns" asp-action="StockReturn"><i></i>
+                                <span>Stock return</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Stocks", "StockLost") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Stocks" asp-action="StockLost"><i></i>
+                                <span>Stock lost</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Stokes", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Stokes" asp-action="Index">
+                                <i></i>
+                                <span>Acquisition stock</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Mouvements", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Mouvements" asp-action="Index"><i></i>
+                                <span>Mouvement stock</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            @if(User.IsInRole("Ppe.Dotation")){
+                <li class=" nav-item">
+                    <a href="#"><i class="la la-list"></i>
+                        <span class="menu-title">Dotations & Retour</span></a>
+                    <ul class="menu-content">
+                        <li class="@(IsLinkActive("Dotations", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Dotations" asp-action="Index"><i></i>
+                                <span>History dotations</span>
+                            </a>
+                        </li>
+                        <li class="@(IsLinkActive("Returns", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Returns" asp-action="Index"><i></i>
+                                <span>History retour</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            @*
+                Responsable RH Employee.Manange
+                Assistant RH Employee.Create
+                Coordinateur Ppe.Dotation
+                Administrator Ppe.Manage
+            *@
+            @if (User.IsInRole("Employee.Create"))
+            {
+                <li class=" nav-item">
+                    <a href="#"><i class="la la-cog"></i>
+                        <span class="menu-title">References</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="@(IsLinkActive("Functions", "Index") ? "active" : "")">
+                            <a class="menu-item" asp-controller="Functions" asp-action="Index"><i></i>
+                                <span>List functions</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
         </ul>
     </div>
 </div>

@@ -14,34 +14,12 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         
-        /*modelBuilder.Entity<Stock>()
-            .Property(s => s.CurrentStock)
-            .HasColumnName("CurrentStock");*/
-        
-        /*modelBuilder.Entity<Variant>()
-            .HasMany(v => v.VariantValues)
-            .WithOne(vv => vv.Variant)
-            .HasForeignKey(vv => vv.VariantId);
-        
-        modelBuilder.Entity<Value>()
-            .HasMany(v => v.VariantValues)
-            .WithOne(vv => vv.Value)
-            .HasForeignKey(vv => vv.ValueId);
-        
-        modelBuilder.Entity<Ppe>()
-            .HasMany(p => p.Variants)
-            .WithOne(v => v.Ppe)
-            .HasForeignKey(v => v.PpeId);*/
+        // employee createdAt, updatedAt, createdBy
         
         modelBuilder.Entity<Stock>()
             .HasOne(s => s.Project)
             .WithMany(p => p.Stocks)
             .HasForeignKey(s => s.ProjectId);
-        
-        /*modelBuilder.Entity<Stock>()
-            .HasOne(s => s.VariantValue)
-            .WithMany(v => v.Stocks)
-            .HasForeignKey(s => s.VariantValueId);*/
         
         modelBuilder.Entity<Function>()
             .HasMany(f => f.Employees)

@@ -8,7 +8,6 @@ public class Employee
 {
     [Key]
     public int Id { get; set; }
-    
     [Required]
     [DisplayName("Matricule")]
     public string Matricule { get; set; }
@@ -21,12 +20,23 @@ public class Employee
     public string LastName { get; set; }
     [DisplayName("Full name")]
     public string FullName => $"{FirstName} {LastName}";
-    public Size Size { get; set; }
-    public ShoeSize ShoeSize { get; set; }
+    public Size? Size { get; set; }
+    public ShoeSize? ShoeSize { get; set; }
     public string? NNI { get; set; }
     public string? Phone { get; set; }
     public string? Tel { get; set; }
     public Gender? Gender { get; set; }
+    [DisplayName("Created at")]
+    public DateTime? CreatedAt { get; set; }
+    [DisplayName("Updated at")]
+    public DateTime? UpdatedAt { get; set; }
+    [DisplayName("Updated by")]
+    public string? UpdatedBy { get; set; }
+    [DisplayName("Created by")]
+    public string? CreatedBy { get; set; }
+    
+    [DisplayName("Is active")]
+    public bool IsActive { get; set; } = true;
     
     // Relationship with Project
     [Required] [DisplayName("Project")]
@@ -54,5 +64,5 @@ public class Employee
     public ICollection<StockToBePaid>? StocksToBePaid { get; set; }
     //public ICollection<DotationDetail> DotationDetails { get; set; }
     
-    
+    // createdAt, updatedAt, createdBy
 }

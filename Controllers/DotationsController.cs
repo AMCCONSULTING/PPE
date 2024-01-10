@@ -259,7 +259,7 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,Reference,EmployeeId,Document,ResponsibleId,CoordinatorId,TransporterId,MagasinierId,Type")] Dotation dotation)
+        public async Task<IActionResult> Create([Bind("Id,Date,Reference,EmployeeId,Document,CoordinatorId,MagasinierId,Type")] Dotation dotation)
         {
             var lastDotation = _context.Dotations
                 .OrderByDescending(d => d.Id)
@@ -333,7 +333,7 @@ namespace PPE.Controllers
         [HttpPost]
        // [Route("Dotations/Edit/{id}/{employeeId}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Reference,EmployeeId,Document,ResponsibleId,CoordinatorId,TransporterId,MagasinierId,Type")] Dotation dotation)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Reference,EmployeeId,Document,CoordinatorId,MagasinierId,Type")] Dotation dotation)
         {
             if (id != dotation.Id)
             {

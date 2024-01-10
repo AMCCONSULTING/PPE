@@ -6,8 +6,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
 <Project>
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <EncryptedPassword />
-    <History>True|2024-01-02T17:08:47.2711554Z;</History>
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAvaqr4HgMGUOuQxZ0dj1uhAAAAAACAAAAAAAQZgAAAAEAACAAAACWQgKgKx2qPf2nrJAMB+8SZBCkDkSHFoxZ5cDUsjRmpQAAAAAOgAAAAAIAACAAAABoIpZy/rKXY2oMyokczkH+2K/6FTOwrlv9/unGBvhlTyAAAADueofDZA6geSF4/azOQjbTj85B6NBgncUdLRVvoS4ul0AAAADyeaeZH47ZzsDVaGOeewI7rMglMswe0rTq3jwjG4f2VMOj26LwaF9dNnUTtO5aaDPFM8ezs+VHFpYOiDPyV8HE</EncryptedPassword>
+    <History>True|2024-01-10T14:31:00.5590571Z;True|2024-01-10T11:12:56.7359738+00:00;True|2024-01-09T16:59:40.4884244+00:00;True|2024-01-09T16:56:53.3667091+00:00;True|2024-01-09T16:54:11.0118928+00:00;True|2024-01-09T16:50:41.5335177+00:00;True|2024-01-09T16:46:06.3405720+00:00;True|2024-01-09T16:41:33.4614282+00:00;True|2024-01-09T14:18:02.3749590+00:00;False|2024-01-09T14:16:25.1174621+00:00;True|2024-01-09T14:05:29.1753904+00:00;True|2024-01-09T10:26:05.0974651+00:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Data Source=SQL5102.site4now.net%3bInitial Catalog=db_aa39c2_ppe%3bUser Id=db_aa39c2_ppe_admin%3bPassword=Ch_0605%24%3b</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
 </Project>

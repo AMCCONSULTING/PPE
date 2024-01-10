@@ -328,10 +328,6 @@
             $(this).val(2);
         }
     })
-    
-    
-    // qte-input change event
-    
 });
 
 function removeItem(btn) {
@@ -344,24 +340,12 @@ const Toast = Swal.mixin({
     showConfirmButton: false,
     timer: 3000,
     timerProgressBar: true,
-    didOpen: (toast) => {
+    /*didOpen: (toast) => {
         toast.onmouseenter = Swal.stopTimer;
         toast.onmouseleave = Swal.resumeTimer;
-    }
+    }*/
 });
 function confirmDelete(url, id) {
-   /* const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-        }
-    });*/
-    
     let btn = $(this);
     let dataTable = btn.closest('table').DataTable();
     Swal.fire({
@@ -423,10 +407,62 @@ function submitBtn() {
     }
 }
 
+function returnPpe(data) {
+    //alert(JSON.stringify(data))
+    let alertMessage = ''
+    const btn = this.event.target
+    switch (data.type) {
+        case 1: 
+            alertMessage = 'Are you sure you want to return this ppe'
+            break
+        case 2: 
+            alertMessage = 'Are you sure you want to change this ppe'
+            break
+        case 3: 
+            alertMessage = 'Are you sure you want to reassign this ppe'
+            break
+        default: 
+            alertMessage = ''
+            break
+    }
+    Swal.fire({
+        text: alertMessage,
+        type: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    })
+        .then(r => {
+            appendAndSubmitForm({
+                type: data.type,
+                articleId: data.articleId,
+                employeeId: data.employeeId
+            });
+        })
+        .catch(e => e)
+}
+
+function appendAndSubmitForm(inputs) {
+    // Iterate over the keys in the inputs object
+    for (const key in inputs) {
+        if (inputs.hasOwnProperty(key)) {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = inputs[key];
+
+            document.getElementById("returnPpeForm").appendChild(input);
+        }
+    }
+    
+    document.getElementById("returnPpeForm").submit();
+}
+
 function removeItemFromStock(btn, id, dotationId) {
     $.ajax({
         url: `/api/remove/article/${id}/dotation/${dotationId}`,
-        //'/api/remove/article/' + id,
         type: 'DELETE',
         dataType: 'json',
         success: function (data) {

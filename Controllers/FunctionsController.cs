@@ -1,3 +1,4 @@
+using DataTables.AspNetCore.Mvc.Binder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PPE.Data;
@@ -25,16 +26,111 @@ namespace PPE.Controllers
                           Problem("Entity set 'ApplicationDbContext.Functions'  is null.");
         }
         
-        /*public IActionResult UploadExcel()
-        {
-            // Path to your Excel file
-            string fileName = "Fontion AMC TRAVAUX.xlsx";
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", fileName);
-
-            _excelService.InsertFunctionsFromExcel(filePath);
-
-            return RedirectToAction("Index"); // Redirect to another action or page
-        }*/
+         [HttpGet()]
+                [Route("api/functions")]
+                public IActionResult Get([DataTablesRequest] DataTablesRequest dataRequest)
+                {
+                    //IEnumerable<Ppe> ppe = _context.Ppes.Include(p => p.Category);
+                    IQueryable<Function> functions = _context.Functions
+                        .OrderByDescending(e => e.Title);
+                    int recordsTotal = functions.Count();
+                    int recordsFilterd = recordsTotal;
+        
+                    /*var filters = new Dictionary<string, string>();
+                    foreach(var key in Request.Query.Keys)
+                    {
+                        if (key.StartsWith("search"))
+                        {
+                            filters[key.Substring("search".Length)] = Request.Query[key];
+                            if (key == "search[value]" && !string.IsNullOrEmpty(Request.Query[key]))
+                            {
+                                employees = employees.Where(e => e.FirstName.Contains(Request.Query[key].ToString()) 
+                                                                 || e.LastName.Contains(Request.Query[key].ToString()) 
+                                                                 || e.NNI.Contains(Request.Query[key].ToString()) 
+                                                                 || e.Phone.Contains(Request.Query[key].ToString()) 
+                                                                 || e.Matricule.Contains(Request.Query[key].ToString())
+                                );
+                                recordsFilterd = employees.Count();
+                            }
+                        }
+                        
+                        if (key.StartsWith("filters"))
+                        {
+                            filters[key.Substring("filters".Length)] = Request.Query[key];
+                            
+                            if (key == "filters[project]" && !string.IsNullOrEmpty(Request.Query[key]))
+                            {
+                                employees = employees.Where(e => e.ProjectId == int.Parse(Request.Query[key]));
+                                recordsFilterd = employees.Count();
+                            }
+                            if (key == "filters[function]" && !string.IsNullOrEmpty(Request.Query[key]))
+                            {
+                                employees = employees.Where(e => e.FunctionId == int.Parse(Request.Query[key]));
+                                recordsFilterd = employees.Count();
+                            }
+        
+                            if (key == "filters[name]" && !string.IsNullOrEmpty(Request.Query[key]))
+                            {
+                                employees = employees.Where(e => e.FirstName.Contains(Request.Query[key].ToString()) 
+                                                                 || e.LastName.Contains(Request.Query[key].ToString()) 
+                                                                 || e.NNI.Contains(Request.Query[key].ToString()) 
+                                                                 || e.Phone.Contains(Request.Query[key].ToString()) 
+                                );
+                                recordsFilterd = employees.Count();
+                            }
+                        }
+                    }
+                    */
+                    
+                    functions = functions.Skip(dataRequest.Start).Take(dataRequest.Length);
+                    var deleteUrl = "Functions/DeleteFunction";
+                    
+                    return Json(functions
+                        .Select(e => new
+                        {
+                            Id = e.Id,
+                            Title = e.Title,
+                            Description = e.Description,
+                            EmployeeCount =  $"{e.Employees!.Count}  <a href='/Employees?filters[function]={e.Id}'> <i class='la la-eye'></i> </a>",
+                            CreatedAt = e.CreatedAt,
+                            CreatedBy = e.CreatedBy,
+                            UpdatedAt = e.UpdatedAt,
+                            UpdatedBy = e.UpdatedBy,
+                            Actions = $"<div class='btn-group'>" +
+                                      $"<a class='btn btn-primary btn-sm' href='/Functions/Edit/{e.Id}'>" +
+                                      $"<i class='la la-edit'></i>"+
+                                      $"</a>"+
+                                      /*$"<a class='btn btn-dark btn-sm' href='/Employees/Details/{e.Id}'>" +
+                                      $"<i class='la la-eye'></i>"+
+                                      $"</a>"+
+                                      $"<a class='btn btn-danger btn-sm' onclick='confirmDelete(\"{deleteUrl}\", {e.Id})'>" +
+                                      $"<i class='la la-trash text-white'></i>"+
+                                      $"</a>"+*/
+                                      $"<a class='btn btn-danger btn-sm' onclick='confirmDelete(\"{deleteUrl}\", {e.Id})'>" +
+                                      $"<i class='la la-trash text-white'></i>"+
+                                      $"</a>"+
+                                      $"</div>"
+                        })
+                        .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
+                }
+                
+                [HttpGet()]
+                [Route("Functions/DeleteFunction/{id}")]
+                public async Task<IActionResult> DeleteFunction(int id)
+                {
+                    if (_context.Functions == null)
+                    {
+                        return Problem("Entity set 'ApplicationDbContext.Function'  is null.");
+                    }
+                    var function = await _context.Functions.FindAsync(id);
+                    if (function != null)
+                    {
+                        _context.Functions.Remove(function);
+                    }
+            
+                    await _context.SaveChangesAsync();
+                    return Json(new {success = true, message = "Function deleted successfully"});
+                }
 
         // GET: Fucntions/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -65,10 +161,22 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description")] Function function)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,CreatedAt,UpdatedAt,CreatedBy")] Function function)
         {
+            
+            // if function title is already used then add error to model state and return to view
+            
+            if (_context.Functions != null && _context.Functions.Any(e => e.Title.ToUpper() == function.Title.ToUpper()))
+            {
+                ModelState.AddModelError("Title", "Function title already used.");
+            }
+            
             if (ModelState.IsValid)
             {
+                function.CreatedAt = DateTime.Now;
+                function.UpdatedAt = DateTime.Now;
+                function.CreatedBy = User.Identity?.Name;
+                function.UpdatedBy = User.Identity?.Name;
                 _context.Add(function);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -97,7 +205,7 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description")] Function function)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,CreatedAt,UpdatedAt,CreatedBy,UpdatedBy")] Function function)
         {
             if (id != function.Id)
             {
@@ -108,7 +216,9 @@ namespace PPE.Controllers
             {
                 try
                 {
-                    _context.Update(function);
+                    function.UpdatedAt = DateTime.Now;
+                    function.UpdatedBy = User.Identity?.Name;
+                    _context.Functions.Update(function);    
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

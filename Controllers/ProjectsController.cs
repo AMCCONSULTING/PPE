@@ -91,6 +91,10 @@ namespace PPE.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Prefix,Description")] Project project)
         {
+            /*return Json(new
+            {
+                project
+            });*/
             if (ModelState.IsValid)
             {
                 _context.Add(project);

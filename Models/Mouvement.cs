@@ -9,6 +9,14 @@ public class Mouvement
     public string? Reference { get; set; }
     public Project? Project { get; set; } = null!;
     public string Document { get; set; }
+    [DisplayName("Created at")]
+    public DateTime? CreatedAt { get; set; }
+    [DisplayName("Updated at")]
+    public DateTime? UpdatedAt { get; set; }
+    [DisplayName("Updated by")]
+    public string? UpdatedBy { get; set; }
+    [DisplayName("Created by")]
+    public string? CreatedBy { get; set; }
     public int ProjectId { get; set; }
     [DisplayName ("Responsable")]
     public int ResponsableId { get; set; }
