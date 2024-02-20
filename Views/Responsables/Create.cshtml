@@ -1,4 +1,5 @@
 ﻿@model PPE.Models.Responsable
+@inject PPE.Data.AppDbContext _context
 
 @{
     ViewData["Title"] = "Add responsable";
@@ -17,23 +18,27 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row">
                 <div class="form-group col-12 col-md-6">
-                    <label asp-for="EmployeeId" class="control-label"></label>
-                    <select asp-for="EmployeeId" 
-                            class="form-control select2 select2-hidden-accessible employee-select" 
-                            data-val="true" 
-                            data-val-required="The EmployeeId field is required." 
-                            id="EmployeeId" 
-                            name="EmployeeId" 
-                            tabindex="-1" 
-                            aria-hidden="true"
-                            asp-items="ViewBag.EmployeeId">
+                    <label asp-for="Employee.ProjectId" class="control-label"></label>
+                    <select
+                        onchange="getEmployeeByProject()"
+                        data-placeholder="-- Select a project --"
+                        class="form-control select2 project-select"
+                        asp-items="@(new SelectList(_context.Projects, "Id", "Title"))">
+                        <option></option>
                     </select>
                 </div>
-                <div class="col-md-6 placeholder"></div>
+                <div class="form-group col-12 col-md-6">
+                    <label asp-for="EmployeeId" class="control-label"></label>
+                    <select 
+                        asp-for="EmployeeId" 
+                        class="form-control select2 employee-select"></select>
+                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                </div>
+                <div class="col-md-12 placeholder"></div>
             </div>
-            <div class="row">
+            <div class="row mt-2">
                 <div class="form-group col-12">
-                    <input type="button" onclick="submitBtn()" value="Save changes" class="btn btn-primary"/>
+                    <input type="button" onclick="submitBtn()" value="Create" class="btn btn-primary" />
                 </div>
             </div>
         </form>

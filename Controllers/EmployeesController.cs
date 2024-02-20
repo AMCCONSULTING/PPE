@@ -1,20 +1,27 @@
+using System.Text;
 using DataTables.AspNetCore.Mvc.Binder;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using PPE.Data;
 using PPE.Data.Enums;
 using PPE.Models;
+using Rotativa.AspNetCore;
 
 namespace PPE.Controllers
 {
     public class EmployeesController : Controller
     {
         private readonly AppDbContext _context;
-
-        public EmployeesController(AppDbContext context)
+        private readonly IConverter _pdfConverter;
+        
+        public EmployeesController(AppDbContext context, IConverter converter)
         {
             _context = context;
+            _pdfConverter = converter;
         }
 
         // GET: Employees
@@ -89,7 +96,7 @@ namespace PPE.Controllers
                 .ThenInclude(e => e.AttributeValueAttributeCategory)
                 .ThenInclude(e => e.AttributeValue)
                 .ThenInclude(e => e.Value)
-                .Include(e => e.PayableStocks)
+                /*.Include(e => e.PayableStocks)
                 .ThenInclude(e => e.Article)
                 .ThenInclude(e => e.Ppe)
                 .Include(e => e.PayableStocks)
@@ -101,9 +108,10 @@ namespace PPE.Controllers
                 .ThenInclude(e => e.Article)
                 .ThenInclude(e => e.AttributeValueAttributeCategory)
                 .ThenInclude(e => e.AttributeValue)
-                .ThenInclude(e => e.Value)
+                .ThenInclude(e => e.Value)*/
                 .FirstOrDefaultAsync(m => m.Id == id);
 
+            /*
             var employeeStocks = await _context.EmployeeStocks
                 .Include(e => e.PpeAttributeCategoryAttributeValue)
                 .ThenInclude(e => e.Ppe)
@@ -235,6 +243,7 @@ namespace PPE.Controllers
                 .ToListAsync();
             
             ViewBag.StockStatus = new SelectList(Enum.GetValues(typeof(StockType)));
+            */
 
             return View(employee);
         }
@@ -256,25 +265,19 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,IsActive,LastName,Matricule,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId,CreatedAt,UpdatedAt,CreatedBy")] Employee employee)
+        public async Task<IActionResult> Create([Bind("FirstName,IsActive,LastName,Matricule,NNI,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
         {
             //return Json(employee);
             if (ModelState.IsValid)
             {
-                //return Json(employee);
-                employee.CreatedAt = DateTime.Now;
-                employee.CreatedBy = User.Identity?.Name;
-                _context.Add(employee);
+                var entry = _context.Entry(employee);
+                if (entry.State != EntityState.Added)
+                {
+                    _context.Entry(employee).State = EntityState.Added;
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            /*return Json(new
-            {
-                errors = ModelState.Values.SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-            });
-            */
             
             ViewData["Size"] = new SelectList(Enum.GetValues(typeof(Size)));
             ViewData["ShoeSize"] = new SelectList(Enum.GetValues(typeof(ShoeSize)));
@@ -310,7 +313,7 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,IsActive,NNI,Matricule,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId,CreatedAt,UpdatedAt,CreatedBy,UpdatedBy")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,IsActive,NNI,Matricule,Phone,Tel,Gender,Size,ShoeSize,ProjectId,FunctionId")] Employee employee)
         {
             if (id != employee.Id)
             {
@@ -321,8 +324,6 @@ namespace PPE.Controllers
             {
                 try
                 {
-                    employee.UpdatedAt = DateTime.Now;
-                    employee.UpdatedBy = User.Identity?.Name;
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
@@ -506,8 +507,8 @@ namespace PPE.Controllers
                     {
                         employees = employees.Where(e => e.FirstName.Contains(Request.Query[key].ToString()) 
                                                          || e.LastName.Contains(Request.Query[key].ToString()) 
-                                                         || e.NNI.Contains(Request.Query[key].ToString()) 
-                                                         || e.Phone.Contains(Request.Query[key].ToString()) 
+                                                         //|| e.NNI.Contains(Request.Query[key].ToString()) 
+                                                         //|| e.Phone.Contains(Request.Query[key].ToString()) 
                                                          || e.Matricule.Contains(Request.Query[key].ToString())
                         );
                         recordsFilterd = employees.Count();
@@ -725,5 +726,122 @@ namespace PPE.Controllers
             await _context.SaveChangesAsync();
             return Json(new {success = true, message = "Employee deleted successfully"});
         }
+        
+        // GET: api/getEmployeeByProject/5
+        [HttpGet()]
+        [Route("/api/getEmployeeByProject/{projectId}")]
+        public IActionResult GetEmployeeByProject(int projectId)
+        {
+            var employees = _context.Employees.Where(e => e.ProjectId == projectId).ToList();
+           
+            var employeesList = $"<option></option>";
+            foreach (var employee in employees)
+            {
+                employeesList += $"<option value='{employee.Id}'>{employee.FirstName} {employee.LastName} ({employee.Matricule})</option>";
+            }
+            
+            return Json(employeesList);
+        }
+        
+        // GET: api/getEmployeeByProject/5
+        [HttpGet()]
+        public IActionResult ExportToExcel()
+        {
+            // Get data from the database (replace with your actual data retrieval logic)
+            var data = _context.Employees
+                .Include(e => e.Project)
+                .Include(e => e.Function)
+                .OrderByDescending(e => e.CreatedAt)
+                .ToList();
+
+            // Create a new Excel package
+            using var package = new ExcelPackage();
+            // Add a worksheet
+            var worksheet = package.Workbook.Worksheets.Add("Employees");
+
+            // Set headers
+            worksheet.Cells[1, 1].Value = "ID";
+            worksheet.Cells[1, 2].Value = "First Name";
+            worksheet.Cells[1, 3].Value = "Last Name";
+            worksheet.Cells[1, 4].Value = "Project";
+            worksheet.Cells[1, 5].Value = "Function";
+            worksheet.Cells[1, 6].Value = "Phone";
+            worksheet.Cells[1, 7].Value = "Tel";
+            worksheet.Cells[1, 8].Value = "Matricule";
+            worksheet.Cells[1, 9].Value = "NNI";
+            worksheet.Cells[1,10].Value = "Size";
+            worksheet.Cells[1,11].Value = "Shoe Size";
+            worksheet.Cells[1, 12].Value = "Created At";
+            worksheet.Cells[1, 13].Value = "Updated At";
+            worksheet.Cells[1, 14].Value = "Created By";
+            worksheet.Cells[1, 15].Value = "Updated By";
+            /*worksheet.Cells[1, 6].Value = "Created At";
+            worksheet.Cells[1, 7].Value = "Updated At";
+            worksheet.Cells[1, 8].Value = "Created By";
+            worksheet.Cells[1, 9].Value = "Updated By";*/
+            
+            // Add more headers for other properties as needed
+
+            // Populate data
+            for (int i = 0; i < data.Count; i++)
+            {
+                var employee = data[i];
+                worksheet.Cells[i + 2, 1].Value = employee.Id;
+                worksheet.Cells[i + 2, 2].Value = employee.FirstName;
+                worksheet.Cells[i + 2, 3].Value = employee.LastName;
+                worksheet.Cells[i + 2, 4].Value = employee.Project.Title;
+                worksheet.Cells[i + 2, 5].Value = employee.Function.Title;
+                worksheet.Cells[i + 2, 6].Value = employee.Phone;
+                worksheet.Cells[i + 2, 7].Value = employee.Tel;
+                worksheet.Cells[i + 2, 8].Value = employee.Matricule;
+                worksheet.Cells[i + 2, 9].Value = employee.NNI;
+                worksheet.Cells[i + 2, 10].Value = employee.Size.ToString();
+                worksheet.Cells[i + 2, 11].Value = employee.ShoeSize.ToString();
+                worksheet.Cells[i + 2, 12].Value = employee.CreatedAt;
+                worksheet.Cells[i + 2, 13].Value = employee.UpdatedAt;
+                worksheet.Cells[i + 2, 14].Value = employee.CreatedBy;
+                worksheet.Cells[i + 2, 15].Value = employee.UpdatedBy;
+                
+                // Add more cells for other properties as needed
+            }
+
+            // Auto fit columns
+            worksheet.Cells.AutoFitColumns();
+
+            // Save the Excel package to a stream
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+
+            // Set the position to the beginning of the stream
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Return the Excel file as a FileStreamResult
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Employees.xlsx");
+        }
+        
+        [HttpGet()]
+        public IActionResult GeneratePdf()
+        {
+            var employees = GetEmployeeData(); // Implement this method to retrieve your employee data
+
+            return new ViewAsPdf("EmployeeList", employees)
+            {
+                FileName = "employees.pdf"
+            };
+        }
+
+        private List<Employee> GetEmployeeData()
+        {
+            // Implement this method to retrieve your actual employee data
+            return new List<Employee>
+            {
+                new Employee { Id = 1, FirstName = "John Doe" },
+                new Employee { Id = 2, FirstName = "Jane Smith" }
+                // Add more employees as needed
+            };
+        }
+        
+        
     }
+    
 }

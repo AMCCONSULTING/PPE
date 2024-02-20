@@ -1,5 +1,5 @@
 @model IEnumerable<PPE.Models.Employee>
-
+    
 @{
     ViewData["Title"] = "Employees List";
     ViewBag.Buttons = new List<ButtonModel> {
@@ -8,11 +8,24 @@
             Action = "Create",
             Controller = "Employees",
             ButtonType = "primary"
-        }
+        },
     };
 }
-
-<div class="card-body bg-white">
+<div class="btn-group btn-sm">
+    @*<a class="btn btn-outline-info btn-sm" asp-controller="Employees" asp-action="GeneratePdf">
+        <i class="la la-file-pdf-o"></i>
+        Export pdf
+    </a>*@
+    <a class="btn btn-outline-success btn-sm" asp-action="ExportToExcel">
+        <i class="la la-file-excel-o"></i>
+        Export excel
+    </a>
+    <a class="btn btn-outline-info btn-sm">
+        <i class="la la-upload"></i>
+        Import excel
+    </a>
+</div>
+<div class="card">
     <div class="card-header">
         <div class="row">
             <div class="col-12 col-md-4 form-group">
@@ -41,32 +54,34 @@
             </div>*@
         </div>
     </div>
-    <table class="table responsive w-100"
-           data-column="matricule,fullName,nni,project,isActive,function,actions"
-           data-url="/api/employees">
-        <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Matricule)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NNI)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Project)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Function)
-            </th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="card-body">
+       <table class="table responsive w-100"
+                  data-column="matricule,fullName,nni,project,isActive,function,actions"
+                  data-url="/api/employees">
+               <thead>
+               <tr>
+                   <th>
+                       @Html.DisplayNameFor(model => model.Matricule)
+                   </th>
+                   <th>
+                       @Html.DisplayNameFor(model => model.FullName)
+                   </th>
+                   <th>
+                       @Html.DisplayNameFor(model => model.NNI)
+                   </th>
+                   <th>
+                       @Html.DisplayNameFor(model => model.Project)
+                   </th>
+                   <th>
+                       @Html.DisplayNameFor(model => model.IsActive)
+                   </th>
+                   <th>
+                       @Html.DisplayNameFor(model => model.Function)
+                   </th>
+                   <th></th>
+               </tr>
+               </thead>
+               <tbody></tbody>
+           </table> 
+    </div>
 </div>

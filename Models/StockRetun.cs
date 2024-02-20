@@ -2,7 +2,7 @@
 
 namespace PPE.Models;
 
-public class StockRetun
+public class StockRetun : AuditableEntity
 {
     public int Id { get; set; }
     public int EmployeeId { get; set; }

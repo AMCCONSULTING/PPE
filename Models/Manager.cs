@@ -3,7 +3,7 @@
 namespace PPE.Models;
 using PPE.Data.Enums;
 
-public class Manager
+public class Manager : AuditableEntity
 {
     public int Id { get; set; }
     [DisplayName("First Name")]

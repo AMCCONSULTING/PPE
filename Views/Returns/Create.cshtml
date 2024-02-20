@@ -16,6 +16,7 @@
     var responsables = new SelectList(Context.Responsables.Select(r => new { Id = r.Id, FullName = r.Employee!.FullName }), "Id", "FullName");
     var hses = new SelectList(Context.Hses.Select(r => new { Id = r.Id, FullName = r.Employee!.FullName }), "Id", "FullName");
     var status = new SelectList(Enum.GetValues(typeof(RetunStatus)));
+    var coordinators = new SelectList(Context.Coordinateurs.Select(r => new { Id = r.Id, FullName = r.Employee!.FullName }), "Id", "FullName");
     
 }
 
@@ -33,6 +34,11 @@
             <input type="hidden" asp-for="ArticleId" value="@ViewBag.ArticleId">
             <div class="row">
                 <div class="form-group col-12 col-md-6">
+                    <label asp-for="Date" class="control-label"></label>
+                    <input type="date" asp-for="Date" class="form-control"/>
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+                <div class="form-group col-12 col-md-6">
                     <label asp-for="Status" class="control-label"></label>
                     <select asp-for="Status" class="form-control select2 status-select"
                             data-placeholder="-- Select Status --"
@@ -43,7 +49,7 @@
                 </div>
                 <div class="form-group col-12 col-md-6 hse-select-container">
                     <label asp-for="HseId" class="control-label"></label>
-                    <select asp-for="HseId" class="form-control select2 hse-select" 
+                    <select asp-for="HseId" class="form-control select2 hse-select"
                             id="hse-select"
                             data-placeholder="-- Select Responsable Hse --"
                             asp-items="hses">
@@ -51,22 +57,22 @@
                     </select>
                 </div>
                 <div class="form-group col-12 col-md-6">
-                    <label asp-for="ResponsableId" class="control-label"></label>
-                    <select asp-for="ResponsableId" class="form-control select2" 
+                    <label asp-for="CoordinatorId" class="control-label"></label>
+                    <select asp-for="CoordinatorId" class="form-control select2"
                             data-placeholder="-- Select Responsable --"
-                            asp-items="responsables">
+                            asp-items="coordinators">
                         <option></option>
                     </select>
-                     <span asp-validation-for="ResponsableId" class="text-danger"></span>
+                    <span asp-validation-for="CoordinatorId" class="text-danger"></span>
                 </div>
                 <div class="form-group col-12 col-md-6">
                     <label asp-for="MagazinierId" class="control-label"></label>
-                    <select asp-for="MagazinierId" class="form-control select2" 
+                    <select asp-for="MagazinierId" class="form-control select2"
                             data-placeholder="-- Select Magazinier --"
                             asp-items="magaziniers">
                         <option></option>
                     </select>
-                     <span asp-validation-for="MagazinierId" class="text-danger"></span>
+                    <span asp-validation-for="MagazinierId" class="text-danger"></span>
                 </div>
                 <div class="form-group col-12 col-md-6">
                     <label asp-for="Quantity" class="control-label"></label>

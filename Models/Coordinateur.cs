@@ -1,8 +1,11 @@
-﻿namespace PPE.Models;
+﻿using System.ComponentModel;
 
-public class Coordinateur
+namespace PPE.Models;
+
+public class Coordinateur : AuditableEntity
 {
     public int Id { get; set; }
+    [DisplayName("Employee")]
     public int EmployeeId { get; set; }
     public Employee? Employee { get; set; } = null!;
 }

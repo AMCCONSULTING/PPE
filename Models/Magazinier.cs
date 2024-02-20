@@ -1,8 +1,11 @@
-﻿namespace PPE.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class Magazinier
+namespace PPE.Models;
+
+public class Magazinier : AuditableEntity
 {
     public int Id { get; set; }
+    [Required]
     public int EmployeeId { get; set; }
     public Employee? Employee { get; set; }
 }

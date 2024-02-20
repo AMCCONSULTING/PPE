@@ -17,15 +17,6 @@
     };
 }
 
-@if (TempData["success"] != null)
-    {
-        <div class="alert alert-success">@TempData["success"]</div>
-    }
-    @if (TempData["error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["error"]</div>
-    }
-
 <div class="card">
     <div class="card-body">
         <div class="row justify-content-between align-items-center">
@@ -44,7 +35,6 @@
         </div>
     </div>
 </div>
-
 @*<h1>
     @User.IsInRole("Ppe.Create")
     @{
@@ -76,9 +66,9 @@
             <a class="nav-link" id="base-tab42" data-toggle="tab" aria-controls="tab42" href="#tab42" aria-expanded="false">
                 <span class="d-flex justify-content-center align-items-center">
                     <span> To be payed</span> &nbsp; &nbsp;
-                    @if (Model.PayableStocks.Any()){
+                    @*@if (Model.PayableStocks.Any()){
                         <div class="badge badge-warning">@Model.PayableStocks.Count(e => e.Quantity > 0 && e.IsPaid == false)</div>
-                    }
+                    }*@
                 </span>
             </a>
         </li>
@@ -128,11 +118,23 @@
                                 </form>*@
                                 
                                 @* </form> *@
-                                <form asp-action="Create" method="get" asp-controller="Returns">
+                                <div class="btn-group btn-group-sm">
+                                    <form asp-action="Create" method="get" asp-controller="Returns">
                                         <input type="hidden" name="articleId" value="@item.ArticleId" />
                                         <input type="hidden" name="employeeId" value="@Model.Id"/>
-                                        <button type="submit" class="btn btn-sm btn-danger">Return</button>
+                                        <button type="submit" class="btn btn-sm btn-info">Return</button>
                                     </form>
+                                    <form asp-action="Create" method="get" asp-controller="Returns" class="mx-1">
+                                        <input type="hidden" name="articleId" value="@item.ArticleId" />
+                                        <input type="hidden" name="employeeId" value="@Model.Id"/>
+                                        <button type="submit" class="btn btn-sm btn-primary">Change</button>
+                                    </form>
+                                    <form asp-action="Create" method="get" asp-controller="Returns">
+                                        <input type="hidden" name="articleId" value="@item.ArticleId" />
+                                        <input type="hidden" name="employeeId" value="@Model.Id"/>
+                                        <button type="submit" class="btn btn-sm btn-danger">Reassign</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }
@@ -155,7 +157,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var item in Model.PayableStocks.Where(e => e.Quantity > 0 && e.IsPaid == false))
+                    @*@foreach (var item in Model.PayableStocks.Where(e => e.Quantity > 0 && e.IsPaid == false))
                     {
                         <tr>
                             <td>@item.Article.Ppe.Title</td> 
@@ -163,7 +165,7 @@
                             <td>@item.Quantity</td>
                             <td><a class="btn btn-sm btn-danger">Remboursé</a></td>
                         </tr>
-                    }
+                    }*@
                     </tbody>
                 </table>
             </div>
@@ -211,7 +213,7 @@
                             <th class="col">Quantity</th>
                         </tr>
                         </thead>
-                        @if (Model.Returns != null)
+                        @*@if (Model.Returns != null)
                         {
                             foreach (var item in Model.Returns.OrderByDescending(r => r.Date))
                             {
@@ -222,7 +224,7 @@
                                     <td>@item.Quantity</td>
                                 </tr>
                             }
-                        }
+                        }*@
                     </table>
                 </div>
             </div>

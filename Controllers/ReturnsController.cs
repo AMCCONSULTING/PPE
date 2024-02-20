@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Azure.Core;
+﻿using Azure.Core;
 using Azure.Identity;
 using DataTables.AspNetCore.Mvc.Binder;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +29,7 @@ namespace PPE.Controllers
         {
             var appDbContext = _context.Returns
                 .Include(re => re.Employee)
-                .Include(re => re.Responsable)
+                .Include(re => re.Coordinateur)
                 .Include(re => re.Hse)
                 .Include(re => re.Magazinier)
                 .Include(re => re.Article);
@@ -47,7 +43,7 @@ namespace PPE.Controllers
             IQueryable<Return> mouvements = _context.Returns
                 .Include(s => s.Magazinier)
                 .ThenInclude(m => m.Employee)
-                .Include(s => s.Responsable)
+                .Include(s => s.Coordinateur)
                 .ThenInclude(t => t.Employee)
                 .Include(s => s.Hse)
                 .ThenInclude(t => t.Employee)
@@ -81,7 +77,7 @@ namespace PPE.Controllers
                     }
                     if (key == "filters[responsable]" && !string.IsNullOrEmpty(Request.Query[key]))
                     {
-                        mouvements = mouvements.Where(e => e.ResponsableId == int.Parse(Request.Query[key]));
+                        mouvements = mouvements.Where(e => e.CoordinatorId == int.Parse(Request.Query[key]));
                         recordsFilterd = mouvements.Count();
                     }
                     
@@ -128,7 +124,7 @@ namespace PPE.Controllers
                     Date = e.Date.ToString("d"),
                     Article = e.Article!.Ppe.Title,
                     Employee = e.Employee!.FullName,
-                    Responsable = e.Responsable!.Employee!.FullName,
+                    Responsable = e.Coordinateur!.Employee!.FullName,
                     Magasinier = e.Magazinier!.Employee!.FullName,
                     Hse = e.Hse != null ? e.Hse.Employee!.FullName : string.Empty,
                     Status = $"<strong class='text-uppercase badge {GetBadgeClass(e.Status)}'>{e.Status.ToString()}</strong>",
@@ -139,15 +135,15 @@ namespace PPE.Controllers
                               $"<i class='la la-plus'></i>"+
                               $"</a>"+*/
                               $"<a class='btn btn-info btn-sm' href='/Returns/Edit/{e.Id}'>" +
-                              $"<i class='la la-edit'></i>"+
-                              $"</a>"+
+                              $"<i class='la la-edit'></i>"/*+
+                              /*$"</a>"+
                               $"<a class='btn btn-primary btn-sm' href='/Returns/Details/{e.Id}'>" +
                               $"<i class='la la-eye'></i>"+
-                              $"</a>"+
+                              $"</a>"+#1#
                               $"<a class='btn btn-danger btn-sm' onclick=#'confirmDelete(\"{deleteUrl}\", {e.Id})'>" +
                               $"<i class='la la-trash text-white'></i>"+
                               $"</a>"+
-                              $"</div>",
+                              $"</div>",*/
                 })
                 .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
             
@@ -185,7 +181,7 @@ namespace PPE.Controllers
 
             var epeRetun = _context.Returns
                 .Include(re => re.Employee)
-                .Include(re => re.Responsable)
+                .Include(re => re.Coordinateur)
                 .Include(re => re.Hse)
                 .Include(re => re.Magazinier)
                 .Include(re => re.Article);
@@ -208,7 +204,7 @@ namespace PPE.Controllers
             ViewData["EmployeeId"] = employeeId;
             ViewData["HseId"] = new SelectList(_context.Hses, "Id", "Id");
             ViewData["MagazinierId"] = new SelectList(_context.Magaziniers, "Id", "Id");
-            ViewData["ResponsableId"] = new SelectList(_context.Responsables, "Id", "Id");
+            ViewData["ResponsableId"] = new SelectList(_context.Coordinateurs, "Id", "Id");
             return View();
         }
 
@@ -218,7 +214,7 @@ namespace PPE.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         //[Route("/Returns/Create/{id?}")]
-        public async Task<IActionResult> Create([Bind("Id,EmployeeId,ArticleId,ResponsableId,HseId,MagazinierId,Quantity,IsPaid,Document,Status")] Return ppeRetun)
+        public async Task<IActionResult> Create([Bind("Id,EmployeeId,ArticleId,CoordinatorId,HseId,MagazinierId,Quantity,IsPaid,Document,Status,Date")] Return ppeRetun)
         {
             
             var articleInStockEmployee = _context.StockEmployees
@@ -257,11 +253,14 @@ namespace PPE.Controllers
             ViewData["EmployeeId"] = ppeRetun.EmployeeId;
             ViewData["HseId"] = new SelectList(_context.Hses, "Id", "Id", ppeRetun.HseId);
             ViewData["MagazinierId"] = new SelectList(_context.Magaziniers, "Id", "Id", ppeRetun.MagazinierId);
-            ViewData["ResponsableId"] = new SelectList(_context.Responsables, "Id", "Id", ppeRetun.ResponsableId);
+            ViewData["ResponsableId"] = new SelectList(_context.Coordinateurs, "Id", "Id", ppeRetun.Coordinateur);
             return View(ppeRetun);
         }
 
         // GET: Returns/Edit/5
+        /*[HttpPost]
+        [ValidateAntiForgeryToken]*/
+
         public async Task<IActionResult> Edit(int? id)
         {
             
@@ -271,7 +270,7 @@ namespace PPE.Controllers
             }
             var @return = await _context.Returns
                 .Include(re => re.Employee)
-                .Include(re => re.Responsable)
+                .Include(re => re.Coordinateur)
                 .Include(re => re.Hse)
                 .Include(re => re.Magazinier)
                 .Include(re => re.Article)
@@ -287,7 +286,7 @@ namespace PPE.Controllers
             ViewData["EmployeeId"] = @return.EmployeeId;
             ViewData["HseId"] = new SelectList(_context.Hses, "Id", "Id", @return.HseId);
             ViewData["MagazinierId"] = new SelectList(_context.Magaziniers, "Id", "Id", @return.MagazinierId);
-            ViewData["ResponsableId"] = new SelectList(_context.Responsables, "Id", "Id", @return.ResponsableId);
+            ViewData["ResponsableId"] = new SelectList(_context.Coordinateurs, "Id", "Id", @return.Coordinateur);
             return View(@return);
         }
 
@@ -296,8 +295,100 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,EmployeeId,ArticleId,ResponsableId,HseId,MagazinierId,Quantity,IsPaid,Status")] Return @return)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EmployeeId,ArticleId,CoordinatorId,HseId,MagazinierId,Quantity,IsPaid,Status,Date,Document")] Return updatedReturn)
         {
+            if (id != updatedReturn.Id)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Detach existing entity with the same key
+                    var existingReturn = _context.Returns.Local.FirstOrDefault(r => r.Id == id);
+                    if (existingReturn != null)
+                    {
+                        _context.Entry(existingReturn).State = EntityState.Detached;
+                    }
+
+                    // Update the entity with the new values
+                    _context.Returns.Update(updatedReturn);
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (DbUpdateException e)
+            {
+                ModelState.AddModelError("", GetFullErrorMessage(e));
+            }
+
+            // Rest of the code...
+            ViewData["ArticleId"] = updatedReturn.ArticleId;
+            ViewData["EmployeeId"] = updatedReturn.EmployeeId;
+            ViewData["HseId"] = new SelectList(_context.Hses, "Id", "Id", updatedReturn.HseId);
+            ViewData["MagazinierId"] = new SelectList(_context.Magaziniers, "Id", "Id", updatedReturn.MagazinierId);
+            ViewData["ResponsableId"] = new SelectList(_context.Coordinateurs, "Id", "Id", updatedReturn.CoordinatorId);
+            return View(updatedReturn);
+        }
+
+        /*
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EmployeeId,ArticleId,CoordinatorId,HseId,MagazinierId,Quantity,IsPaid,Status,Date,Document")] Return @return)
+{
+    if (id != @return.Id)
+    {
+        return NotFound();
+    }
+
+    await using (var transaction = await _context.Database.BeginTransactionAsync())
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Returns.Update(@return);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync(); // Commit the transaction if everything is successful
+                return RedirectToAction(nameof(Index));
+            }
+        }
+        catch (DbUpdateException e)
+        {
+            await transaction.RollbackAsync();
+            ModelState.AddModelError("", GetFullErrorMessage(e));
+        }
+    }
+
+    ViewData["ArticleId"] = @return.ArticleId;
+    ViewData["EmployeeId"] = @return.EmployeeId;
+    ViewData["HseId"] = new SelectList(_context.Hses, "Id", "Id", @return.HseId);
+    ViewData["MagazinierId"] = new SelectList(_context.Magaziniers, "Id", "Id", @return.MagazinierId);
+    ViewData["ResponsableId"] = new SelectList(_context.Coordinateurs, "Id", "Id", @return.CoordinatorId);
+    return View(@return);
+}
+*/
+        
+        private string GetFullErrorMessage(DbUpdateException ex)
+        {
+            var messages = new List<string>();
+            Exception currentException = ex;
+
+            while (currentException != null)
+            {
+                messages.Add(currentException.Message);
+                currentException = currentException.InnerException;
+            }
+
+            return string.Join(" ", messages);
+        }
+        
+
+        /*
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EmployeeId,ArticleId,CoordinateurId,HseId,MagazinierId,Quantity,IsPaid,Status,Date")] Return @return)
+        {
+            //return Json(@return);
             if (id != @return.Id)
             {
                 return NotFound();
@@ -343,19 +434,16 @@ namespace PPE.Controllers
             {
                 try
                 {
+                    return Json(@return);
                     _context.Update(@return);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException exception)
                 {
-                    if (!ReturnExists(@return.Id))
+                    return Json(new
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                        exception = exception
+                    });
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -363,9 +451,10 @@ namespace PPE.Controllers
             ViewData["EmployeeId"] = @return.EmployeeId;
             ViewData["HseId"] = new SelectList(_context.Hses, "Id", "Id", @return.HseId);
             ViewData["MagazinierId"] = new SelectList(_context.Magaziniers, "Id", "Id", @return.MagazinierId);
-            ViewData["ResponsableId"] = new SelectList(_context.Responsables, "Id", "Id", @return.ResponsableId);
+            ViewData["ResponsableId"] = new SelectList(_context.Coordinateurs, "Id", "Id", @return.CoordinatorId);
             return View(@return);
         }
+        */
 
         // GET: Returns/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -407,7 +496,7 @@ namespace PPE.Controllers
             
             var appDbContext = _context.Returns
                 .Include(re => re.Employee)
-                .Include(re => re.Responsable)
+                .Include(re => re.Coordinateur)
                 .Include(re => re.Hse)
                 .Include(re => re.Magazinier)
                 .Include(re => re.Article)

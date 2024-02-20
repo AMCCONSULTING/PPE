@@ -1,0 +1,24 @@
+﻿<!-- Views/Employee/EmployeeList.cshtml -->
+@model List<Employee>
+
+<h1>Employee List</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Employee ID</th>
+        <th>Name</th>
+        <!-- Add more columns as needed -->
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var employee in Model)
+    {
+        <tr>
+            <td>@employee.Id</td>
+            <td>@employee.FirstName</td>
+            <!-- Add more columns as needed -->
+        </tr>
+    }
+    </tbody>
+</table>

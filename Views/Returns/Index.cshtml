@@ -125,7 +125,7 @@
     <hr />
     <div class="card-body">
         <table class="table responsive w-100"
-               data-column="date,article,employee,magasinier,hse,status,document"
+               data-column="date,article,employee,magasinier,hse,status,document,actions"
                data-url="/api/returns/getdotations">
             <thead>
                 <tr>
@@ -156,7 +156,9 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Document)
                     </th>
-                    <th></th>
+                    <th>
+                        Actions
+                    </th>
                 </tr>
             </thead>
             <tbody>

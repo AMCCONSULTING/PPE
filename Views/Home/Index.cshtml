@@ -1,6 +1,43 @@
-﻿@{
+﻿@using Microsoft.EntityFrameworkCore
+@inject PPE.Data.AppDbContext Context;
+@{
     ViewData["Title"] = "Dashboard";
+    var StockDetails = Context.MainStocks
+        .Include(s => s.PpeAttributeCategoryAttributeValue)
+        .ThenInclude(pav => pav.Ppe)
+        .Include(s => s.PpeAttributeCategoryAttributeValue)
+        .ThenInclude(pav => pav.AttributeValueAttributeCategory)
+        .ThenInclude(avac => avac.AttributeValue)
+        //.ThenInclude(ac => ac.Attribute)
+        .ThenInclude(av => av.Value)
+        .GroupBy(s => s.PpeAttributeCategoryAttributeValue.Ppe)
+        .Select(s => new
+        {
+            Ppe = s.Key,
+            StockIn = s.Sum(s => s.QuantityIn),
+            StockOut = s.Sum(s => s.QuantityOut),
+            CurrentStock = s.Sum(s => s.QuantityIn) - s.Sum(s => s.QuantityOut)
+        });
 }
+
+@*<div class="card">
+    <div class="card-body">
+        <form asp-action="UploadFile" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="file">Select Excel File:</label>
+                <input type="file" name="file" id="file" />
+            </div>
+            <button type="submit">Upload</button>
+        </form>
+        <form asp-action="Upload" enctype="multipart/form-data">
+            <div class="form-group">
+                <input class="form-control" name="file" type="file"/>
+            </div>
+                    <button class="btn btn-primary" type="submit">Import</button>
+                </form>
+        
+    </div>
+</div>*@
 
 <canvas id="ppeChart" width="400" height="100"></canvas>
 

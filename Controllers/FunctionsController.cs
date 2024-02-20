@@ -19,11 +19,17 @@ namespace PPE.Controllers
         // GET: Fucntions
         public async Task<IActionResult> Index()
         {
-              return _context.Functions != null ? 
-                          View(await _context.Functions
-                              .Include(e => e.Employees)
-                              .ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Functions'  is null.");
+            var functions = _context.Functions
+                .Include(e => e.Employees)
+                .ToList();
+            
+            // get functions in list and separate by comma like this: "function1, function2, function3"
+            /*ViewBag.Functions = functions.Select(f => f.Title).ToList();
+            return Json(String.Join(", ", ViewBag.Functions));*/
+            
+              return View(await _context.Functions
+                  .Include(e => e.Employees)
+                  .ToListAsync());
         }
         
          [HttpGet()]
@@ -35,52 +41,6 @@ namespace PPE.Controllers
                         .OrderByDescending(e => e.Title);
                     int recordsTotal = functions.Count();
                     int recordsFilterd = recordsTotal;
-        
-                    /*var filters = new Dictionary<string, string>();
-                    foreach(var key in Request.Query.Keys)
-                    {
-                        if (key.StartsWith("search"))
-                        {
-                            filters[key.Substring("search".Length)] = Request.Query[key];
-                            if (key == "search[value]" && !string.IsNullOrEmpty(Request.Query[key]))
-                            {
-                                employees = employees.Where(e => e.FirstName.Contains(Request.Query[key].ToString()) 
-                                                                 || e.LastName.Contains(Request.Query[key].ToString()) 
-                                                                 || e.NNI.Contains(Request.Query[key].ToString()) 
-                                                                 || e.Phone.Contains(Request.Query[key].ToString()) 
-                                                                 || e.Matricule.Contains(Request.Query[key].ToString())
-                                );
-                                recordsFilterd = employees.Count();
-                            }
-                        }
-                        
-                        if (key.StartsWith("filters"))
-                        {
-                            filters[key.Substring("filters".Length)] = Request.Query[key];
-                            
-                            if (key == "filters[project]" && !string.IsNullOrEmpty(Request.Query[key]))
-                            {
-                                employees = employees.Where(e => e.ProjectId == int.Parse(Request.Query[key]));
-                                recordsFilterd = employees.Count();
-                            }
-                            if (key == "filters[function]" && !string.IsNullOrEmpty(Request.Query[key]))
-                            {
-                                employees = employees.Where(e => e.FunctionId == int.Parse(Request.Query[key]));
-                                recordsFilterd = employees.Count();
-                            }
-        
-                            if (key == "filters[name]" && !string.IsNullOrEmpty(Request.Query[key]))
-                            {
-                                employees = employees.Where(e => e.FirstName.Contains(Request.Query[key].ToString()) 
-                                                                 || e.LastName.Contains(Request.Query[key].ToString()) 
-                                                                 || e.NNI.Contains(Request.Query[key].ToString()) 
-                                                                 || e.Phone.Contains(Request.Query[key].ToString()) 
-                                );
-                                recordsFilterd = employees.Count();
-                            }
-                        }
-                    }
-                    */
                     
                     functions = functions.Skip(dataRequest.Start).Take(dataRequest.Length);
                     var deleteUrl = "Functions/DeleteFunction";
@@ -173,10 +133,10 @@ namespace PPE.Controllers
             
             if (ModelState.IsValid)
             {
-                function.CreatedAt = DateTime.Now;
+                /*function.CreatedAt = DateTime.Now;
                 function.UpdatedAt = DateTime.Now;
                 function.CreatedBy = User.Identity?.Name;
-                function.UpdatedBy = User.Identity?.Name;
+                function.UpdatedBy = User.Identity?.Name;*/
                 _context.Add(function);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -216,8 +176,8 @@ namespace PPE.Controllers
             {
                 try
                 {
-                    function.UpdatedAt = DateTime.Now;
-                    function.UpdatedBy = User.Identity?.Name;
+                    /*function.UpdatedAt = DateTime.Now;
+                    function.UpdatedBy = User.Identity?.Name;*/
                     _context.Functions.Update(function);    
                     await _context.SaveChangesAsync();
                 }

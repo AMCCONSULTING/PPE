@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class StokeDetail
+public class StokeDetail : AuditableEntity
 {
     public int Id { get; set; }
     public int StokeId { get; set; }

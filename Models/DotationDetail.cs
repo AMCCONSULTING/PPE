@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class DotationDetail
+public class DotationDetail : AuditableEntity
 {
     public int Id { get; set; }
     public int DotationId { get; set; }

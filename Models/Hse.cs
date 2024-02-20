@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class Hse
+public class Hse : AuditableEntity
 {
     public int Id { get; set; }
     public int EmployeeId { get; set; }

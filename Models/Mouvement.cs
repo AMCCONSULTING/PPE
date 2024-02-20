@@ -2,7 +2,7 @@
 
 namespace PPE.Models;
 
-public class Mouvement
+public class Mouvement : AuditableEntity
 {
     public int Id { get; set; }
     public DateTime Date { get; set; }

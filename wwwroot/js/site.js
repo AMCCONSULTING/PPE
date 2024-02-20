@@ -488,3 +488,21 @@ function removeItemFromStock(btn, id, dotationId) {
     });
 }
 
+function getEmployeeByProject() {
+    const projectSelect = $('.project-select');
+    const projectId = projectSelect.val();
+    $.ajax({
+        url: `/api/getEmployeeByProject/${projectId}`,
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            $('.employee-select').html(data);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("AJAX Error:", textStatus, errorThrown);
+            console.log(jqXHR.responseText); // Log the response text for more details
+        }
+    });
+}
+
+

@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class MouvementDetail
+public class MouvementDetail : AuditableEntity
 {
     public int Id { get; set; }
     public int MouvementId { get; set; }

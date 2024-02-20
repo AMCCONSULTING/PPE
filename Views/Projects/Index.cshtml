@@ -11,55 +11,75 @@
         }
     };
 }
-<div class="table-responsive">
-    <table class="table bg-white">
-        <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Prefix)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmployeeCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var item in Model) {
+<div class="card">
+    <div class="card-header">
+        <div class="btn-group btn-sm">
+            @*<a class="btn btn-outline-info btn-sm" asp-controller="Employees" asp-action="GeneratePdf">
+                <i class="la la-file-pdf-o"></i>
+                Export pdf
+            </a>*@
+            <a class="btn btn-outline-success btn-sm" asp-action="">
+                <i class="la la-file-excel-o"></i>
+                Export excel
+            </a>
+            <a class="btn btn-outline-info btn-sm">
+                <i class="la la-upload"></i>
+                Import excel
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Prefix)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmployeeCount)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">
-                            <i class="la la-edit"></i>
-                        </a> 
-                        <a class="btn btn-sm btn-dark" asp-action="Details" asp-route-id="@item.Id">
-                            <i class="la la-eye"></i>
-                        </a> 
-                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">
-                            <i class="la la-trash"></i>
-                        </a>
-                    </div>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Prefix)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EmployeeCount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th></th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Prefix)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmployeeCount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">
+                                <i class="la la-edit"></i>
+                            </a>
+                            <a class="btn btn-sm btn-dark" asp-action="Details" asp-route-id="@item.Id">
+                                <i class="la la-eye"></i>
+                            </a>
+                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">
+                                <i class="la la-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 </div>
+

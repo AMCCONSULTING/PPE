@@ -2,7 +2,7 @@
 
 namespace PPE.Models;
 
-public class Stock
+public class Stock : AuditableEntity
 {
     public int Id { get; set; }
     //public int Quantity { get; set; }

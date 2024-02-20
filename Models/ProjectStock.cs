@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class ProjectStock
+public class ProjectStock : AuditableEntity
 {
     public int Id { get; set; }
     public int ProjectId { get; set; }

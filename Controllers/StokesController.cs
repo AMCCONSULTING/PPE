@@ -170,6 +170,7 @@ namespace PPE.Controllers
             if (ModelState.IsValid)
             {
                 await _stokeService.AddStoke(stoke);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(AddStokeDetails) , new { id = stoke.Id });
             }
             
@@ -227,6 +228,12 @@ namespace PPE.Controllers
         /*[ValidateAntiForgeryToken]*/
         public async Task<IActionResult> AddStokeDetails(int id, List<int> articles, List<int> quantities)
         {
+
+            /*return Json(new
+            {
+                articles = articles,
+                quantities = quantities,
+            });*/
             
             if (id == null || _context.Stokes == null)
             {
@@ -420,9 +427,8 @@ namespace PPE.Controllers
         }
         
         // GET: Stokes/DeleteStoke/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        //[Route("Stokes/DeleteStoke/{id}")]
+        [HttpGet]
+        [Route("Stokes/DeleteStoke/{id}")]
         public async Task<IActionResult> DeleteStoke(int? id)
         {
             
@@ -431,26 +437,24 @@ namespace PPE.Controllers
                 return NotFound();
             }
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                try
+                var stoke = await _context.Stokes.FindAsync(id);
+                if (stoke == null)
                 {
-                    var stoke = await _context.Stokes.FindAsync(id);
-                    if (stoke == null)
-                    {
-                        return NotFound();
-                    }
+                    return NotFound();
+                }
 
-                    _context.Stokes.Remove(stoke);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return Json(new { success = true, message = "Stoke deleted successfully" });
-                }
-                catch (Exception e)
-                {
-                    await transaction.RollbackAsync();
-                    return Problem(e.Message);
-                }
+                _context.Stokes.Remove(stoke);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return Json(new { success = true, message = "Stoke deleted successfully" });
+            }
+            catch (Exception e)
+            {
+                await transaction.RollbackAsync();
+                return Problem(e.Message);
             }
         }
 

@@ -176,6 +176,17 @@ namespace PPE.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,EmployeeId")] Hse hse)
         {
+            // if employeeId is already a hse, set error message to "Employee is already a hse"
+            if (_context.Hses.Any(t => t.EmployeeId == hse.EmployeeId))
+            {
+                ModelState.AddModelError("EmployeeId", "Employee is already a hse");
+            }
+            
+            if (hse.EmployeeId == 0)
+            {
+                ModelState.AddModelError("EmployeeId", "Employee is required");
+            }
+            
             if (ModelState.IsValid)
             {
                 _context.Add(hse);

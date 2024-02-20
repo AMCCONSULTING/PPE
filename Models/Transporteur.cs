@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class Transporteur
+public class Transporteur : AuditableEntity
 {
     public int Id { get; set; }
     public int EmployeeId { get; set; }

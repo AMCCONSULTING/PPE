@@ -2,7 +2,7 @@
 
 namespace PPE.Models;
 
-public class EmployeeStock
+public class EmployeeStock : AuditableEntity
 {
     public int Id { get; set; }
     public DateTime Date { get; set; }

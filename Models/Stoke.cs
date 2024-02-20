@@ -2,12 +2,12 @@
 
 namespace PPE.Models;
 
-public class Stoke
+public class Stoke : AuditableEntity
 {
     public int Id { get; set; }
     public DateTime Date { get; set; }
     public string? Reference { get; set; }
-    public string Document { get; set; }
+    public string? Document { get; set; }
     [DisplayName ("Magazinier")]
     public int? MagazinierId { get; set; }
     public Magazinier? Magazinier { get; set; }

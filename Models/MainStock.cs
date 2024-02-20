@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class MainStock
+public class MainStock : AuditableEntity
 {
     public int Id { get; set; }
     public PpeAttributeCategoryAttributeValue PpeAttributeCategoryAttributeValue { get; set; } = null!;

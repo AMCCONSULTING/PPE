@@ -1,4 +1,6 @@
-﻿using OfficeOpenXml;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using PPE.Models;
 
 namespace PPE.Data.Services;
@@ -39,4 +41,55 @@ public class ExcelService : IExcelService
             _context.SaveChanges();
         }
     }
+    
+    /*public IActionResult UploadFile<TEntity>(Func<ExcelWorksheet, TEntity> mapRowFunc, IFormFile file) where TEntity : class
+    {
+        //var file = HttpContext.Request.Form.Files["file"];
+
+        using var transaction = _context.Database.BeginTransaction();
+        try
+        {
+            if (file is { Length: > 0 })
+            {
+                using var stream = new MemoryStream();
+                file.CopyTo(stream);
+                using var package = new ExcelPackage(stream);
+                var worksheet = package.Workbook.Worksheets[0];
+
+                for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+                {
+                    // Create an instance of TEntity using the provided mapping function
+                    var entity = mapRowFunc(worksheet);
+
+                    // Check if the entity already exists in the database
+                    var existingEntity = _context.Set<TEntity>().Find(entity);
+
+                    if (existingEntity != null)
+                    {
+                        continue;
+                    }
+
+                    // Add the entity to the context
+                    _context.Set<TEntity>().Add(entity);
+                }
+
+                // Save changes to the database
+                _context.SaveChanges();
+            }
+
+            // Commit the transaction if everything is successful
+            transaction.Commit();
+            return RedirectToAction("Index");
+        }
+        catch (DbUpdateException ex)
+        {
+            // Rollback the transaction in case of an exception
+            transaction.Rollback();
+            var errorHandlingService = new ErrorHandlingService();
+            ModelState.AddModelError("", errorHandlingService.GetFullErrorMessage(ex));
+            return View("Index");
+        }
+    }
+    */
+
 }

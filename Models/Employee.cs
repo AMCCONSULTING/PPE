@@ -4,14 +4,13 @@ using PPE.Data.Enums;
 
 namespace PPE.Models;
 
-public class Employee
+public class Employee : AuditableEntity
 {
     [Key]
     public int Id { get; set; }
     [Required]
     [DisplayName("Matricule")]
     public string Matricule { get; set; }
-    
     [Required]
     [DisplayName("First name")]
     public string FirstName { get; set; } 
@@ -26,14 +25,6 @@ public class Employee
     public string? Phone { get; set; }
     public string? Tel { get; set; }
     public Gender? Gender { get; set; }
-    [DisplayName("Created at")]
-    public DateTime? CreatedAt { get; set; }
-    [DisplayName("Updated at")]
-    public DateTime? UpdatedAt { get; set; }
-    [DisplayName("Updated by")]
-    public string? UpdatedBy { get; set; }
-    [DisplayName("Created by")]
-    public string? CreatedBy { get; set; }
     
     [DisplayName("Is active")]
     public bool IsActive { get; set; } = true;

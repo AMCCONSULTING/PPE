@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class PayableStock
+public class PayableStock : AuditableEntity
 {
     public int Id { get; set; }
     public int EmployeeId { get; set; }

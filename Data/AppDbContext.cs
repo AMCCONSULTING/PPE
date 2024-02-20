@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using PPE.Data.Services;
 using PPE.Models;
 using Attribute = PPE.Models.Attribute;
 
@@ -6,9 +9,79 @@ namespace PPE.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private string? _user;
+    private string? _userAsync;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, IHttpContextAccessor httpContextAccessor, UserResolverService userService, UserResolverService userServiceAsync) : base(options)
     {
-        
+        _httpContextAccessor = httpContextAccessor;
+        _user = userService.GetUser();
+        _userAsync = userServiceAsync.GetUserAsync().Result;
+    }
+    
+    public override int SaveChanges()
+    {
+        var entries = ChangeTracker.Entries().Where(e => e.Entity is AuditableEntity && (
+            e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        foreach (var entry in entries)
+        {
+            var entity = (AuditableEntity)entry.Entity;
+            var now = DateTime.Now;
+
+            if (entry.State == EntityState.Added)
+            {
+                entity.CreatedAt = now;
+                entity.CreatedBy = _user;
+            }
+            else
+            {
+                entity.UpdatedAt = now;
+                entity.UpdatedBy = _user;
+            }
+        }
+
+        return base.SaveChanges();
+    }
+    
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker.Entries().Where(e => e.Entity is AuditableEntity && (
+            e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        foreach (var entry in entries)
+        {
+            var entity = (AuditableEntity)entry.Entity;
+            var now = DateTime.UtcNow;
+
+            if (entry.State == EntityState.Added)
+            {
+                entity.CreatedAt = now;
+                entity.CreatedBy = _user;
+            }
+
+            entity.UpdatedAt = now;
+            entity.UpdatedBy = _user;
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private Task<string?> GetCurrentUserIdAsync()
+    {
+        // Access the current user's ID from the HttpContext
+        var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
+
+        return Task.FromResult(userId);
+    }
+
+    private string? GetCurrentUserId()
+    {
+        // Access the current user's ID from the HttpContext
+        var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
+
+        return userId;
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -50,9 +123,6 @@ public class AppDbContext : DbContext
             .HasOne(av => av.Attribute)
             .WithMany(es => es.AttributeValues)
             .HasForeignKey(es => es.AttributeId);
-        
-        
-        
     }
     
     public DbSet<Category> Categories { get; set; }

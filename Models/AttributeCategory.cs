@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class AttributeCategory
+public class AttributeCategory : AuditableEntity
 {
     public int Id { get; set; }
 

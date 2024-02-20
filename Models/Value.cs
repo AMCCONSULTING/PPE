@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class Value
+public class Value : AuditableEntity
 {
     public int Id { get; set; }
     public string Text { get; set; }

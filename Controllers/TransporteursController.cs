@@ -59,6 +59,18 @@ namespace PPE.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,EmployeeId")] Transporteur transporteur)
         {
+           // if employeeId is already a transporteur, set error message to "Employee is already a transporteur"
+           if (_context.Transporteurs.Any(t => t.EmployeeId == transporteur.EmployeeId))
+            {
+                ModelState.AddModelError("EmployeeId", "Employee is already a transporteur");
+            }
+           
+           // if employeeId is null, set error message to "Employee is required"
+           if (transporteur.EmployeeId == 0)
+           {
+               ModelState.AddModelError("EmployeeId", "Employee is required");
+           }
+           
             if (ModelState.IsValid)
             {
                 _context.Add(transporteur);

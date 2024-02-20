@@ -96,20 +96,6 @@ namespace PPE.Controllers
                         mouvements = mouvements.Where(e => e.Reference.Contains(Request.Query[key].ToString()));
                         recordsFilterd = mouvements.Count();
                     }
-                    /*if (key == "filters[date-from]" && !string.IsNullOrEmpty(Request.Query[key]))
-                    {
-                        DateTime filterDate = DateTime.Parse(Request.Query[key]).Date;
-                        mouvements = mouvements.Where(e => e.Date.Date == filterDate);
-                       // stokes = stokes.Where(e => e.Date == DateTime.Parse(Request.Query[key]));
-                        recordsFilterd = mouvements.Count();
-                    }
-                    if ((key == "filters[date-from]" && key == "filters[date-to]")  && !string.IsNullOrEmpty(Request.Query[key]))
-                    {
-                        DateTime filterDateStart = DateTime.Parse(Request.Query[key]).Date;
-                        DateTime filterDateEnd = DateTime.Parse(Request.Query[key]).Date;
-                        mouvements = mouvements.Where(e => e.Date.Date >= filterDateStart && e.Date.Date <= filterDateEnd);
-                        recordsFilterd = mouvements.Count();
-                    }*/
                     
                     if (key == "filters[startDate]" && !string.IsNullOrEmpty(Request.Query[key]))
                     {
@@ -259,47 +245,53 @@ namespace PPE.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,Reference,EmployeeId,Document,CoordinatorId,MagasinierId,Type")] Dotation dotation)
+        public async Task<IActionResult> Create([Bind("Id,Date,Reference,EmployeeId,Document,CoordinatorId,MagasinierId,Type,IsFromStock")] Dotation dotation)
         {
+            //dotation.IsFromStock
+
+           // return Json(dotation);
+            
             var lastDotation = _context.Dotations
                 .OrderByDescending(d => d.Id)
                 .FirstOrDefault();
 
-            if (lastDotation == null)
+            dotation.Reference = lastDotation == null ? $"{DateTime.Now.Year}-DOT{1:0000}-EMP{dotation.EmployeeId}" : $"{DateTime.Now.Year}-DOT{lastDotation.Id + 1:0000}-EMP{dotation.EmployeeId}";
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                dotation.Reference = $"{DateTime.Now.Year}-DOT{1:0000}-EMP{dotation.EmployeeId}";
-            } else
-            {
-                dotation.Reference = $"{DateTime.Now.Year}-DOT{lastDotation.Id + 1:0000}-EMP{dotation.EmployeeId}";
-            }
-            
-            if (ModelState.IsValid)
-            {
-                var newDotation = new Dotation
+                if (ModelState.IsValid)
                 {
-                    Date = dotation.Date,
-                    Reference = dotation.Reference,
-                    EmployeeId = dotation.EmployeeId,
-                    //ResponsibleId = dotation.ResponsibleId,
-                    CoordinatorId = dotation.CoordinatorId,
-                    //TransporterId = dotation.TransporterId,
-                    MagasinierId = dotation.MagasinierId,
-                    Type = dotation.Type,
-                    Document = dotation.Document
-                };
+                    var newDotation = new Dotation
+                    {
+                        Date = dotation.Date,
+                        Reference = dotation.Reference,
+                        EmployeeId = dotation.EmployeeId,
+                        CoordinatorId = dotation.CoordinatorId,
+                        MagasinierId = dotation.MagasinierId,
+                        Type = dotation.Type,
+                        Document = dotation.Document,
+                        IsFromStock = dotation.IsFromStock
+                    };
                 
-                _context.Add(newDotation);
-                await _context.SaveChangesAsync();
-                
-              //  return Json(new { success = true, message = "Dotation created successfully", newDotation = newDotation.Id , id = dotation.Id});
-                return RedirectToAction("AddDotationDetails", new { id = newDotation.Id });
+                    var entry = _context.Entry(newDotation);
+                    if (entry.State != EntityState.Added)
+                    {
+                        _context.Entry(newDotation).State = EntityState.Added;
+                    }
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("AddDotationDetails", new { id = newDotation.Id });
+                }
+            } 
+            catch (Exception e)
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine(e);
+                throw;
             }
             
             ViewData["CoordinatorId"] = new SelectList(_context.Coordinateurs, "Id", "Id", dotation.CoordinatorId);
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", dotation.EmployeeId);
             ViewData["MagasinierId"] = new SelectList(_context.Magaziniers, "Id", "Id", dotation.MagasinierId);
-            /*ViewData["ResponsibleId"] = new SelectList(_context.Responsables, "Id", "Id", dotation.ResponsibleId);
-            ViewData["TransporterId"] = new SelectList(_context.Transporteurs, "Id", "Id", dotation.TransporterId);*/
             return View(dotation);
         }
 
@@ -433,7 +425,7 @@ namespace PPE.Controllers
                 .FirstOrDefault(d => d.Id == id);
             if (dotation == null)
             {
-                return Json(new { success = false, message = "Dotation not found" });
+                //return Json(new { success = false, message = "Dotation not found" });
                 return NotFound();
             }
             
@@ -454,7 +446,25 @@ namespace PPE.Controllers
                 .FirstOrDefault(d => d.Id == id);
             
             //return Json(new { articles = articles, quantities = quantities });
-            
+
+            if (dotation.IsFromStock)
+            {
+                return Json(
+                    new
+                    {
+                        success = false,
+                        message = "This dotation is from the stock normal",
+                    });
+            }
+            else
+            {
+                return Json(new
+                {
+                    success = true,
+                    message = "This dotation is from project stock",
+                });
+            }
+
             if (ModelState.IsValid)
             {
                 if (dotation == null)
@@ -485,8 +495,6 @@ namespace PPE.Controllers
                         {
                             if (employeeStock == null)
                             {
-                                // the employee doesn't have this article in his stock
-                                // we add it to his stock and subtract it from the project stock
                                 var newEmployeeStock = new StockEmployee
                                 {
                                     ArticleId = articles[i],
@@ -562,8 +570,7 @@ namespace PPE.Controllers
                     await transaction.RollbackAsync();
                     return Json(new
                     {
-                        message = // the error message
-                            e.Message,
+                        message = e.Message,
                     });
                     Console.WriteLine(e);
                     

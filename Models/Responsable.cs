@@ -1,6 +1,6 @@
 ﻿namespace PPE.Models;
 
-public class Responsable
+public class Responsable : AuditableEntity
 {
     public int Id { get; set; }
     public int EmployeeId { get; set; }

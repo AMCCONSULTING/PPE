@@ -18,7 +18,10 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row">
                 <div class="form-group col-12 col-md-6">
-                    <label asp-for="Date" class="control-label"></label>
+                    <label class="control-label">
+                        @Html.DisplayNameFor(model => model.Date)
+                        <span class="text-danger">*</span>
+                    </label>
                     <input asp-for="Date" class="form-control" type="date"/>
                     <span asp-validation-for="Date" class="text-danger"></span>
                 </div>
@@ -28,7 +31,10 @@
                     <span asp-validation-for="Document" class="text-danger"></span>
                 </div>
                 <div class="form-group col-12 col-md-6">
-                    <label asp-for="ResponsableId" class="control-label"></label>
+                    <label class="control-label">
+                        @Html.DisplayNameFor(model => model.ResponsableId)
+                        <span class="text-danger">*</span>
+                    </label>
                     <select asp-for="ResponsableId"
                             class="form-control select2"
                             data-placeholder="Select a Responsable"
